@@ -3,6 +3,7 @@ package DAO;
 import Conexion.ConexionDB;
 import Enumerados.ClasificacionEdad;
 import Enumerados.GeneroAudiovisual;
+import Interfaces.BajaLogicaEnDao;
 import Modelo.Pelicula;
 
 import java.sql.Connection;
@@ -12,7 +13,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class PeliculaDao extends CRUDBase<Pelicula> {
+public class PeliculaDao implements BajaLogicaEnDao<Pelicula> {
 
     @Override
     public int crear(Pelicula obj) throws SQLException {
@@ -92,6 +93,20 @@ public class PeliculaDao extends CRUDBase<Pelicula> {
     }
 
     @Override
+    public int eliminar(int id) throws SQLException {
+        String query = "Delete from peliculas where id_pelicula = ?";
+        int result = 0;
+
+        try(Connection cn = ConexionDB.conectar();
+            PreparedStatement ps = cn.prepareStatement(query)) {
+
+            ps.setInt(1, id);
+
+            result = ps.executeUpdate();
+        }
+        return result;
+    }
+
     public int bajaLogica(int id, boolean baja) throws SQLException {
         String query = "Update peliculas set baja = ? where id_pelicula = ?";
         int result = 0;

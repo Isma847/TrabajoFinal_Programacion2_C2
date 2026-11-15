@@ -1,6 +1,6 @@
 package Service;
 
-import DAO.CRUDBase;
+import Interfaces.BajaLogicaEnDao;
 import Interfaces.TieneBaja;
 
 import java.sql.SQLException;
@@ -10,10 +10,10 @@ import java.util.Map;
 
 public abstract class Service<T extends TieneBaja> {
 
-    protected final CRUDBase<T> dao;
+    protected final BajaLogicaEnDao<T> dao;
     protected final Map<Integer, T> coleccion = new LinkedHashMap<>();
 
-    protected Service(CRUDBase<T> dao) throws SQLException {
+    protected Service(BajaLogicaEnDao<T> dao) throws SQLException {
         this.dao = dao;
         cargar();
     }

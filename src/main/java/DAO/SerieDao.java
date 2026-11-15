@@ -3,6 +3,7 @@ package DAO;
 import Conexion.ConexionDB;
 import Enumerados.ClasificacionEdad;
 import Enumerados.GeneroAudiovisual;
+import Interfaces.BajaLogicaEnDao;
 import Modelo.Serie;
 
 import java.sql.Connection;
@@ -12,7 +13,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class SerieDao extends CRUDBase<Serie> {
+public class SerieDao implements BajaLogicaEnDao<Serie>{
 
     @Override
     public int crear(Serie obj) throws SQLException {
@@ -63,8 +64,8 @@ public class SerieDao extends CRUDBase<Serie> {
                         GeneroAudiovisual.valueOf(rs.getString("genero")),
                         rs.getInt("id_director"),
                         rs.getInt("id_serie"),
-                        rs.getInt("cantCapitulos"),
-                        rs.getInt("cantTemporadas")
+                        rs.getInt("cantidadCapitulos"),
+                        rs.getInt("cantidadTemporadas")
                 );
                 series.add(serie);
             }
@@ -74,7 +75,7 @@ public class SerieDao extends CRUDBase<Serie> {
 
     @Override
     public int actualizar(Serie obj) throws SQLException {
-        String query = "Update series set nombre = ?, duracionMinutos = ?, clasificacion = ?, genero = ?, id_director = ?, cantCapitulos = ?, cantTemporadas = ? where id_serie = ?";
+        String query = "Update series set nombre = ?, duracionMinutos = ?, clasificacion = ?, genero = ?, id_director = ?, cantidadCapitulos = ?, cantidadTemporadas = ? where id_serie = ?";
         int result = 0;
 
         try(Connection cn = ConexionDB.conectar();
@@ -95,6 +96,20 @@ public class SerieDao extends CRUDBase<Serie> {
     }
 
     @Override
+    public int eliminar(int id) throws SQLException {
+        String query = "Delete from series where id_serie = ?";
+        int result = 0;
+
+        try(Connection cn = ConexionDB.conectar();
+            PreparedStatement ps = cn.prepareStatement(query)) {
+
+            ps.setInt(1, id);
+
+            result = ps.executeUpdate();
+        }
+        return result;
+    }
+
     public int bajaLogica(int id, boolean baja) throws SQLException {
         String query = "Update series set baja = ? where id_serie = ?";
         int result = 0;
