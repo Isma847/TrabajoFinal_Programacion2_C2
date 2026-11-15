@@ -3,67 +3,39 @@ package Modelo;
 import Enumerados.ClasificacionEdad;
 import Enumerados.GeneroVideojuegos;
 
-import java.util.Objects;
-
 public class Videojuego extends ContenidoMultimedia {
+    private int dificultad;
+    private GeneroVideojuegos genero;
 
-    private static int contador = 0;
-
-    private int ID;
-    private int Dificultad;
-    private GeneroVideojuegos Genero;
-
-    public Videojuego(boolean accesible, ClasificacionEdad clasificaion, int duracionHoras, int duracionMinutos, int duracionSegundos, String nombre, int dificultad, GeneroVideojuegos genero, int ID) {
-        super(accesible, clasificaion, duracionHoras, duracionMinutos, duracionSegundos, nombre);
-        Dificultad = dificultad;
-        Genero = genero;
-        contador++;
-        this.ID = contador;
+    public Videojuego(boolean baja, ClasificacionEdad clasificaion, int duracionMinutos, String nombre, int id, int dificultad, GeneroVideojuegos genero) {
+        super(baja, clasificaion, duracionMinutos, nombre, id);
+        this.dificultad = dificultad;
+        this.genero = genero;
     }
 
-
-    public Videojuego(int ID) {
-        contador++;
-        this.ID = contador;
-    }
+    public Videojuego() { }
 
     public int getDificultad() {
-        return Dificultad;
+        return dificultad;
     }
 
     public void setDificultad(int dificultad) {
-        Dificultad = dificultad;
+        this.dificultad = dificultad;
     }
 
     public GeneroVideojuegos getGenero() {
-        return Genero;
+        return genero;
     }
 
     public void setGenero(GeneroVideojuegos genero) {
-        Genero = genero;
-    }
-
-    public int getID() {
-        return ID;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof Videojuego that)) return false;
-        return ID == that.ID;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(ID);
+        this.genero = genero;
     }
 
     @Override
     public String toString() {
         return "Videojuegos{" +
-                "Dificultad=" + Dificultad +
-                ", ID=" + ID +
-                ", Genero=" + Genero +
+                "Dificultad=" + dificultad +
+                ", Genero=" + genero +
                 "} " + super.toString();
     }
 }

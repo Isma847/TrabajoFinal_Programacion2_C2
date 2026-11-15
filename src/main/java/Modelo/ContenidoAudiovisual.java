@@ -3,15 +3,13 @@ package Modelo;
 import Enumerados.ClasificacionEdad;
 import Enumerados.GeneroAudiovisual;
 
-import java.util.Objects;
-
-public class ContenidoAudiovisual extends ContenidoMultimedia {
-    private GeneroAudiovisual Genero;
+public abstract class ContenidoAudiovisual extends ContenidoMultimedia {
+    private GeneroAudiovisual genero;
     private int idDirector;
 
     public ContenidoAudiovisual(boolean baja, ClasificacionEdad clasificaion, int duracionMinutos, String nombre, GeneroAudiovisual genero, int idDirector, int id) {
         super(baja, clasificaion, duracionMinutos, nombre, id);
-        Genero = genero;
+        this.genero = genero;
         this.idDirector = idDirector;
     }
 
@@ -26,29 +24,18 @@ public class ContenidoAudiovisual extends ContenidoMultimedia {
     }
 
     public GeneroAudiovisual getGenero() {
-        return Genero;
+        return genero;
     }
 
     public void setGenero(GeneroAudiovisual genero) {
-        Genero = genero;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof ContenidoAudiovisual that)) return false;
-        return this.getId() == that.getId();
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(getId());
+        this.genero = genero;
     }
 
     @Override
     public String toString() {
         return "ContenidoAudiovisual{" +
                 "director=" + idDirector +
-                ", Genero=" + Genero +
+                ", Genero=" + genero +
                 "} " + super.toString();
     }
 }

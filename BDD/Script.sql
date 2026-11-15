@@ -33,6 +33,7 @@ CREATE TABLE IF NOT EXISTS directores (
 
 CREATE TABLE IF NOT EXISTS series (
 	id_serie INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(80) NOT NULL,
     duracionMinutos INT NOT NULL,
     clasificacion VARCHAR(30) NOT NULL,
     baja BOOLEAN NOT NULL DEFAULT FALSE,
@@ -41,13 +42,14 @@ CREATE TABLE IF NOT EXISTS series (
     genero VARCHAR(30) NOT NULL,
     
     cantidadCapitulos INT NOT NULL,
-    cantTemporadas INT NOT NULL,
+    cantidadTemporadas INT NOT NULL,
     
     CONSTRAINT fk_director_series FOREIGN KEY (id_director) REFERENCES directores(id_director)
 );
 
 CREATE TABLE IF NOT EXISTS peliculas (
 	id_pelicula INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(80) NOT NULL,
     duracionMinutos INT NOT NULL,
     clasificacion VARCHAR(30) NOT NULL,
     baja BOOLEAN NOT NULL DEFAULT FALSE,
@@ -62,6 +64,7 @@ CREATE TABLE IF NOT EXISTS peliculas (
 
 CREATE TABLE IF NOT EXISTS videojuegos (
 	id_videojuego INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(80) NOT NULL,
     duracionMinutos INT NOT NULL,
     clasificacion VARCHAR(30) NOT NULL,
     baja BOOLEAN NOT NULL DEFAULT FALSE,
@@ -72,6 +75,7 @@ CREATE TABLE IF NOT EXISTS videojuegos (
 
 CREATE TABLE IF NOT EXISTS resenas (
 	id_resena INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT NOT NULL,
     calificacion INT NOT NULL,
     comentario TEXT,
     fecha VARCHAR(10) NOT NULL

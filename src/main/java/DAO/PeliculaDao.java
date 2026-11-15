@@ -25,7 +25,7 @@ public class PeliculaDao extends CRUDBase<Pelicula> {
 
             psInsert.setString(1, obj.getNombre());
             psInsert.setInt(2, obj.getDuracionMinutos());
-            psInsert.setString(3, obj.getClasificaion().name());
+            psInsert.setString(3, obj.getClasificacionEdad().name());
             psInsert.setBoolean(4, obj.getBaja());
             psInsert.setString(5, obj.getGenero().name());
             psInsert.setInt(6, obj.getIdDirector());
@@ -45,7 +45,7 @@ public class PeliculaDao extends CRUDBase<Pelicula> {
     }
 
     @Override
-    public Collection<Pelicula> leer() throws SQLException {
+    public Collection<Pelicula> leerTodos() throws SQLException {
         String query = "Select * from peliculas";
         ArrayList<Pelicula> peliculas = new ArrayList<>();
 
@@ -80,7 +80,7 @@ public class PeliculaDao extends CRUDBase<Pelicula> {
 
             ps.setString(1, obj.getNombre());
             ps.setInt(2, obj.getDuracionMinutos());
-            ps.setString(3, obj.getClasificaion().name());
+            ps.setString(3, obj.getClasificacionEdad().name());
             ps.setString(4, obj.getGenero().name());
             ps.setInt(5, obj.getIdDirector());
             ps.setString(6, obj.getFechaEstreno());
@@ -92,7 +92,7 @@ public class PeliculaDao extends CRUDBase<Pelicula> {
     }
 
     @Override
-    public int eliminar(int id, boolean baja) throws SQLException {
+    public int bajaLogica(int id, boolean baja) throws SQLException {
         String query = "Update peliculas set baja = ? where id_pelicula = ?";
         int result = 0;
 

@@ -1,18 +1,20 @@
 package Modelo;
 
 import Enumerados.ClasificacionEdad;
+import Interfaces.TieneBaja;
 
-public class ContenidoMultimedia {
+import java.util.Objects;
 
+public abstract class ContenidoMultimedia implements Comparable<ContenidoMultimedia>, TieneBaja {
     private int id;
     private String nombre;
     private int duracionMinutos;
-    private ClasificacionEdad clasificaion;
+    private ClasificacionEdad clasificacionEdad;
     private boolean baja = false;
 
-    public ContenidoMultimedia(boolean baja, ClasificacionEdad clasificaion, int duracionMinutos, String nombre, int id) {
+    public ContenidoMultimedia(boolean baja, ClasificacionEdad clasificacionEdad, int duracionMinutos, String nombre, int id) {
         this.baja = baja;
-        this.clasificaion = clasificaion;
+        this.clasificacionEdad = clasificacionEdad;
         this.duracionMinutos = duracionMinutos;
         this.nombre = nombre;
         this.id = id;
@@ -20,20 +22,22 @@ public class ContenidoMultimedia {
 
     public ContenidoMultimedia() {}
 
+    @Override
     public boolean getBaja() {
         return baja;
     }
 
-    public void setBaja(boolean accesible) {
-        baja = accesible;
+    @Override
+    public void setBaja(boolean baja) {
+        this.baja = baja;
     }
 
-    public ClasificacionEdad getClasificaion() {
-        return clasificaion;
+    public ClasificacionEdad getClasificacionEdad() {
+        return clasificacionEdad;
     }
 
-    public void setClasificaion(ClasificacionEdad clasificaion) {
-        clasificaion = clasificaion;
+    public void setClasificacionEdad(ClasificacionEdad clasificacionEdad) {
+        this.clasificacionEdad = clasificacionEdad;
     }
 
     public int getDuracionMinutos() {
@@ -41,7 +45,7 @@ public class ContenidoMultimedia {
     }
 
     public void setDuracionMinutos(int duracionMinutos) {
-        duracionMinutos = duracionMinutos;
+        this.duracionMinutos = duracionMinutos;
     }
 
     public String getNombre() {
@@ -52,10 +56,12 @@ public class ContenidoMultimedia {
         this.nombre = nombre;
     }
 
+    @Override
     public int getId() {
         return id;
     }
 
+    @Override
     public void setId(int id) {
         this.id = id;
     }
@@ -63,9 +69,25 @@ public class ContenidoMultimedia {
     @Override
     public String toString() {
         return "ContenidoMultimedia{" +
-                "Clasificaion=" + clasificaion +
+                "Clasificaion=" + clasificacionEdad +
                 ", DuracionMinutos=" + duracionMinutos +
                 ", nombre='" + nombre + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        return id == ((ContenidoMultimedia) o).id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getClass(), id);
+    }
+
+    @Override
+    public int compareTo(ContenidoMultimedia o) {
+        return Integer.compare(this.id, o.getId());
     }
 }

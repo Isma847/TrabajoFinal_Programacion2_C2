@@ -3,9 +3,7 @@ package Modelo;
 import Enumerados.ClasificacionEdad;
 import Enumerados.GeneroAudiovisual;
 
-import java.util.Objects;
-
-public class Pelicula extends ContenidoAudiovisual implements Comparable<Pelicula>{
+public class Pelicula extends ContenidoAudiovisual {
 
     private String fechaEstreno;
 
@@ -29,23 +27,5 @@ public class Pelicula extends ContenidoAudiovisual implements Comparable<Pelicul
         return "Pelicula{" +
                 "fechaEstreno='" + fechaEstreno + '\'' +
                 "} " + super.toString();
-    }
-
-    @Override
-    public int compareTo(Pelicula o) {
-        return Integer.compare(this.getId(), o.getId());
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-        Pelicula pelicula = (Pelicula) o;
-        return Objects.equals(getId(), pelicula.getId());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), getId());
     }
 }

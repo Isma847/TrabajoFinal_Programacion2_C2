@@ -5,7 +5,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class ConexionDB {
-    private static final String URL = "jdbc:mysql://localhost:3306/Temuflix";
+    private static final String URL = "jdbc:mysql://localhost:3306/temuflix";
     private static final String USUARIO = "root";
     private static final String PASSWORD = "1234";
 
