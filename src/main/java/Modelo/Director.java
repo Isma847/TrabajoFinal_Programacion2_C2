@@ -8,9 +8,6 @@ public class Director extends Persona {
         this.descripcion = descripcion;
 
     }
-    public void setDescripcion(String descripcion){
-        this.descripcion =descripcion;
-    }
     public String getDescripcion() {
         return descripcion;
     }
