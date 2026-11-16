@@ -77,10 +77,12 @@ CREATE TABLE IF NOT EXISTS resenas (
     -- id_contenido es un campo polimorfico para simplificar
     -- pero en un programa real deberían usarse varias tablas con FK
     id_contenido INT NOT NULL,
+    id_usuario INT NOT NULL,
     tipo VARCHAR(10) NOT NULL,
     calificacion INT NOT NULL,
     comentario TEXT,
     fecha VARCHAR(10) NOT NULL,
+    constraint fk_usuario_resena FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE,
     constraint ck_tipo_resena CHECK (tipo IN ('SERIE', 'JUEGO', 'PELICULA'))
 );
 
