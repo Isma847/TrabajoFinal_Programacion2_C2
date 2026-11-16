@@ -2,6 +2,7 @@ package Service;
 
 import DAO.PeliculaDao;
 import Enumerados.GeneroAudiovisual;
+import Excepciones.DatoInvalidoException;
 import Modelo.Pelicula;
 
 import java.sql.SQLException;
@@ -16,10 +17,10 @@ public class PeliculaService extends Service<Pelicula> {
     @Override
     protected void validar(Pelicula p) {
         if(p.getGenero() == null) {
-            throw new IllegalArgumentException("El género es obligatorio");
+            throw new DatoInvalidoException("El género es obligatorio");
         }
         if(p.getClasificacionEdad() == null) {
-            throw new IllegalArgumentException("El clasificacion es obligatorio");
+            throw new DatoInvalidoException("El clasificacion es obligatorio");
         }
     }
 
@@ -31,5 +32,14 @@ public class PeliculaService extends Service<Pelicula> {
             }
         }
         return resultado;
+    }
+
+    // Se llama despues de eliminar un director desde la clase de sistema
+    public void quitarDirector(int idDirector) {
+        for(Pelicula p : coleccion.values()) {
+            if(p.getIdDirector() == idDirector) {
+                p.setIdDirector(0);
+            }
+        }
     }
 }

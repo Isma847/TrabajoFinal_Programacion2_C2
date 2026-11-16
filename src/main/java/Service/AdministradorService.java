@@ -1,6 +1,7 @@
 package Service;
 
 import DAO.AdministradorDao;
+import Excepciones.DatoInvalidoException;
 import Modelo.Administrador;
 
 import java.sql.SQLException;
@@ -68,12 +69,10 @@ public class AdministradorService {
 
     private void validar(Administrador administrador) {
         if (administrador == null) {
-            throw new IllegalArgumentException("El administrador es obligatorio");
+            throw new DatoInvalidoException("El administrador es obligatorio");
         }
         if (administrador.getBaja()) {
-            throw new IllegalArgumentException(
-                    "El esquema actual solo permite guardar administradores activos"
-            );
+            throw new DatoInvalidoException("El esquema actual solo permite guardar administradores activos");
         }
 
         validarTexto(administrador.getNombre(), "nombre");
@@ -85,7 +84,7 @@ public class AdministradorService {
 
     private void validarTexto(String valor, String campo) {
         if (valor == null || valor.trim().isEmpty()) {
-            throw new IllegalArgumentException("El campo " + campo + " es obligatorio");
+            throw new DatoInvalidoException("El campo " + campo + " es obligatorio");
         }
     }
 

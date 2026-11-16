@@ -1,6 +1,7 @@
 package Service;
 
 import DAO.UsuarioDao;
+import Excepciones.DatoInvalidoException;
 import Modelo.Usuario;
 
 import java.sql.SQLException;
@@ -68,12 +69,10 @@ public class UsuarioService {
 
     private void validar(Usuario usuario) {
         if (usuario == null) {
-            throw new IllegalArgumentException("El usuario es obligatorio");
+            throw new DatoInvalidoException("El usuario es obligatorio");
         }
         if (usuario.getBaja()) {
-            throw new IllegalArgumentException(
-                    "El esquema actual solo permite guardar usuarios activos"
-            );
+            throw new DatoInvalidoException("El esquema actual solo permite guardar usuarios activos");
         }
 
         validarTexto(usuario.getNombre(), "nombre", 80);
@@ -85,7 +84,7 @@ public class UsuarioService {
 
     private void validarTexto(String valor, String campo, int maximo) {
         if (valor == null || valor.isBlank() || valor.codePointCount(0, valor.length()) > maximo) {
-            throw new IllegalArgumentException("El campo " + campo + " debe tener entre 1 y "
+            throw new DatoInvalidoException("El campo " + campo + " debe tener entre 1 y "
                     + maximo + " caracteres");
         }
     }

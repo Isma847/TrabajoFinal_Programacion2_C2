@@ -1,6 +1,7 @@
 package Service;
 
 import DAO.DirectorDao;
+import Excepciones.DatoInvalidoException;
 import Modelo.Director;
 
 import java.sql.SQLException;
@@ -68,17 +69,17 @@ public class DirectorService {
 
     private void validar(Director director) {
         if (director == null) {
-            throw new IllegalArgumentException("El director es obligatorio");
+            throw new DatoInvalidoException("El director es obligatorio");
         }
 
         String nombre = director.getNombre();
         if (nombre == null || nombre.isBlank() || nombre.codePointCount(0, nombre.length()) > 80) {
-            throw new IllegalArgumentException("El nombre debe tener entre 1 y 80 caracteres");
+            throw new DatoInvalidoException("El nombre debe tener entre 1 y 80 caracteres");
         }
 
         String apellido = director.getApellido();
         if (apellido == null || apellido.isBlank() || apellido.codePointCount(0, apellido.length()) > 80) {
-            throw new IllegalArgumentException("El apellido debe tener entre 1 y 80 caracteres");
+            throw new DatoInvalidoException("El apellido debe tener entre 1 y 80 caracteres");
         }
     }
 
