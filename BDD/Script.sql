@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS series (
     clasificacion VARCHAR(30) NOT NULL,
     baja BOOLEAN NOT NULL DEFAULT FALSE,
 
-    id_director INT NOT NULL,
+    id_director INT,
     genero VARCHAR(30) NOT NULL,
 
     cantidadCapitulos INT NOT NULL,
@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS peliculas (
     clasificacion VARCHAR(30) NOT NULL,
     baja BOOLEAN NOT NULL DEFAULT FALSE,
 
-    id_director INT NOT NULL,
+    id_director INT,
     genero VARCHAR(30) NOT NULL,
 
     fechaEstreno VARCHAR(10) NOT NULL,
@@ -74,9 +74,14 @@ CREATE TABLE IF NOT EXISTS videojuegos (
 
 CREATE TABLE IF NOT EXISTS resenas (
     id_resena INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    -- id_contenido es un campo polimorfico para simplificar
+    -- pero en un programa real deberían usarse varias tablas con FK
+    id_contenido INT NOT NULL,
+    tipo VARCHAR(10) NOT NULL,
     calificacion INT NOT NULL,
     comentario TEXT,
-    fecha VARCHAR(10) NOT NULL
+    fecha VARCHAR(10) NOT NULL,
+    constraint ck_tipo_resena CHECK (tipo IN ('SERIE', 'JUEGO', 'PELICULA'))
 );
 
 CREATE TABLE IF NOT EXISTS favoritos (
@@ -114,4 +119,3 @@ CREATE TABLE IF NOT EXISTS progresos (
     CONSTRAINT fk_progresos_videojuego FOREIGN KEY (id_videojuego) REFERENCES videojuegos(id_videojuego) ON DELETE CASCADE,
     CONSTRAINT ck_progresos_estado CHECK (estado IN ('PENDIENTE','JUGANDO','COMPLETADO'))
 );
- 
