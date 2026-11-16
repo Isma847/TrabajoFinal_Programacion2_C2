@@ -2,6 +2,7 @@ package UI;
 
 import Enumerados.ClasificacionEdad;
 import Enumerados.GeneroAudiovisual;
+import Excepciones.DatoInvalidoException;
 import Modelo.Director;
 import Modelo.Pelicula;
 import Service.DirectorService;
@@ -29,7 +30,7 @@ public class MenuPeliculas {
             System.out.println("1. Listar");
             System.out.println("2. Consultar por ID");
             System.out.println("3. Agregar");
-            System.out.println("4. Modificar");
+            System.out.println("4. Modificar un campo");
             System.out.println("5. Dar de baja o reactivar");
             System.out.println("0. Volver");
             System.out.print("Opción: ");
@@ -46,7 +47,7 @@ public class MenuPeliculas {
                     }
                     default -> System.out.println("Opción inválida");
                 }
-            } catch (IllegalArgumentException e) {
+            } catch (IllegalArgumentException | DatoInvalidoException e) {
                 System.out.println(e.getMessage());
             } catch (SQLException e) {
                 System.err.println("No se pudo guardar el cambio. " + e.getMessage());
@@ -61,14 +62,37 @@ public class MenuPeliculas {
             return;
         }
 
+        System.out.println("ID | Nombre | Duración | Estado");
         for (Pelicula pelicula : lista) {
-            mostrarPelicula(pelicula);
+            System.out.printf("%d | %s | %d min | %s%n",
+                    pelicula.getId(), pelicula.getNombre(), pelicula.getDuracionMinutos(), estado(pelicula));
         }
     }
 
     private void mostrarPelicula(Pelicula pelicula) {
-        String estado = pelicula.getBaja() ? "De baja" : "Activa";
-        System.out.println("ID " + pelicula.getId() + " | " + estado + " | " + pelicula);
+        System.out.println("\n--- Película " + pelicula.getId() + " ---");
+        System.out.println("Nombre: " + pelicula.getNombre());
+        System.out.println("Duración: " + pelicula.getDuracionMinutos() + " min");
+        System.out.println("Clasificación: " + pelicula.getClasificacionEdad());
+        System.out.println("Género: " + pelicula.getGenero());
+        System.out.println("Director: " + nombreDirector(pelicula.getIdDirector()));
+        System.out.println("Fecha de estreno: " + pelicula.getFechaEstreno());
+        System.out.println("Estado: " + estado(pelicula));
+    }
+
+    private String estado(Pelicula pelicula) {
+        return pelicula.getBaja() ? "De baja" : "Activa";
+    }
+
+    private String nombreDirector(int id) {
+        if (id <= 0) {
+            return "Sin director";
+        }
+        Director director = directores.buscarPorId(id);
+        if (director == null) {
+            return "ID " + id;
+        }
+        return director.getNombre() + " " + director.getApellido() + " (ID " + id + ")";
     }
 
     private Pelicula pedirPelicula() {
@@ -81,7 +105,15 @@ public class MenuPeliculas {
     }
 
     private void agregar() throws SQLException {
-        Pelicula pelicula = leerDatos(0, false);
+        String nombre = leerTexto("Nombre", 100);
+        int duracion = leerEnteroPositivo("Duración en minutos");
+        ClasificacionEdad clasificacion = elegir("Clasificación", ClasificacionEdad.values());
+        GeneroAudiovisual genero = elegir("Género", GeneroAudiovisual.values());
+        int idDirector = leerDirector();
+        String fechaEstreno = leerTexto("Fecha de estreno", 10);
+
+        Pelicula pelicula = new Pelicula(false, clasificacion, duracion, nombre, genero,
+                idDirector, fechaEstreno, 0);
         if (peliculas.agregar(pelicula)) {
             System.out.println("Película agregada con ID " + pelicula.getId() + ".");
         } else {
@@ -92,13 +124,52 @@ public class MenuPeliculas {
     private void modificar() throws SQLException {
         Pelicula actual = pedirPelicula();
         mostrarPelicula(actual);
-        Pelicula modificada = leerDatos(actual.getId(), actual.getBaja());
+
+        System.out.println("\n¿Qué querés modificar?");
+        System.out.println("1. Nombre");
+        System.out.println("2. Duración");
+        System.out.println("3. Clasificación");
+        System.out.println("4. Género");
+        System.out.println("5. Director");
+        System.out.println("6. Fecha de estreno");
+        System.out.println("0. Cancelar");
+        System.out.print("Opción: ");
+
+        Pelicula modificada = copiarPelicula(actual);
+        switch (entrada.nextLine().trim()) {
+            case "1" -> modificada.setNombre(leerTexto("Nuevo nombre", 100));
+            case "2" -> modificada.setDuracionMinutos(leerEnteroPositivo("Nueva duración en minutos"));
+            case "3" -> modificada.setClasificacionEdad(elegir("Nueva clasificación", ClasificacionEdad.values()));
+            case "4" -> modificada.setGenero(elegir("Nuevo género", GeneroAudiovisual.values()));
+            case "5" -> modificada.setIdDirector(leerDirector());
+            case "6" -> modificada.setFechaEstreno(leerTexto("Nueva fecha de estreno", 10));
+            case "0" -> {
+                return;
+            }
+            default -> {
+                System.out.println("Opción inválida");
+                return;
+            }
+        }
 
         if (peliculas.modificar(modificada)) {
             System.out.println("Película modificada.");
         } else {
             System.out.println("No se pudo modificar la película.");
         }
+    }
+
+    private Pelicula copiarPelicula(Pelicula pelicula) {
+        return new Pelicula(
+                pelicula.getBaja(),
+                pelicula.getClasificacionEdad(),
+                pelicula.getDuracionMinutos(),
+                pelicula.getNombre(),
+                pelicula.getGenero(),
+                pelicula.getIdDirector(),
+                pelicula.getFechaEstreno(),
+                pelicula.getId()
+        );
     }
 
     private void cambiarEstado() throws SQLException {
@@ -112,16 +183,11 @@ public class MenuPeliculas {
         }
     }
 
-    private Pelicula leerDatos(int id, boolean baja) {
+    private int leerDirector() {
         ArrayList<Director> listaDirectores = directores.leerTodos();
         if (listaDirectores.isEmpty()) {
             throw new IllegalArgumentException("Primero cargá un director.");
         }
-
-        String nombre = leerTexto("Nombre", 100);
-        int duracion = leerEnteroPositivo("Duración en minutos");
-        ClasificacionEdad clasificacion = elegir("Clasificación", ClasificacionEdad.values());
-        GeneroAudiovisual genero = elegir("Género", GeneroAudiovisual.values());
 
         System.out.println("Directores disponibles");
         for (Director director : listaDirectores) {
@@ -132,9 +198,7 @@ public class MenuPeliculas {
         if (directores.buscarPorId(idDirector) == null) {
             throw new IllegalArgumentException("El director indicado no existe.");
         }
-
-        String fechaEstreno = leerTexto("Fecha de estreno", 10);
-        return new Pelicula(baja, clasificacion, duracion, nombre, genero, idDirector, fechaEstreno, id);
+        return idDirector;
     }
 
     private String leerTexto(String campo, int maximo) {
@@ -154,7 +218,6 @@ public class MenuPeliculas {
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException(campo + " debe ser un número entero.");
         }
-
         if (numero <= 0) {
             throw new IllegalArgumentException(campo + " debe ser mayor que cero.");
         }
