@@ -1,6 +1,7 @@
 package Service;
 
 import DAO.ResenaDao;
+import Excepciones.DatoInvalidoException;
 import Modelo.Resena;
 
 import java.sql.SQLException;
@@ -82,12 +83,12 @@ public class ResenaService {
 
     private void validar(Resena resena) {
         if (resena == null) {
-            throw new IllegalArgumentException("La reseña es obligatoria");
+            throw new DatoInvalidoException("La reseña es obligatoria");
         }
 
         String fecha = resena.getFecha();
         if (fecha == null || fecha.codePointCount(0, fecha.length()) > 10) {
-            throw new IllegalArgumentException("La fecha es obligatoria y admite hasta 10 caracteres");
+            throw new DatoInvalidoException("La fecha es obligatoria y admite hasta 10 caracteres");
         }
     }
 

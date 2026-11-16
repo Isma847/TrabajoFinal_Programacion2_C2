@@ -2,6 +2,7 @@ package Service;
 
 import DAO.VideojuegoDao;
 import Enumerados.GeneroVideojuegos;
+import Excepciones.DatoInvalidoException;
 import Modelo.Videojuego;
 
 import java.sql.SQLException;
@@ -16,7 +17,7 @@ public class VideojuegoService extends Service<Videojuego> {
     @Override
     protected void validar(Videojuego v) {
         if(v.getGenero() == null) {
-            throw new IllegalArgumentException("El genero es obligatorio");
+            throw new DatoInvalidoException("El genero es obligatorio");
         }
     }
 

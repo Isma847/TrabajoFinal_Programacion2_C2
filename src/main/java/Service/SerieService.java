@@ -2,6 +2,7 @@ package Service;
 
 import DAO.SerieDao;
 import Enumerados.GeneroAudiovisual;
+import Excepciones.DatoInvalidoException;
 import Modelo.Serie;
 
 import java.sql.SQLException;
@@ -16,7 +17,7 @@ public class SerieService extends Service<Serie> {
     @Override
     protected void validar(Serie s) {
         if(s.getGenero() == null) {
-            throw new IllegalArgumentException("El género es obligatorio");
+            throw new DatoInvalidoException("El género es obligatorio");
         }
     }
 
@@ -28,5 +29,14 @@ public class SerieService extends Service<Serie> {
             }
         }
         return resultado;
+    }
+
+    // Se llama despues de eliminar un director desde la clase de sistema
+    public void quitarDirector(int idDirector) {
+        for(Serie s : coleccion.values()) {
+            if(s.getIdDirector() == idDirector) {
+                s.setIdDirector(0);
+            }
+        }
     }
 }

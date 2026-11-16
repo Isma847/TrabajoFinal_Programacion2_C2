@@ -29,7 +29,9 @@ public class SerieDao implements BajaLogicaEnDao<Serie>{
             psInsert.setString(3, obj.getClasificacionEdad().name());
             psInsert.setBoolean(4, obj.getBaja());
             psInsert.setString(5, obj.getGenero().name());
-            psInsert.setInt(6, obj.getIdDirector());
+            // Si no tiene director (id 0) se guarda NULL para no violar la FK
+            if (obj.getIdDirector() > 0) psInsert.setInt(6, obj.getIdDirector());
+            else psInsert.setNull(6, java.sql.Types.INTEGER);
             psInsert.setInt(7, obj.getCantidadCapitulos());
             psInsert.setInt(8, obj.getCantidadTemporadas());
 
@@ -85,7 +87,9 @@ public class SerieDao implements BajaLogicaEnDao<Serie>{
             ps.setInt(2, obj.getDuracionMinutos());
             ps.setString(3, obj.getClasificacionEdad().name());
             ps.setString(4, obj.getGenero().name());
-            ps.setInt(5, obj.getIdDirector());
+            // Si no tiene director (id 0) se guarda NULL para no violar la FK
+            if (obj.getIdDirector() > 0) ps.setInt(5, obj.getIdDirector());
+            else ps.setNull(5, java.sql.Types.INTEGER);
             ps.setInt(6, obj.getCantidadCapitulos());
             ps.setInt(7, obj.getCantidadTemporadas());
             ps.setInt(8, obj.getId());

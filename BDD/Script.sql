@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS series (
 
     cantidadCapitulos INT NOT NULL,
     cantidadTemporadas INT NOT NULL,
-    CONSTRAINT fk_director_series FOREIGN KEY (id_director) REFERENCES directores(id_director) ON DELETE CASCADE
+    CONSTRAINT fk_director_series FOREIGN KEY (id_director) REFERENCES directores(id_director) ON DELETE SET NULL
 );
 
 CREATE TABLE IF NOT EXISTS peliculas (
@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS peliculas (
     genero VARCHAR(30) NOT NULL,
 
     fechaEstreno VARCHAR(10) NOT NULL,
-    CONSTRAINT fk_director_peliculas FOREIGN KEY (id_director) REFERENCES directores(id_director) ON DELETE CASCADE
+    CONSTRAINT fk_director_peliculas FOREIGN KEY (id_director) REFERENCES directores(id_director) ON DELETE SET NULL
 );
 
 CREATE TABLE IF NOT EXISTS videojuegos (
