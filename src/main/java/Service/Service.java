@@ -72,6 +72,18 @@ public abstract class Service<T extends TieneBaja> {
         return false;
     }
 
+    public boolean eliminar(int id) throws SQLException {
+        T obj = coleccion.get(id);
+        if(obj == null) {
+            return false;
+        }
+        if(dao.eliminar(id) > 0) {
+            coleccion.remove(id);
+            return true;
+        }
+        return false;
+    }
+
     public ArrayList<T> leerTodos() {
         return new ArrayList<>(coleccion.values());
     }
