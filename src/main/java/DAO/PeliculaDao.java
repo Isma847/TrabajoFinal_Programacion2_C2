@@ -17,7 +17,7 @@ public class PeliculaDao implements BajaLogicaEnDao<Pelicula> {
 
     @Override
     public int crear(Pelicula obj) throws SQLException {
-        String query = "Insert into peliculas (nombre, duracionMinutos, clasificacion, baja, genero, id_director, fechaEstreno) values (?,?,?,?,?,?,?)";
+        String query = "Insert into peliculas (nombre, duracionMinutos, clasificacion, baja, genero, id_director, fechaEstreno, descripcion) values (?,?,?,?,?,?,?,?)";
         String query_getId = "Select LAST_INSERT_ID()";
 
         try(Connection cn = ConexionDB.conectar();
@@ -33,6 +33,7 @@ public class PeliculaDao implements BajaLogicaEnDao<Pelicula> {
             if (obj.getIdDirector() > 0) psInsert.setInt(6, obj.getIdDirector());
             else psInsert.setNull(6, java.sql.Types.INTEGER);
             psInsert.setString(7, obj.getFechaEstreno());
+            psInsert.setString(8, obj.getDescripcion());
 
             psInsert.executeUpdate();
 
@@ -65,7 +66,8 @@ public class PeliculaDao implements BajaLogicaEnDao<Pelicula> {
                         GeneroAudiovisual.valueOf(rs.getString("genero")),
                         rs.getInt("id_director"),
                         rs.getString("fechaEstreno"),
-                        rs.getInt("id_pelicula")
+                        rs.getInt("id_pelicula"),
+                        rs.getString("descripcion")
                 );
                 peliculas.add(peli);
             }
@@ -89,7 +91,8 @@ public class PeliculaDao implements BajaLogicaEnDao<Pelicula> {
             if (obj.getIdDirector() > 0) ps.setInt(5, obj.getIdDirector());
             else ps.setNull(5, java.sql.Types.INTEGER);
             ps.setString(6, obj.getFechaEstreno());
-            ps.setInt(7, obj.getId());
+            ps.setString(7, obj.getDescripcion());
+            ps.setInt(8, obj.getId());
 
             result = ps.executeUpdate();
         }

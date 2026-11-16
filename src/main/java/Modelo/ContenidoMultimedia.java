@@ -10,14 +10,16 @@ public abstract class ContenidoMultimedia implements Comparable<ContenidoMultime
     private String nombre;
     private int duracionMinutos;
     private ClasificacionEdad clasificacionEdad;
+    private String descripcion;
     private boolean baja = false;
 
-    public ContenidoMultimedia(boolean baja, ClasificacionEdad clasificacionEdad, int duracionMinutos, String nombre, int id) {
+    public ContenidoMultimedia(boolean baja, ClasificacionEdad clasificacionEdad, int duracionMinutos, String nombre, int id, String descripcion) {
         this.baja = baja;
         this.clasificacionEdad = clasificacionEdad;
         this.duracionMinutos = duracionMinutos;
         this.nombre = nombre;
         this.id = id;
+        this.descripcion = descripcion;
     }
 
     public ContenidoMultimedia() {}
@@ -64,6 +66,14 @@ public abstract class ContenidoMultimedia implements Comparable<ContenidoMultime
     @Override
     public void setId(int id) {
         this.id = id;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
     }
 
     @Override

@@ -62,10 +62,10 @@ public class MenuPeliculas {
             return;
         }
 
-        System.out.println("ID | Nombre | Duración | Estado");
+        System.out.println("ID | Nombre | Duración | Estado | Descripcion");
         for (Pelicula pelicula : lista) {
-            System.out.printf("%d | %s | %d min | %s%n",
-                    pelicula.getId(), pelicula.getNombre(), pelicula.getDuracionMinutos(), estado(pelicula));
+            System.out.printf("%d | %s | %d min | %s%n | %s",
+                    pelicula.getId(), pelicula.getNombre(), pelicula.getDuracionMinutos(), estado(pelicula), pelicula.getDescripcion());
         }
     }
 
@@ -77,6 +77,7 @@ public class MenuPeliculas {
         System.out.println("Género: " + pelicula.getGenero());
         System.out.println("Director: " + nombreDirector(pelicula.getIdDirector()));
         System.out.println("Fecha de estreno: " + pelicula.getFechaEstreno());
+        System.out.println("Descripcion: " + pelicula.getDescripcion());
         System.out.println("Estado: " + estado(pelicula));
     }
 
@@ -109,11 +110,12 @@ public class MenuPeliculas {
         int duracion = leerEnteroPositivo("Duración en minutos");
         ClasificacionEdad clasificacion = elegir("Clasificación", ClasificacionEdad.values());
         GeneroAudiovisual genero = elegir("Género", GeneroAudiovisual.values());
+        String descripcion =  leerTexto("Descripcion", 600);
         int idDirector = leerDirector();
         String fechaEstreno = leerTexto("Fecha de estreno", 10);
 
         Pelicula pelicula = new Pelicula(false, clasificacion, duracion, nombre, genero,
-                idDirector, fechaEstreno, 0);
+                idDirector, fechaEstreno, 0, descripcion);
         if (peliculas.agregar(pelicula)) {
             System.out.println("Película agregada con ID " + pelicula.getId() + ".");
         } else {
@@ -132,6 +134,7 @@ public class MenuPeliculas {
         System.out.println("4. Género");
         System.out.println("5. Director");
         System.out.println("6. Fecha de estreno");
+        System.out.println("7. Descripción");
         System.out.println("0. Cancelar");
         System.out.print("Opción: ");
 
@@ -143,6 +146,7 @@ public class MenuPeliculas {
             case "4" -> modificada.setGenero(elegir("Nuevo género", GeneroAudiovisual.values()));
             case "5" -> modificada.setIdDirector(leerDirector());
             case "6" -> modificada.setFechaEstreno(leerTexto("Nueva fecha de estreno", 10));
+            case "7" -> modificada.setDescripcion(leerTexto("Nueva descripcion", 600));
             case "0" -> {
                 return;
             }
@@ -168,7 +172,8 @@ public class MenuPeliculas {
                 pelicula.getGenero(),
                 pelicula.getIdDirector(),
                 pelicula.getFechaEstreno(),
-                pelicula.getId()
+                pelicula.getId(),
+                pelicula.getDescripcion()
         );
     }
 

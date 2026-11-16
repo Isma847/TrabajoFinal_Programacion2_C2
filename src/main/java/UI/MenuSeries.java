@@ -62,11 +62,11 @@ public class MenuSeries {
             return;
         }
 
-        System.out.println("ID | Nombre | Temporadas | Capítulos | Estado");
+        System.out.println("ID | Nombre | Temporadas | Capítulos | Estado | Descripcion");
         for (Serie serie : lista) {
-            System.out.printf("%d | %s | %d | %d | %s%n",
+            System.out.printf("%d | %s | %d | %d | %s%n | %s",
                     serie.getId(), serie.getNombre(), serie.getCantidadTemporadas(),
-                    serie.getCantidadCapitulos(), estado(serie));
+                    serie.getCantidadCapitulos(), estado(serie), serie.getDescripcion());
         }
     }
 
@@ -79,6 +79,7 @@ public class MenuSeries {
         System.out.println("Director: " + nombreDirector(serie.getIdDirector()));
         System.out.println("Capítulos: " + serie.getCantidadCapitulos());
         System.out.println("Temporadas: " + serie.getCantidadTemporadas());
+        System.out.println("Descripcion: " + serie.getDescripcion());
         System.out.println("Estado: " + estado(serie));
     }
 
@@ -114,9 +115,10 @@ public class MenuSeries {
         int idDirector = leerDirector();
         int capitulos = leerEnteroPositivo("Cantidad de capítulos");
         int temporadas = leerEnteroPositivo("Cantidad de temporadas");
+        String descripcion = leerTexto("Descripción", 600);
 
         Serie serie = new Serie(false, clasificacion, duracion, nombre, genero,
-                idDirector, 0, capitulos, temporadas);
+                idDirector, 0, capitulos, temporadas, descripcion);
         if (series.agregar(serie)) {
             System.out.println("Serie agregada con ID " + serie.getId() + ".");
         } else {
@@ -136,6 +138,7 @@ public class MenuSeries {
         System.out.println("5. Director");
         System.out.println("6. Cantidad de capítulos");
         System.out.println("7. Cantidad de temporadas");
+        System.out.println("8. Descripción");
         System.out.println("0. Cancelar");
         System.out.print("Opción: ");
 
@@ -148,6 +151,7 @@ public class MenuSeries {
             case "5" -> modificada.setIdDirector(leerDirector());
             case "6" -> modificada.setCantidadCapitulos(leerEnteroPositivo("Nueva cantidad de capítulos"));
             case "7" -> modificada.setCantidadTemporadas(leerEnteroPositivo("Nueva cantidad de temporadas"));
+            case "8" -> modificada.setDescripcion(leerTexto("Descripción", 600));
             case "0" -> {
                 return;
             }
@@ -174,7 +178,8 @@ public class MenuSeries {
                 serie.getIdDirector(),
                 serie.getId(),
                 serie.getCantidadCapitulos(),
-                serie.getCantidadTemporadas()
+                serie.getCantidadTemporadas(),
+                serie.getDescripcion()
         );
     }
 

@@ -17,7 +17,7 @@ public class SerieDao implements BajaLogicaEnDao<Serie>{
 
     @Override
     public int crear(Serie obj) throws SQLException {
-        String query = "Insert into series (nombre, duracionMinutos, clasificacion, baja, genero, id_director, cantidadCapitulos, cantidadTemporadas) values (?,?,?,?,?,?,?,?)";
+        String query = "Insert into series (nombre, duracionMinutos, clasificacion, baja, genero, id_director, cantidadCapitulos, cantidadTemporadas, descripcion) values (?,?,?,?,?,?,?,?,?)";
         String query_getId = "Select LAST_INSERT_ID()";
 
         try(Connection cn = ConexionDB.conectar();
@@ -34,6 +34,7 @@ public class SerieDao implements BajaLogicaEnDao<Serie>{
             else psInsert.setNull(6, java.sql.Types.INTEGER);
             psInsert.setInt(7, obj.getCantidadCapitulos());
             psInsert.setInt(8, obj.getCantidadTemporadas());
+            psInsert.setString(9, obj.getDescripcion());
 
             psInsert.executeUpdate();
 
@@ -67,7 +68,8 @@ public class SerieDao implements BajaLogicaEnDao<Serie>{
                         rs.getInt("id_director"),
                         rs.getInt("id_serie"),
                         rs.getInt("cantidadCapitulos"),
-                        rs.getInt("cantidadTemporadas")
+                        rs.getInt("cantidadTemporadas"),
+                        rs.getString("descripcion")
                 );
                 series.add(serie);
             }
@@ -77,7 +79,7 @@ public class SerieDao implements BajaLogicaEnDao<Serie>{
 
     @Override
     public int actualizar(Serie obj) throws SQLException {
-        String query = "Update series set nombre = ?, duracionMinutos = ?, clasificacion = ?, genero = ?, id_director = ?, cantidadCapitulos = ?, cantidadTemporadas = ? where id_serie = ?";
+        String query = "Update series set nombre = ?, duracionMinutos = ?, clasificacion = ?, genero = ?, id_director = ?, cantidadCapitulos = ?, cantidadTemporadas = ?, descripcion = ? where id_serie = ?";
         int result = 0;
 
         try(Connection cn = ConexionDB.conectar();
@@ -92,7 +94,8 @@ public class SerieDao implements BajaLogicaEnDao<Serie>{
             else ps.setNull(5, java.sql.Types.INTEGER);
             ps.setInt(6, obj.getCantidadCapitulos());
             ps.setInt(7, obj.getCantidadTemporadas());
-            ps.setInt(8, obj.getId());
+            ps.setString(8, obj.getDescripcion());
+            ps.setInt(9, obj.getId());
 
             result = ps.executeUpdate();
         }

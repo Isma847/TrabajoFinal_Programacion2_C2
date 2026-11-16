@@ -8,8 +8,8 @@ public class Serie extends ContenidoAudiovisual {
     private int cantidadCapitulos;
     private int cantidadTemporadas;
 
-    public Serie(boolean baja, ClasificacionEdad clasificaion, int duracionMinutos, String nombre, GeneroAudiovisual genero, int idDirector, int id, int cantidadCapitulos, int cantidadTemporadas) {
-        super(baja, clasificaion, duracionMinutos, nombre, genero, idDirector, id);
+    public Serie(boolean baja, ClasificacionEdad clasificaion, int duracionMinutos, String nombre, GeneroAudiovisual genero, int idDirector, int id, int cantidadCapitulos, int cantidadTemporadas, String descripcion) {
+        super(baja, clasificaion, duracionMinutos, nombre, genero, idDirector, id, descripcion);
         this.cantidadCapitulos = cantidadCapitulos;
         this.cantidadTemporadas = cantidadTemporadas;
     }

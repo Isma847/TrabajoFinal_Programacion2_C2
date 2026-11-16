@@ -36,6 +36,7 @@ CREATE TABLE IF NOT EXISTS series (
     id_serie INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
     duracionMinutos INT NOT NULL,
+    descripcion VARCHAR(600),
     clasificacion VARCHAR(30) NOT NULL,
     baja BOOLEAN NOT NULL DEFAULT FALSE,
 
@@ -51,6 +52,7 @@ CREATE TABLE IF NOT EXISTS peliculas (
     id_pelicula INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
     duracionMinutos INT NOT NULL,
+    descripcion VARCHAR(600),
     clasificacion VARCHAR(30) NOT NULL,
     baja BOOLEAN NOT NULL DEFAULT FALSE,
 
@@ -65,6 +67,7 @@ CREATE TABLE IF NOT EXISTS videojuegos (
     id_videojuego INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
     duracionMinutos INT NOT NULL,
+    descripcion VARCHAR(600),
     clasificacion VARCHAR(30) NOT NULL,
     baja BOOLEAN NOT NULL DEFAULT FALSE,
 

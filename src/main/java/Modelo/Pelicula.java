@@ -7,8 +7,8 @@ public class Pelicula extends ContenidoAudiovisual {
 
     private String fechaEstreno;
 
-    public Pelicula(boolean baja, ClasificacionEdad clasificaion, int duracionMinutos, String nombre, GeneroAudiovisual genero, int idDirector, String fechaEstreno, int id) {
-        super(baja, clasificaion, duracionMinutos, nombre, genero, idDirector, id);
+    public Pelicula(boolean baja, ClasificacionEdad clasificaion, int duracionMinutos, String nombre, GeneroAudiovisual genero, int idDirector, String fechaEstreno, int id, String descripcion) {
+        super(baja, clasificaion, duracionMinutos, nombre, genero, idDirector, id, descripcion);
         this.fechaEstreno = fechaEstreno;
     }
 

@@ -16,7 +16,7 @@ import java.util.Collection;
 public class VideojuegoDao implements BajaLogicaEnDao<Videojuego> {
     @Override
     public int crear(Videojuego obj) throws SQLException {
-        String query = "Insert into videojuegos (nombre, duracionMinutos, clasificacion, baja, genero, dificultad) values (?,?,?,?,?,?)";
+        String query = "Insert into videojuegos (nombre, duracionMinutos, clasificacion, baja, genero, dificultad, descripcion) values (?,?,?,?,?,?,?)";
         String query_getId = "Select LAST_INSERT_ID()";
 
         try(Connection cn = ConexionDB.conectar();
@@ -29,6 +29,7 @@ public class VideojuegoDao implements BajaLogicaEnDao<Videojuego> {
             psInsert.setBoolean(4, obj.getBaja());
             psInsert.setString(5, obj.getGenero().name());
             psInsert.setInt(6, obj.getDificultad());
+            psInsert.setString(7, obj.getDescripcion());
 
             psInsert.executeUpdate();
 
@@ -60,7 +61,8 @@ public class VideojuegoDao implements BajaLogicaEnDao<Videojuego> {
                         rs.getString("nombre"),
                         rs.getInt("id_videojuego"),
                         rs.getInt("dificultad"),
-                        GeneroVideojuegos.valueOf(rs.getString("genero"))
+                        GeneroVideojuegos.valueOf(rs.getString("genero")),
+                        rs.getString("descripcion")
                 );
                 videojuegos.add(juego);
             }
@@ -81,7 +83,8 @@ public class VideojuegoDao implements BajaLogicaEnDao<Videojuego> {
             ps.setString(3, obj.getClasificacionEdad().name());
             ps.setString(4, obj.getGenero().name());
             ps.setInt(5, obj.getDificultad());
-            ps.setInt(6, obj.getId());
+            ps.setString(6, obj.getDescripcion());
+            ps.setInt(7, obj.getId());
 
             result = ps.executeUpdate();
         }

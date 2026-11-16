@@ -7,8 +7,8 @@ public abstract class ContenidoAudiovisual extends ContenidoMultimedia {
     private GeneroAudiovisual genero;
     private int idDirector;
 
-    public ContenidoAudiovisual(boolean baja, ClasificacionEdad clasificaion, int duracionMinutos, String nombre, GeneroAudiovisual genero, int idDirector, int id) {
-        super(baja, clasificaion, duracionMinutos, nombre, id);
+    public ContenidoAudiovisual(boolean baja, ClasificacionEdad clasificaion, int duracionMinutos, String nombre, GeneroAudiovisual genero, int idDirector, int id, String descripcion) {
+        super(baja, clasificaion, duracionMinutos, nombre, id, descripcion);
         this.genero = genero;
         this.idDirector = idDirector;
     }

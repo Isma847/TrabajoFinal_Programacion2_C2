@@ -7,8 +7,8 @@ public class Videojuego extends ContenidoMultimedia {
     private int dificultad;
     private GeneroVideojuegos genero;
 
-    public Videojuego(boolean baja, ClasificacionEdad clasificaion, int duracionMinutos, String nombre, int id, int dificultad, GeneroVideojuegos genero) {
-        super(baja, clasificaion, duracionMinutos, nombre, id);
+    public Videojuego(boolean baja, ClasificacionEdad clasificaion, int duracionMinutos, String nombre, int id, int dificultad, GeneroVideojuegos genero, String descripcion) {
+        super(baja, clasificaion, duracionMinutos, nombre, id, descripcion);
         this.dificultad = dificultad;
         this.genero = genero;
     }
