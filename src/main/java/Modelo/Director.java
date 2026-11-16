@@ -6,6 +6,10 @@ public class Director extends Persona {
     public Director(String apellido, String nombre, String descripcion) {
         super(apellido, nombre);
         this.descripcion = descripcion;
+
+    }
+    public String getDescripcion() {
+        return descripcion;
     }
 
 }
