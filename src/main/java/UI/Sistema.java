@@ -10,24 +10,29 @@ public class Sistema {
 
     private final GestionCuenta gestionCuenta;
     private final Scanner entrada;
-
-
+    private final MenuSeries menuSeries;
     private final MenuPeliculas menuPeliculas;
 
-    public Sistema(GestionCuenta gestionCuenta, Scanner entrada, MenuPeliculas menuPeliculas) {
+
+
+    public Sistema(GestionCuenta gestionCuenta, Scanner entrada, MenuSeries menuSeries, MenuPeliculas menuPeliculas) {
         this.gestionCuenta = gestionCuenta;
         this.entrada = entrada;
+        this.menuSeries = menuSeries;
         this.menuPeliculas = menuPeliculas;
     }
+
 
     public void mostrarMenuAdmin() {
         while (true) {
             System.out.println("\n--- Menú administrador ---");
             System.out.println("1. Gestionar películas");
+            System.out.println("2. Gestionar series");
             System.out.println("0. Cerrar sesión");
             System.out.print("Opción: ");
 
             switch (entrada.nextLine().trim()) {
+                case "2" -> menuSeries.mostrar();
                 case "1" -> menuPeliculas.mostrar();
                 case "0" -> {
                     gestionCuenta.cerrarSesion();
@@ -95,4 +100,14 @@ public class Sistema {
             System.out.println("Opción inválida");
         }
     }
+
+
+    public Sistema(GestionCuenta gestionCuenta, Scanner entrada,
+                   MenuPeliculas menuPeliculas, MenuSeries menuSeries) {
+        this.gestionCuenta = gestionCuenta;
+        this.entrada = entrada;
+        this.menuPeliculas = menuPeliculas;
+        this.menuSeries = menuSeries;
+    }
+
 }

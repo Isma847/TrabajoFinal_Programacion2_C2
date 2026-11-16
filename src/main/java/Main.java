@@ -8,6 +8,9 @@ import UI.Sistema;
 
 import java.sql.SQLException;
 import java.util.Scanner;
+import Service.SerieService;
+import UI.MenuSeries;
+
 
 public class Main {
 
@@ -20,8 +23,11 @@ public class Main {
             PeliculaService peliculas = new PeliculaService();
             DirectorService directores = new DirectorService();
             MenuPeliculas menuPeliculas = new MenuPeliculas(peliculas, directores, entrada);
+            SerieService series = new SerieService();
+            MenuSeries menuSeries = new MenuSeries(series, directores, entrada);
+            Sistema sistema = new Sistema(gestionCuenta, entrada, menuPeliculas, menuSeries);
 
-            Sistema sistema = new Sistema(gestionCuenta, entrada, menuPeliculas);
+
             sistema.mostrarMenuInicio();
         } catch (SQLException e) {
             System.err.println("No se pudo iniciar Temuflix. " + e.getMessage());
