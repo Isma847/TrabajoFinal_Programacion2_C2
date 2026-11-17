@@ -97,12 +97,16 @@ public class Sistema {
             System.out.println("\n--- Menú usuario ---");
             System.out.println("1. Consultar videojuegos");
             System.out.println("2. Reseñas");
+            System.out.println("3. Consultar películas");
+            System.out.println("4. Consultar series");
             System.out.println("0. Cerrar sesión");
             System.out.print("Opción: ");
 
             switch (entrada.nextLine().trim()) {
                 case "1" -> menuVideojuegos.mostrarUsuario();
                 case "2" -> menuResenas.mostrarUsuario(usuario);
+                case "3" -> menuPeliculas.mostrarUsuario();
+                case "4" -> menuSeries.mostrarUsuario();
                 case "0" -> {
                     gestionCuenta.cerrarSesion();
                     return;
