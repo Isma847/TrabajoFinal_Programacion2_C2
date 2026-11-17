@@ -95,8 +95,10 @@ public class Sistema {
 
         while (true) {
             System.out.println("\n--- Menú usuario ---");
-            System.out.println("1. Consultar videojuegos");
+            System.out.println("1. jugar videojuegos");
             System.out.println("2. Reseñas");
+            System.out.println("3. ver pelicular");
+            System.out.println("4. ver series");
             System.out.println("0. Cerrar sesión");
             System.out.print("Opción: ");
 

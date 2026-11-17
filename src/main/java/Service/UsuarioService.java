@@ -93,7 +93,6 @@ public class UsuarioService {
         Usuario copia = new Usuario(
                 usuario.getApellido(),
                 usuario.getNombre(),
-                usuario.getBaja(),
                 usuario.getEmail(),
                 usuario.getPassword(),
                 usuario.getUsername(),
