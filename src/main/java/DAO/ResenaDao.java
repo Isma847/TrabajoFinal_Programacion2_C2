@@ -16,12 +16,15 @@ public class ResenaDao implements CRUDBase<Resena> {
 
     @Override
     public int crear(Resena resena) throws SQLException {
-        String sql = "INSERT INTO resenas (calificacion, comentario, fecha) "
-                + "VALUES (?, ?, ?)";
+        String sql = "INSERT INTO resenas (calificacion, comentario, fecha, id_contenido, id_usuario, tipo) "
+                + "VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection cn = ConexionDB.conectar();
              PreparedStatement ps = cn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             cargarParametros(ps, resena);
+            ps.setInt(4, resena.getIdContenido());
+            ps.setInt(5, resena.getIdUsuario());
+            ps.setString(6, resena.getTipo());
 
             if (ps.executeUpdate() == 0) {
                 return -1;
@@ -39,7 +42,8 @@ public class ResenaDao implements CRUDBase<Resena> {
 
     @Override
     public Collection<Resena> leerTodos() throws SQLException {
-        String sql = "SELECT id_resena, calificacion, comentario, fecha FROM resenas";
+        String sql = "SELECT id_resena, id_contenido, id_usuario, tipo, calificacion, comentario, fecha "
+                + "FROM resenas";
         ArrayList<Resena> resenas = new ArrayList<>();
 
         try (Connection cn = ConexionDB.conectar();
@@ -47,6 +51,9 @@ public class ResenaDao implements CRUDBase<Resena> {
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 Resena resena = new Resena(
+                        rs.getInt("id_contenido"),
+                        rs.getInt("id_usuario"),
+                        rs.getString("tipo"),
                         rs.getInt("calificacion"),
                         rs.getString("comentario"),
                         rs.getString("fecha")

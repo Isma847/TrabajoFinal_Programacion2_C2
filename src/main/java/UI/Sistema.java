@@ -2,6 +2,7 @@ package UI;
 
 import Excepciones.SesionInvalidaException;
 import Modelo.Administrador;
+import Modelo.Usuario;
 import Service.GestionCuenta;
 
 import java.util.Scanner;
@@ -10,37 +11,19 @@ public class Sistema {
 
     private final GestionCuenta gestionCuenta;
     private final Scanner entrada;
-    private final MenuSeries menuSeries;
     private final MenuPeliculas menuPeliculas;
+    private final MenuSeries menuSeries;
+    private final MenuVideojuegos menuVideojuegos;
+    private final MenuResenas menuResenas;
 
-
-
-    public Sistema(GestionCuenta gestionCuenta, Scanner entrada, MenuSeries menuSeries, MenuPeliculas menuPeliculas) {
+    public Sistema(GestionCuenta gestionCuenta, Scanner entrada, MenuPeliculas menuPeliculas,
+                   MenuSeries menuSeries, MenuVideojuegos menuVideojuegos, MenuResenas menuResenas) {
         this.gestionCuenta = gestionCuenta;
         this.entrada = entrada;
-        this.menuSeries = menuSeries;
         this.menuPeliculas = menuPeliculas;
-    }
-
-
-    public void mostrarMenuAdmin() {
-        while (true) {
-            System.out.println("\n--- Menú administrador ---");
-            System.out.println("1. Gestionar películas");
-            System.out.println("2. Gestionar series");
-            System.out.println("0. Cerrar sesión");
-            System.out.print("Opción: ");
-
-            switch (entrada.nextLine().trim()) {
-                case "2" -> menuSeries.mostrar();
-                case "1" -> menuPeliculas.mostrar();
-                case "0" -> {
-                    gestionCuenta.cerrarSesion();
-                    return;
-                }
-                default -> System.out.println("Opción inválida");
-            }
-        }
+        this.menuSeries = menuSeries;
+        this.menuVideojuegos = menuVideojuegos;
+        this.menuResenas = menuResenas;
     }
 
     public void mostrarMenuInicio() {
@@ -81,33 +64,51 @@ public class Sistema {
         }
     }
 
-
-    public void mostrarMenuUsuario() {
-        mostrarMenuSesion("Menú usuario");
-    }
-
-    private void mostrarMenuSesion(String titulo) {
+    public void mostrarMenuAdmin() {
         while (true) {
-            System.out.println("\n--- " + titulo + " ---");
+            System.out.println("\n--- Menú administrador ---");
+            System.out.println("1. Gestionar películas");
+            System.out.println("2. Gestionar series");
+            System.out.println("3. Gestionar videojuegos");
+            System.out.println("4. Gestionar reseñas");
             System.out.println("0. Cerrar sesión");
             System.out.print("Opción: ");
 
-            if ("0".equals(entrada.nextLine().trim())) {
-                gestionCuenta.cerrarSesion();
-                return;
+            switch (entrada.nextLine().trim()) {
+                case "1" -> menuPeliculas.mostrar();
+                case "2" -> menuSeries.mostrar();
+                case "3" -> menuVideojuegos.mostrar();
+                case "4" -> menuResenas.mostrarAdmin();
+                case "0" -> {
+                    gestionCuenta.cerrarSesion();
+                    return;
+                }
+                default -> System.out.println("Opción inválida");
             }
-
-            System.out.println("Opción inválida");
         }
     }
 
+    public void mostrarMenuUsuario() {
+        if (!(gestionCuenta.getUsuarioActual() instanceof Usuario usuario)) {
+            return;
+        }
 
-    public Sistema(GestionCuenta gestionCuenta, Scanner entrada,
-                   MenuPeliculas menuPeliculas, MenuSeries menuSeries) {
-        this.gestionCuenta = gestionCuenta;
-        this.entrada = entrada;
-        this.menuPeliculas = menuPeliculas;
-        this.menuSeries = menuSeries;
+        while (true) {
+            System.out.println("\n--- Menú usuario ---");
+            System.out.println("1. Consultar videojuegos");
+            System.out.println("2. Reseñas");
+            System.out.println("0. Cerrar sesión");
+            System.out.print("Opción: ");
+
+            switch (entrada.nextLine().trim()) {
+                case "1" -> menuVideojuegos.mostrarUsuario();
+                case "2" -> menuResenas.mostrarUsuario(usuario);
+                case "0" -> {
+                    gestionCuenta.cerrarSesion();
+                    return;
+                }
+                default -> System.out.println("Opción inválida");
+            }
+        }
     }
-
 }
