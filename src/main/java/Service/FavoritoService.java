@@ -68,4 +68,30 @@ public class FavoritoService {
             }
         }
     }
+
+    public int obtenerEstadisticaPorContenido(int id_contenido, String tipo) {
+        int contador = 0;
+        for (Favorito obj : coleccion) {
+            if (obj.getId_contenido() == id_contenido) {
+                if (obj.getTipo().equals(tipo)) {
+                    contador++;
+                }
+            }
+        }
+        return contador;
+    }
+
+    public int obtenerEstadisticaPorTipo(String tipo) {
+        int contador = 0;
+        for (Favorito obj : coleccion) {
+            if (obj.getTipo().equals(tipo)) {
+                contador++;
+            }
+        }
+        return contador;
+    }
+
+    public HashSet<Favorito> getColeccion() {
+        return coleccion;
+    }
 }
