@@ -4,13 +4,8 @@ import Conexion.ConexionDB;
 import Interfaces.CRUDBase;
 import Modelo.Resena;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
-import java.util.Collection;
 
 public class ResenaDao implements CRUDBase<Resena> {
 
@@ -41,7 +36,7 @@ public class ResenaDao implements CRUDBase<Resena> {
     }
 
     @Override
-    public Collection<Resena> leerTodos() throws SQLException {
+    public ArrayList<Resena> leerTodos() throws SQLException {
         String sql = "SELECT id_resena, id_contenido, id_usuario, tipo, calificacion, comentario, fecha "
                 + "FROM resenas";
         ArrayList<Resena> resenas = new ArrayList<>();

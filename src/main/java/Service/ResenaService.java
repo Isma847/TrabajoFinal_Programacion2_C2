@@ -132,4 +132,16 @@ public class ResenaService {
         copia.setId(resena.getId());
         return copia;
     }
+
+    // Llamar despues de eliminar algun contenido multimedia
+    private void eliminarEnCascada(int idContenido, String tipo) throws SQLException {
+        // Tipo tiene que ser 'SERIE', 'JUEGO' o 'PELICULA'
+        for(Resena resena : coleccion.values()) {
+            if (resena.getIdContenido() == idContenido) {
+                if(tipo.equals(resena.getTipo())) {
+                    eliminar(resena.getId());
+                }
+            }
+        }
+    }
 }

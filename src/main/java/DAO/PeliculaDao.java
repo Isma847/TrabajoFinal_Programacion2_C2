@@ -77,7 +77,7 @@ public class PeliculaDao implements BajaLogicaEnDao<Pelicula> {
 
     @Override
     public int actualizar(Pelicula obj) throws SQLException {
-        String query = "Update peliculas set nombre = ?, duracionMinutos = ?, clasificacion = ?, genero = ?, id_director = ?, fechaEstreno = ? where id_pelicula = ?";
+        String query = "Update peliculas set nombre = ?, duracionMinutos = ?, clasificacion = ?, genero = ?, id_director = ?, fechaEstreno = ?, descripcion = ? where id_pelicula = ?";
         int result = 0;
 
         try(Connection cn = ConexionDB.conectar();

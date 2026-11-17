@@ -88,4 +88,16 @@ public class DirectorService {
         copia.setId(director.getId());
         return copia;
     }
+
+    // Llamar a PeliculaService.quitarDirector(id) y SerieService.quitarDirector(id) despues de usarlo
+    public boolean eliminar(int id) throws SQLException {
+        if (!coleccion.containsKey(id)) {
+            return false;
+        }
+        if (dao.eliminar(id) <= 0) {
+            return false;
+        }
+        coleccion.remove(id);
+        return true;
+    }
 }

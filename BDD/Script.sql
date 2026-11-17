@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS administradores (
     apellido VARCHAR(80) NOT NULL,
     username VARCHAR(60) NOT NULL,
     contrasena VARCHAR(30) NOT NULL,
-    email VARCHAR(160) NOT NULL,
+    email VARCHAR(160) NOT NULL UNIQUE,
     nivelAcceso INT NOT NULL,
     baja BOOLEAN NOT NULL DEFAULT FALSE
 );
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
     apellido VARCHAR(80) NOT NULL,
     username VARCHAR(60) NOT NULL,
     contrasena VARCHAR(30) NOT NULL,
-    email VARCHAR(160) NOT NULL,
+    email VARCHAR(160) NOT NULL UNIQUE,
     edad INT NOT NULL,
     baja BOOLEAN NOT NULL DEFAULT FALSE
 );
