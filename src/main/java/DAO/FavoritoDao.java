@@ -47,7 +47,7 @@ public class FavoritoDao {
             }
         }
 
-        return directores;
+        return favoritos;
     }
 
     public int eliminar(int id) throws SQLException {
