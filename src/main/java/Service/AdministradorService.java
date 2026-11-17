@@ -92,11 +92,10 @@ public class AdministradorService {
         Administrador copia = new Administrador(
                 administrador.getApellido(),
                 administrador.getNombre(),
-                administrador.getBaja(),
                 administrador.getEmail(),
                 administrador.getPassword(),
                 administrador.getUsername(),
-                administrador.getNivelAcceso()
+                administrador.isPuedeEliminar()
         );
         copia.setId(administrador.getId());
         return copia;

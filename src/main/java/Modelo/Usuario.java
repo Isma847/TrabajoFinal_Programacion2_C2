@@ -4,8 +4,8 @@ public class Usuario extends Cuenta{
 
     private int edad;
 
-    public Usuario(String apellido, String nombre, boolean baja, String email, String password, String username, int edad) {
-        super(apellido, nombre, baja, email, password, username);
+    public Usuario(String apellido, String nombre, String email, String password, String username, int edad) {
+        super(apellido, nombre, email, password, username);
         this.edad = edad;
     }
 

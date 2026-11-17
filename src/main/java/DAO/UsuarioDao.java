@@ -48,7 +48,6 @@ public class UsuarioDao implements CRUDBase<Usuario> {
                 Usuario usuario = new Usuario(
                         rs.getString("apellido"),
                         rs.getString("nombre"),
-                        false,
                         rs.getString("email"),
                         rs.getString("contrasena"),
                         rs.getString("username"),
