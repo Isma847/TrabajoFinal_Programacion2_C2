@@ -10,6 +10,7 @@ import Service.PeliculaService;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class MenuPeliculas {
@@ -37,8 +38,8 @@ public class MenuPeliculas {
 
             try {
                 switch (entrada.nextLine().trim()) {
-                    case "1" -> listar();
-                    case "2" -> mostrarPelicula(pedirPelicula());
+                    case "1" -> listar(peliculas.leerTodos());
+                    case "2" -> mostrarPelicula(pedirPelicula(false));
                     case "3" -> agregar();
                     case "4" -> modificar();
                     case "5" -> cambiarEstado();
@@ -55,17 +56,39 @@ public class MenuPeliculas {
         }
     }
 
-    private void listar() {
-        ArrayList<Pelicula> lista = peliculas.leerTodos();
+    public void mostrarUsuario() {
+        while (true) {
+            System.out.println("\n--- Catálogo de películas ---");
+            System.out.println("1. Listar películas activas");
+            System.out.println("2. Consultar por ID");
+            System.out.println("0. Volver");
+            System.out.print("Opción: ");
+
+            try {
+                switch (entrada.nextLine().trim()) {
+                    case "1" -> listar(peliculas.getLista(false));
+                    case "2" -> mostrarPelicula(pedirPelicula(true));
+                    case "0" -> {
+                        return;
+                    }
+                    default -> System.out.println("Opción inválida");
+                }
+            } catch (IllegalArgumentException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+
+    private void listar(List<Pelicula> lista) {
         if (lista.isEmpty()) {
             System.out.println("No hay películas cargadas.");
             return;
         }
 
-        System.out.println("ID | Nombre | Duración | Estado | Descripcion");
+        System.out.println("ID | Nombre | Duración | Estado | Descripción");
         for (Pelicula pelicula : lista) {
-            System.out.printf("%d | %s | %d min | %s%n | %s",
-                    pelicula.getId(), pelicula.getNombre(), pelicula.getDuracionMinutos(), estado(pelicula), pelicula.getDescripcion());
+            System.out.printf("%d | %s | %d min | %s | %s%n",
+                    pelicula.getId(), pelicula.getNombre(), pelicula.getDuracionMinutos(), estado(pelicula), descripcionVisible(pelicula.getDescripcion()));
         }
     }
 
@@ -77,8 +100,12 @@ public class MenuPeliculas {
         System.out.println("Género: " + pelicula.getGenero());
         System.out.println("Director: " + nombreDirector(pelicula.getIdDirector()));
         System.out.println("Fecha de estreno: " + pelicula.getFechaEstreno());
-        System.out.println("Descripcion: " + pelicula.getDescripcion());
+        System.out.println("Descripción: " + descripcionVisible(pelicula.getDescripcion()));
         System.out.println("Estado: " + estado(pelicula));
+    }
+
+    private String descripcionVisible(String descripcion) {
+        return descripcion == null || descripcion.isBlank() ? "Sin descripción" : descripcion;
     }
 
     private String estado(Pelicula pelicula) {
@@ -96,10 +123,10 @@ public class MenuPeliculas {
         return director.getNombre() + " " + director.getApellido() + " (ID " + id + ")";
     }
 
-    private Pelicula pedirPelicula() {
+    private Pelicula pedirPelicula(boolean soloActivas) {
         int id = leerEnteroPositivo("ID de la película");
         Pelicula pelicula = peliculas.buscarPorId(id);
-        if (pelicula == null) {
+        if (pelicula == null || (soloActivas && pelicula.getBaja())) {
             throw new IllegalArgumentException("No existe una película con ese ID.");
         }
         return pelicula;
@@ -124,7 +151,7 @@ public class MenuPeliculas {
     }
 
     private void modificar() throws SQLException {
-        Pelicula actual = pedirPelicula();
+        Pelicula actual = pedirPelicula(false);
         mostrarPelicula(actual);
 
         System.out.println("\n¿Qué querés modificar?");
@@ -178,7 +205,7 @@ public class MenuPeliculas {
     }
 
     private void cambiarEstado() throws SQLException {
-        Pelicula pelicula = pedirPelicula();
+        Pelicula pelicula = pedirPelicula(false);
         boolean estabaDeBaja = pelicula.getBaja();
 
         if (peliculas.darDeBaja(pelicula.getId())) {

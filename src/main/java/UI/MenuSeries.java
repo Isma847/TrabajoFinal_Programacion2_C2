@@ -10,6 +10,7 @@ import Service.SerieService;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class MenuSeries {
@@ -37,8 +38,8 @@ public class MenuSeries {
 
             try {
                 switch (entrada.nextLine().trim()) {
-                    case "1" -> listar();
-                    case "2" -> mostrarSerie(pedirSerie());
+                    case "1" -> listar(series.leerTodos());
+                    case "2" -> mostrarSerie(pedirSerie(false));
                     case "3" -> agregar();
                     case "4" -> modificar();
                     case "5" -> cambiarEstado();
@@ -55,18 +56,40 @@ public class MenuSeries {
         }
     }
 
-    private void listar() {
-        ArrayList<Serie> lista = series.leerTodos();
+    public void mostrarUsuario() {
+        while (true) {
+            System.out.println("\n--- Catálogo de series ---");
+            System.out.println("1. Listar series activas");
+            System.out.println("2. Consultar por ID");
+            System.out.println("0. Volver");
+            System.out.print("Opción: ");
+
+            try {
+                switch (entrada.nextLine().trim()) {
+                    case "1" -> listar(series.getLista(false));
+                    case "2" -> mostrarSerie(pedirSerie(true));
+                    case "0" -> {
+                        return;
+                    }
+                    default -> System.out.println("Opción inválida");
+                }
+            } catch (IllegalArgumentException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+
+    private void listar(List<Serie> lista) {
         if (lista.isEmpty()) {
             System.out.println("No hay series cargadas.");
             return;
         }
 
-        System.out.println("ID | Nombre | Temporadas | Capítulos | Estado | Descripcion");
+        System.out.println("ID | Nombre | Temporadas | Capítulos | Estado | Descripción");
         for (Serie serie : lista) {
-            System.out.printf("%d | %s | %d | %d | %s%n | %s",
+            System.out.printf("%d | %s | %d | %d | %s | %s%n",
                     serie.getId(), serie.getNombre(), serie.getCantidadTemporadas(),
-                    serie.getCantidadCapitulos(), estado(serie), serie.getDescripcion());
+                    serie.getCantidadCapitulos(), estado(serie), descripcionVisible(serie.getDescripcion()));
         }
     }
 
@@ -79,8 +102,12 @@ public class MenuSeries {
         System.out.println("Director: " + nombreDirector(serie.getIdDirector()));
         System.out.println("Capítulos: " + serie.getCantidadCapitulos());
         System.out.println("Temporadas: " + serie.getCantidadTemporadas());
-        System.out.println("Descripcion: " + serie.getDescripcion());
+        System.out.println("Descripción: " + descripcionVisible(serie.getDescripcion()));
         System.out.println("Estado: " + estado(serie));
+    }
+
+    private String descripcionVisible(String descripcion) {
+        return descripcion == null || descripcion.isBlank() ? "Sin descripción" : descripcion;
     }
 
     private String estado(Serie serie) {
@@ -98,10 +125,10 @@ public class MenuSeries {
         return director.getNombre() + " " + director.getApellido() + " (ID " + id + ")";
     }
 
-    private Serie pedirSerie() {
+    private Serie pedirSerie(boolean soloActivas) {
         int id = leerEnteroPositivo("ID de la serie");
         Serie serie = series.buscarPorId(id);
-        if (serie == null) {
+        if (serie == null || (soloActivas && serie.getBaja())) {
             throw new IllegalArgumentException("No existe una serie con ese ID.");
         }
         return serie;
@@ -127,7 +154,7 @@ public class MenuSeries {
     }
 
     private void modificar() throws SQLException {
-        Serie actual = pedirSerie();
+        Serie actual = pedirSerie(false);
         mostrarSerie(actual);
 
         System.out.println("\n¿Qué querés modificar?");
@@ -184,7 +211,7 @@ public class MenuSeries {
     }
 
     private void cambiarEstado() throws SQLException {
-        Serie serie = pedirSerie();
+        Serie serie = pedirSerie(false);
         boolean estabaDeBaja = serie.getBaja();
 
         if (series.darDeBaja(serie.getId())) {
