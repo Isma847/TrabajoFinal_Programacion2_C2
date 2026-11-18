@@ -1,14 +1,18 @@
 package Service;
 
 import DAO.FavoritoDao;
+import Excepciones.DatoInvalidoException;
 import Modelo.Favorito;
 
 import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class FavoritoService {
-    private FavoritoDao dao;
+
+    private final FavoritoDao dao;
     private final HashSet<Favorito> coleccion = new HashSet<>();
 
     public FavoritoService(FavoritoDao dao) throws SQLException {
@@ -18,80 +22,129 @@ public class FavoritoService {
 
     private void cargar() throws SQLException {
         coleccion.clear();
-        for (Favorito obj : dao.leerTodos()) {
-            coleccion.add(obj);
+        for (Favorito favorito : dao.leerTodos()) {
+            coleccion.add(favorito);
         }
     }
 
     public boolean crear(Favorito favorito) throws SQLException {
+        if (favorito == null) {
+            throw new DatoInvalidoException("El favorito es obligatorio");
+        }
+        validarReferencia(favorito.getId_usaurio(), favorito.getId_contenido(), favorito.getTipo());
+        if (favorito.getId() != 0
+                || contiene(favorito.getId_usaurio(), favorito.getId_contenido(), favorito.getTipo())) {
+            return false;
+        }
+
         int id = dao.crear(favorito);
-        if (id > 0) {
-            favorito.setId(id);
-            coleccion.add(favorito);
-            return true;
+        if (id <= 0) {
+            return false;
+        }
+
+        favorito.setId(id);
+        coleccion.add(copiar(favorito));
+        return true;
+    }
+
+    public boolean contiene(int idUsuario, int idContenido, String tipo) {
+        for (Favorito favorito : coleccion) {
+            if (favorito.getId_usaurio() == idUsuario
+                    && favorito.getId_contenido() == idContenido && favorito.getTipo().equals(tipo)) {
+                return true;
+            }
         }
         return false;
     }
 
     public boolean eliminar(int id) throws SQLException {
-        for (Favorito obj : coleccion) {
-            if (obj.getId() == id) {
-                if (dao.eliminar(id) > 0) {
-                    coleccion.remove(obj);
-                    return true;
+        Iterator<Favorito> it = coleccion.iterator();
+        while (it.hasNext()) {
+            Favorito favorito = it.next();
+            if (favorito.getId() == id) {
+                if (dao.eliminar(id) <= 0) {
+                    return false;
                 }
-                return false;
+                it.remove();
+                return true;
             }
         }
         return false;
     }
 
-    public HashSet<Favorito> leerPorUsuario(int id_usuario) {
+    public HashSet<Favorito> leerPorUsuario(int idUsuario) {
         HashSet<Favorito> resultado = new HashSet<>();
-        for (Favorito obj : coleccion) {
-            if (obj.getId_usaurio() == id_usuario) {
-                resultado.add(obj);
+        for (Favorito favorito : coleccion) {
+            if (favorito.getId_usaurio() == idUsuario) {
+                resultado.add(copiar(favorito));
             }
         }
         return resultado;
     }
 
-    public void eliminarPorUsuario(int id_usuario) throws SQLException {
-        Iterator<Favorito> it = coleccion.iterator();
-        while (it.hasNext()) {
-            Favorito obj = it.next();
-
-            if (obj.getId_usaurio() == id_usuario) {
-                if (dao.eliminar(obj.getId()) > 0) {
-                    it.remove();
-                }
-            }
-        }
+    public void eliminarPorUsuario(int idUsuario) throws SQLException {
+        dao.eliminarPorUsuario(idUsuario);
+        coleccion.removeIf(favorito -> favorito.getId_usaurio() == idUsuario);
     }
 
-    public int obtenerEstadisticaPorContenido(int id_contenido, String tipo) {
-        int contador = 0;
-        for (Favorito obj : coleccion) {
-            if (obj.getId_contenido() == id_contenido) {
-                if (obj.getTipo().equals(tipo)) {
-                    contador++;
-                }
+    public int quitarDeUsuario(int idUsuario, int idContenido, String tipo) throws SQLException {
+        validarReferencia(idUsuario, idContenido, tipo);
+        int eliminados = dao.quitarDeUsuario(idUsuario, idContenido, tipo);
+        coleccion.removeIf(favorito -> favorito.getId_usaurio() == idUsuario
+                && favorito.getId_contenido() == idContenido && favorito.getTipo().equals(tipo));
+        return eliminados;
+    }
+
+    public int obtenerEstadisticaPorContenido(int idContenido, String tipo) {
+        HashSet<Integer> usuarios = new HashSet<>();
+        for (Favorito favorito : coleccion) {
+            if (favorito.getId_contenido() == idContenido && favorito.getTipo().equals(tipo)) {
+                usuarios.add(favorito.getId_usaurio());
             }
         }
-        return contador;
+        return usuarios.size();
     }
 
     public int obtenerEstadisticaPorTipo(String tipo) {
-        int contador = 0;
-        for (Favorito obj : coleccion) {
-            if (obj.getTipo().equals(tipo)) {
-                contador++;
+        HashSet<String> favoritos = new HashSet<>();
+        for (Favorito favorito : coleccion) {
+            if (favorito.getTipo().equals(tipo)) {
+                favoritos.add(favorito.getId_usaurio() + ":" + favorito.getId_contenido());
             }
         }
-        return contador;
+        return favoritos.size();
+    }
+
+    public Map<Integer, Integer> contarPorUsuario() {
+        Map<Integer, HashSet<String>> contenidos = new LinkedHashMap<>();
+        for (Favorito favorito : coleccion) {
+            contenidos.computeIfAbsent(favorito.getId_usaurio(), id -> new HashSet<>())
+                    .add(favorito.getTipo() + ":" + favorito.getId_contenido());
+        }
+
+        Map<Integer, Integer> cantidades = new LinkedHashMap<>();
+        for (Map.Entry<Integer, HashSet<String>> entrada : contenidos.entrySet()) {
+            cantidades.put(entrada.getKey(), entrada.getValue().size());
+        }
+        return cantidades;
     }
 
     public HashSet<Favorito> getColeccion() {
         return coleccion;
     }
+
+    private void validarReferencia(int idUsuario, int idContenido, String tipo) {
+        if (idUsuario <= 0 || idContenido <= 0) {
+            throw new DatoInvalidoException("El usuario y el contenido deben tener un ID válido");
+        }
+        if (!"PELICULA".equals(tipo) && !"SERIE".equals(tipo) && !"JUEGO".equals(tipo)) {
+            throw new DatoInvalidoException("El tipo debe ser PELICULA, SERIE o JUEGO");
+        }
+    }
+
+    private Favorito copiar(Favorito favorito) {
+        return new Favorito(favorito.getId(), favorito.getId_usaurio(),
+                favorito.getId_contenido(), favorito.getTipo());
+    }
 }
+

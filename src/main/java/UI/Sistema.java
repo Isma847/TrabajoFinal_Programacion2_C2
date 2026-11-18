@@ -15,15 +15,18 @@ public class Sistema {
     private final MenuSeries menuSeries;
     private final MenuVideojuegos menuVideojuegos;
     private final MenuResenas menuResenas;
+    private final MenuFavoritos menuFavoritos;
 
     public Sistema(GestionCuenta gestionCuenta, Scanner entrada, MenuPeliculas menuPeliculas,
-                   MenuSeries menuSeries, MenuVideojuegos menuVideojuegos, MenuResenas menuResenas) {
+                   MenuSeries menuSeries, MenuVideojuegos menuVideojuegos,
+                   MenuResenas menuResenas, MenuFavoritos menuFavoritos) {
         this.gestionCuenta = gestionCuenta;
         this.entrada = entrada;
         this.menuPeliculas = menuPeliculas;
         this.menuSeries = menuSeries;
         this.menuVideojuegos = menuVideojuegos;
         this.menuResenas = menuResenas;
+        this.menuFavoritos = menuFavoritos;
     }
 
     public void mostrarMenuInicio() {
@@ -71,6 +74,7 @@ public class Sistema {
             System.out.println("2. Gestionar series");
             System.out.println("3. Gestionar videojuegos");
             System.out.println("4. Gestionar reseñas");
+            System.out.println("5. Estadísticas de favoritos");
             System.out.println("0. Cerrar sesión");
             System.out.print("Opción: ");
 
@@ -79,6 +83,7 @@ public class Sistema {
                 case "2" -> menuSeries.mostrar();
                 case "3" -> menuVideojuegos.mostrar();
                 case "4" -> menuResenas.mostrarAdmin();
+                case "5" -> menuFavoritos.mostrarAdmin();
                 case "0" -> {
                     gestionCuenta.cerrarSesion();
                     return;
@@ -99,6 +104,7 @@ public class Sistema {
             System.out.println("2. Reseñas");
             System.out.println("3. Consultar películas");
             System.out.println("4. Consultar series");
+            System.out.println("5. Favoritos");
             System.out.println("0. Cerrar sesión");
             System.out.print("Opción: ");
 
@@ -107,6 +113,7 @@ public class Sistema {
                 case "2" -> menuResenas.mostrarUsuario(usuario);
                 case "3" -> menuPeliculas.mostrarUsuario();
                 case "4" -> menuSeries.mostrarUsuario();
+                case "5" -> menuFavoritos.mostrarUsuario(usuario);
                 case "0" -> {
                     gestionCuenta.cerrarSesion();
                     return;
