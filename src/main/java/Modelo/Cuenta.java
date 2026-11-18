@@ -11,9 +11,9 @@ public class Cuenta extends Persona implements TieneBaja {
     private String email;
     private boolean baja;
 
-    public Cuenta(String apellido, String nombre, boolean baja, String email, String password, String username) {
+    public Cuenta(String apellido, String nombre, String email, String password, String username) {
         super(apellido, nombre);
-        this.baja = baja;
+        this.baja = false;
         this.email = email;
         this.password = password;
         this.username = username;

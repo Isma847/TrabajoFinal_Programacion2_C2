@@ -49,11 +49,10 @@ public class AdministradorDao implements CRUDBase<Administrador> {
                 Administrador administrador = new Administrador(
                         rs.getString("apellido"),
                         rs.getString("nombre"),
-                        false,
                         rs.getString("email"),
                         rs.getString("contrasena"),
                         rs.getString("username"),
-                        rs.getInt("nivelAcceso")
+                        rs.getBoolean("puedeEliminar")
                 );
                 administrador.setId(rs.getInt("id_administrador"));
                 administradores.add(administrador);
@@ -92,6 +91,6 @@ public class AdministradorDao implements CRUDBase<Administrador> {
         ps.setString(3, administrador.getUsername());
         ps.setString(4, administrador.getPassword());
         ps.setString(5, administrador.getEmail());
-        ps.setInt(6, administrador.getNivelAcceso());
+        ps.setBoolean(6, administrador.isPuedeEliminar());
     }
 }

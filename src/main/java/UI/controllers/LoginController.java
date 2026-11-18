@@ -5,6 +5,7 @@ import Modelo.Administrador;
 import Modelo.Cuenta;
 import Modelo.Usuario;
 import Service.GestionCuenta;
+import Service.PeliculaService;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -33,6 +34,13 @@ public class LoginController {
 
 
     private GestionCuenta gestionCuenta;
+
+    private PeliculaService peliculaService;
+
+    public void setPeliculaService(PeliculaService peliculaService) {
+        this.peliculaService = peliculaService;
+    }
+
 
     public void setGestionCuenta(GestionCuenta gestionCuenta) {
         this.gestionCuenta = gestionCuenta;
@@ -79,6 +87,13 @@ public class LoginController {
         if (ruta.equals("/vistas/menu-admin.fxml")) {
             MenuAdminController controller = loader.getController();
             controller.setGestionCuenta(gestionCuenta);
+        }
+
+        if (ruta.equals("/vistas/menu-usuario.fxml")) {
+            MenuUsuarioController controller = loader.getController();
+
+            controller.setGestionCuenta(gestionCuenta);
+            controller.setPeliculaService(peliculaService);
         }
 
         Stage stage = (Stage) btnIniciarSesion.getScene().getWindow();

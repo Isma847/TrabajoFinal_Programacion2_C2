@@ -1,8 +1,11 @@
 package Service;
 
 import Excepciones.SesionInvalidaException;
+import Modelo.Administrador;
 import Modelo.Cuenta;
+import Modelo.Usuario;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class GestionCuenta {
@@ -48,4 +51,23 @@ public class GestionCuenta {
     public void cerrarSesion() {
         usuarioActual = null;
     }
+
+    public void agregarUsuario(Usuario usuario){
+        try {
+            usuarios.agregar(usuario);
+        } catch (SQLException e) {
+            System.err.println("error al crear el usuario: " +  e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    public void agregarAdministrador(Administrador admin){
+        try {
+            administradores.agregar(admin);
+        } catch (SQLException e) {
+            System.err.println("error al crear el usuario: " +  e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
 }
