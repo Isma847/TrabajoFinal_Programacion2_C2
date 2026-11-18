@@ -6,9 +6,9 @@
 <?import javafx.scene.text.Font?>
 
 
-<VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" spacing="15.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="UI.controllers.MenuAdminController">
+<VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="800.0" spacing="15.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="UI.controllers.MenuAdminController">
    <children>
-      <Label text="Temuflix">
+      <Label text="TEMUFLIX">
          <font>
             <Font name="System Bold" size="48.0" />
          </font>
@@ -22,7 +22,7 @@
       <Button mnemonicParsing="false" onAction="#abrirSeries" prefHeight="40.0" prefWidth="320.0" text="Gestionar Series" />
       <Button mnemonicParsing="false" onAction="#abrirVideojuegos" prefHeight="40.0" prefWidth="320.0" text="Gestionar Videojuegos" />
       <Button mnemonicParsing="false" onAction="#abrirResenas" prefHeight="40.0" prefWidth="320.0" text="Gestionar Reseñas " />
-      <Button mnemonicParsing="false" onAction="#cerrarSesion" prefHeight="40.0" prefWidth="320.0" text="CERRAR SESION">
+      <Button fx:id="btncerrarSesion" mnemonicParsing="false" onAction="#cerrarSesion" prefHeight="40.0" prefWidth="320.0" text="CERRAR SESION">
          <font>
             <Font name="System Bold" size="13.0" />
          </font>

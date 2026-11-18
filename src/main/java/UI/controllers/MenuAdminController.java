@@ -15,7 +15,7 @@ public class MenuAdminController {
     private GestionCuenta gestionCuenta;
 
     @FXML
-    private Button btnCerrarSesion;
+    private Button btncerrarSesion;
 
 
 
@@ -55,7 +55,10 @@ public class MenuAdminController {
 
             Parent root = loader.load();
 
-            Stage stage = (Stage) btnCerrarSesion.getScene().getWindow();
+            LoginController controller = loader.getController();
+            controller.setGestionCuenta(gestionCuenta);
+
+            Stage stage = (Stage) btncerrarSesion.getScene().getWindow();
             stage.setScene(new Scene(root));
             stage.show();
 

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+
+<VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="UI.controllers.PeliculasUsuarioController">
+   <children>
+      <Label text="Catalogo de peliculas">
+         <font>
+            <Font name="System Bold" size="26.0" />
+         </font>
+      </Label>
+      <TableView fx:id="tablaPeliculas" prefHeight="200.0" prefWidth="509.0">
+        <columns>
+          <TableColumn fx:id="colNombre" prefWidth="105.33331298828125" text="nombre" />
+          <TableColumn fx:id="colGenero" prefWidth="82.66668701171875" text="genero" />
+            <TableColumn fx:id="colDuracion" prefWidth="94.0" text="duracion" />
+            <TableColumn fx:id="colClasificacion" prefWidth="94.66668701171875" text="clasificacion" />
+            <TableColumn fx:id="colFechaEstreno" minWidth="3.33331298828125" prefWidth="118.66668701171875" text="fecha de estreno" />
+            <TableColumn fx:id="colDescripcion" minWidth="0.0" prefWidth="103.33331298828125" text="descripcion" />
+        </columns>
+      </TableView>
+      <Button fx:id="btnVolver" mnemonicParsing="false" onAction="#volverMenu" text="Volver al menu principal" />
+   </children>
+</VBox>
