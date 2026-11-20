@@ -14,8 +14,8 @@ import java.util.Collection;
 public class AdministradorDao implements CRUDBase<Administrador> {
 
     public int crear(Administrador administrador) throws SQLException {
-        String sql = "INSERT INTO administradores (nombre, apellido, username, contrasena, email, nivelAcceso) "
-                + "VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO administradores (nombre, apellido, username, contrasena, email, puedeEliminar, baja) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?)";
         String sqlId = "SELECT LAST_INSERT_ID()";
 
         try (Connection cn = ConexionDB.conectar();
@@ -38,7 +38,7 @@ public class AdministradorDao implements CRUDBase<Administrador> {
     }
 
     public Collection<Administrador> leerTodos() throws SQLException {
-        String sql = "SELECT id_administrador, nombre, apellido, username, contrasena, email, nivelAcceso "
+        String sql = "SELECT id_administrador, nombre, apellido, username, contrasena, email, puedeEliminar, baja "
                 + "FROM administradores";
         ArrayList<Administrador> administradores = new ArrayList<>();
 
@@ -55,6 +55,7 @@ public class AdministradorDao implements CRUDBase<Administrador> {
                         rs.getBoolean("puedeEliminar")
                 );
                 administrador.setId(rs.getInt("id_administrador"));
+                administrador.setBaja(rs.getBoolean("baja"));
                 administradores.add(administrador);
             }
         }
@@ -64,12 +65,12 @@ public class AdministradorDao implements CRUDBase<Administrador> {
 
     public int actualizar(Administrador administrador) throws SQLException {
         String sql = "UPDATE administradores SET nombre = ?, apellido = ?, username = ?, "
-                + "contrasena = ?, email = ?, nivelAcceso = ? WHERE id_administrador = ?";
+                + "contrasena = ?, email = ?, puedeEliminar = ?, baja = ? WHERE id_administrador = ?";
 
         try (Connection cn = ConexionDB.conectar();
              PreparedStatement ps = cn.prepareStatement(sql)) {
             cargarParametros(ps, administrador);
-            ps.setInt(7, administrador.getId());
+            ps.setInt(8, administrador.getId());
 
             return ps.executeUpdate();
         }
@@ -92,5 +93,6 @@ public class AdministradorDao implements CRUDBase<Administrador> {
         ps.setString(4, administrador.getPassword());
         ps.setString(5, administrador.getEmail());
         ps.setBoolean(6, administrador.isPuedeEliminar());
+        ps.setBoolean(7, administrador.getBaja());
     }
 }

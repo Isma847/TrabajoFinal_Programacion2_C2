@@ -71,20 +71,18 @@ public class AdministradorService {
         if (administrador == null) {
             throw new DatoInvalidoException("El administrador es obligatorio");
         }
-        if (administrador.getBaja()) {
-            throw new DatoInvalidoException("El esquema actual solo permite guardar administradores activos");
-        }
 
-        validarTexto(administrador.getNombre(), "nombre");
-        validarTexto(administrador.getApellido(), "apellido");
-        validarTexto(administrador.getUsername(), "username");
-        validarTexto(administrador.getPassword(), "contraseña");
-        validarTexto(administrador.getEmail(), "email");
+        validarTexto(administrador.getNombre(), "nombre", 80);
+        validarTexto(administrador.getApellido(), "apellido", 80);
+        validarTexto(administrador.getUsername(), "username", 60);
+        validarTexto(administrador.getPassword(), "contraseña", 30);
+        validarTexto(administrador.getEmail(), "email", 160);
     }
 
-    private void validarTexto(String valor, String campo) {
-        if (valor == null || valor.trim().isEmpty()) {
-            throw new DatoInvalidoException("El campo " + campo + " es obligatorio");
+    private void validarTexto(String valor, String campo, int maximo) {
+        if (valor == null || valor.isBlank() || valor.codePointCount(0, valor.length()) > maximo) {
+            throw new DatoInvalidoException("El campo " + campo + " debe tener entre 1 y "
+                    + maximo + " caracteres");
         }
     }
 
@@ -98,6 +96,7 @@ public class AdministradorService {
                 administrador.isPuedeEliminar()
         );
         copia.setId(administrador.getId());
+        copia.setBaja(administrador.getBaja());
         return copia;
     }
 }

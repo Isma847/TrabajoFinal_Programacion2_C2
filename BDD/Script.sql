@@ -1,16 +1,17 @@
 -- Si ya existían tablas de una versión anterior, ejecutar antes: DROP DATABASE temuflix;
 
-CREATE DATABASE IF NOT EXISTS temuflix;
+SET NAMES utf8mb4;
+CREATE DATABASE IF NOT EXISTS temuflix CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE temuflix;
 
 CREATE TABLE IF NOT EXISTS administradores (
     id_administrador INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(80) NOT NULL,
     apellido VARCHAR(80) NOT NULL,
-    username VARCHAR(60) NOT NULL,
+    username VARCHAR(60) NOT NULL UNIQUE,
     contrasena VARCHAR(30) NOT NULL,
     email VARCHAR(160) NOT NULL UNIQUE,
-    nivelAcceso INT NOT NULL,
+    puedeEliminar BOOLEAN NOT NULL DEFAULT FALSE,
     baja BOOLEAN NOT NULL DEFAULT FALSE
 );
 
@@ -18,7 +19,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
     id_usuario INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(80) NOT NULL,
     apellido VARCHAR(80) NOT NULL,
-    username VARCHAR(60) NOT NULL,
+    username VARCHAR(60) NOT NULL UNIQUE,
     contrasena VARCHAR(30) NOT NULL,
     email VARCHAR(160) NOT NULL UNIQUE,
     edad INT NOT NULL,
@@ -96,6 +97,7 @@ CREATE TABLE IF NOT EXISTS favoritos (
     -- id_contenido es un campo polimorfico para simplificar
     -- pero en un programa real deberían usarse varias tablas con FK
     id_contenido INT NOT NULL,
+    CONSTRAINT uq_favoritos_usuario_contenido UNIQUE (id_usuario, tipo, id_contenido),
     constraint fk_usuario_fav FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE,
     constraint ck_tipo_fav CHECK (tipo IN ('SERIE', 'JUEGO', 'PELICULA'))
 );

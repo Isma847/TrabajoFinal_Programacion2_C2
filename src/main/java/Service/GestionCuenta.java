@@ -1,5 +1,6 @@
 package Service;
 
+import Excepciones.DatoInvalidoException;
 import Excepciones.SesionInvalidaException;
 import Modelo.Administrador;
 import Modelo.Cuenta;
@@ -52,21 +53,45 @@ public class GestionCuenta {
         usuarioActual = null;
     }
 
-    public void agregarUsuario(Usuario usuario){
+    // Devuelve true si la cuenta se creo; si no, informa el motivo por consola.
+    public boolean agregarUsuario(Usuario usuario) {
         try {
-            usuarios.agregar(usuario);
+            verificarDisponible(usuario);
+            return usuarios.agregar(usuario);
+        } catch (DatoInvalidoException e) {
+            System.out.println(e.getMessage());
         } catch (SQLException e) {
-            System.err.println("error al crear el usuario: " +  e.getMessage());
-            e.printStackTrace();
+            System.out.println("No se pudo crear la cuenta: " + e.getMessage());
         }
+        return false;
     }
 
-    public void agregarAdministrador(Administrador admin){
+    public boolean agregarAdministrador(Administrador admin) {
         try {
-            administradores.agregar(admin);
+            verificarDisponible(admin);
+            return administradores.agregar(admin);
+        } catch (DatoInvalidoException e) {
+            System.out.println(e.getMessage());
         } catch (SQLException e) {
-            System.err.println("error al crear el usuario: " +  e.getMessage());
-            e.printStackTrace();
+            System.out.println("No se pudo crear la cuenta: " + e.getMessage());
+        }
+        return false;
+    }
+
+    // username y email deben ser unicos entre usuarios Y administradores
+    private void verificarDisponible(Cuenta nueva) {
+        if (nueva == null) {
+            throw new DatoInvalidoException("La cuenta es obligatoria");
+        }
+        ArrayList<Cuenta> cuentas = new ArrayList<>(usuarios.leerTodos());
+        cuentas.addAll(administradores.leerTodos());
+        for (Cuenta c : cuentas) {
+            if (c.getUsername() != null && c.getUsername().equalsIgnoreCase(nueva.getUsername())) {
+                throw new DatoInvalidoException("Ese nombre de usuario ya está en uso");
+            }
+            if (c.getEmail() != null && c.getEmail().equalsIgnoreCase(nueva.getEmail())) {
+                throw new DatoInvalidoException("Ese email ya está registrado");
+            }
         }
     }
 

@@ -71,15 +71,15 @@ public class UsuarioService {
         if (usuario == null) {
             throw new DatoInvalidoException("El usuario es obligatorio");
         }
-        if (usuario.getBaja()) {
-            throw new DatoInvalidoException("El esquema actual solo permite guardar usuarios activos");
-        }
 
         validarTexto(usuario.getNombre(), "nombre", 80);
         validarTexto(usuario.getApellido(), "apellido", 80);
         validarTexto(usuario.getUsername(), "username", 60);
-        validarTexto(usuario.getPassword(), "contraseña", 512);
+        validarTexto(usuario.getPassword(), "contraseña", 30);
         validarTexto(usuario.getEmail(), "email", 160);
+        if (usuario.getEdad() < 1 || usuario.getEdad() > 120) {
+            throw new DatoInvalidoException("La edad debe estar entre 1 y 120");
+        }
     }
 
     private void validarTexto(String valor, String campo, int maximo) {
@@ -99,6 +99,7 @@ public class UsuarioService {
                 usuario.getEdad()
         );
         copia.setId(usuario.getId());
+        copia.setBaja(usuario.getBaja());
         return copia;
     }
 }

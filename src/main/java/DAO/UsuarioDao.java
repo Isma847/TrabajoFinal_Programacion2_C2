@@ -15,8 +15,8 @@ import java.util.Collection;
 public class UsuarioDao implements CRUDBase<Usuario> {
 
     public int crear(Usuario usuario) throws SQLException {
-        String sql = "INSERT INTO usuarios (nombre, apellido, username, contrasena, email, edad) "
-                + "VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO usuarios (nombre, apellido, username, contrasena, email, edad, baja) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection cn = ConexionDB.conectar();
              PreparedStatement ps = cn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -37,7 +37,7 @@ public class UsuarioDao implements CRUDBase<Usuario> {
     }
 
     public Collection<Usuario> leerTodos() throws SQLException {
-        String sql = "SELECT id_usuario, nombre, apellido, username, contrasena, email, edad "
+        String sql = "SELECT id_usuario, nombre, apellido, username, contrasena, email, edad, baja "
                 + "FROM usuarios";
         ArrayList<Usuario> usuarios = new ArrayList<>();
 
@@ -54,6 +54,7 @@ public class UsuarioDao implements CRUDBase<Usuario> {
                         rs.getInt("edad")
                 );
                 usuario.setId(rs.getInt("id_usuario"));
+                usuario.setBaja(rs.getBoolean("baja"));
                 usuarios.add(usuario);
             }
         }
@@ -63,12 +64,12 @@ public class UsuarioDao implements CRUDBase<Usuario> {
 
     public int actualizar(Usuario usuario) throws SQLException {
         String sql = "UPDATE usuarios SET nombre = ?, apellido = ?, username = ?, "
-                + "contrasena = ?, email = ?, edad = ? WHERE id_usuario = ?";
+                + "contrasena = ?, email = ?, edad = ?, baja = ? WHERE id_usuario = ?";
 
         try (Connection cn = ConexionDB.conectar();
              PreparedStatement ps = cn.prepareStatement(sql)) {
             cargarParametros(ps, usuario);
-            ps.setInt(7, usuario.getId());
+            ps.setInt(8, usuario.getId());
 
             return ps.executeUpdate();
         }
@@ -93,5 +94,6 @@ public class UsuarioDao implements CRUDBase<Usuario> {
         ps.setString(4, usuario.getPassword());
         ps.setString(5, usuario.getEmail());
         ps.setInt(6, usuario.getEdad());
+        ps.setBoolean(7, usuario.getBaja());
     }
 }

@@ -72,7 +72,7 @@ public class VideojuegoDao implements BajaLogicaEnDao<Videojuego> {
 
     @Override
     public int actualizar(Videojuego obj) throws SQLException {
-        String query = "Update videojuegos set nombre = ?, duracionMinutos = ?, clasificacion = ?, genero = ?, dificultad = ? where id_videojuego = ?";
+        String query = "Update videojuegos set nombre = ?, duracionMinutos = ?, clasificacion = ?, genero = ?, dificultad = ?, descripcion = ? where id_videojuego = ?";
         int result = 0;
 
         try(Connection cn = ConexionDB.conectar();

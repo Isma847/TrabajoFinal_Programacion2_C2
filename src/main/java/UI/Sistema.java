@@ -125,6 +125,15 @@ public class Sistema {
         }
     }
 
+    // Lee una linea y la convierte a entero; devuelve -1 si no es un numero
+    private int leerEntero() {
+        try {
+            return Integer.parseInt(entrada.nextLine().trim());
+        } catch (NumberFormatException e) {
+            return -1;
+        }
+    }
+
     private void CrearCuenta (){
         System.out.println("quiere crear una cuenta de usuario o administrador?");
         System.out.println("1. usuario");
@@ -138,8 +147,7 @@ public class Sistema {
                 System.out.println("ingrese su apellido.");
                 String apellidoUser = entrada.nextLine();
                 System.out.println("ingrese su edad.");
-                int edad = entrada.nextInt();
-                entrada.nextLine();
+                int edad = leerEntero();
                 System.out.println("ingrese su email.");
                 String emailUSer = entrada.nextLine();
                 System.out.println("ingrese su password.");
@@ -147,7 +155,9 @@ public class Sistema {
                 System.out.println("ingrese su nombre de usuario");
                 String usernameUSer = entrada.nextLine();
 
-                gestionCuenta.agregarUsuario(new Usuario (apellidoUser, nombreUser, emailUSer, passwordUser, usernameUSer, edad));
+                if (gestionCuenta.agregarUsuario(new Usuario (apellidoUser, nombreUser, emailUSer, passwordUser, usernameUSer, edad))) {
+                    System.out.println("Cuenta creada. Ya podés iniciar sesión.");
+                }
                 break;
             case  "2":
                 System.out.println("ingrese su nombre");
@@ -163,12 +173,11 @@ public class Sistema {
                 System.out.println("tiene permitido eliminar definitivamente?");
                 System.out.println("1. si");
                 System.out.println("2. no");
-                int eliminar =  entrada.nextInt();
-                entrada.nextLine();
-                if (eliminar == 1) {
-                    gestionCuenta.agregarAdministrador(new Administrador(apellidoAdmin, nombreAdmin, emailAdmin, passwordAdmin, usernameAdmin, true));
-                } else if (eliminar == 2) {
-                    gestionCuenta.agregarAdministrador(new Administrador(apellidoAdmin, nombreAdmin, emailAdmin, passwordAdmin, usernameAdmin, false));
+                int eliminar = leerEntero();
+                if (eliminar == 1 || eliminar == 2) {
+                    if (gestionCuenta.agregarAdministrador(new Administrador(apellidoAdmin, nombreAdmin, emailAdmin, passwordAdmin, usernameAdmin, eliminar == 1))) {
+                        System.out.println("Cuenta creada. Ya podés iniciar sesión.");
+                    }
                 } else {
                     System.out.println("comando no valido, volviendo al menu anterior.");
                 }
