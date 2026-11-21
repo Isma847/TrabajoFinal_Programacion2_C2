@@ -10,10 +10,14 @@ public class Cuenta extends Persona implements TieneBaja {
     private String password;
     private String email;
     private boolean baja;
+    private int edad;
+    private boolean admin;
 
-    public Cuenta(String apellido, String nombre, String email, String password, String username) {
+    public Cuenta(String apellido, String nombre, boolean admin, int edad, String email, String password, String username) {
         super(apellido, nombre);
+        this.admin = admin;
         this.baja = false;
+        this.edad = edad;
         this.email = email;
         this.password = password;
         this.username = username;
@@ -56,6 +60,26 @@ public class Cuenta extends Persona implements TieneBaja {
         this.username = username;
     }
 
+    public boolean isAdmin() {
+        return admin;
+    }
+
+    public void setAdmin(boolean admin) {
+        this.admin = admin;
+    }
+
+    public boolean isBaja() {
+        return baja;
+    }
+
+    public int getEdad() {
+        return edad;
+    }
+
+    public void setEdad(int edad) {
+        this.edad = edad;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof Cuenta cuenta)) return false;
@@ -67,12 +91,16 @@ public class Cuenta extends Persona implements TieneBaja {
         return Objects.hashCode(this.email);
     }
 
+
     @Override
     public String toString() {
         return "Cuenta{" +
-                "baja=" + baja +
-                ", Email='" + email + '\'' +
-                ", Username='" + username + '\'' +
+                "admin=" + admin +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", email='" + email + '\'' +
+                ", baja=" + baja +
+                ", edad=" + edad +
                 "} " + super.toString();
     }
 }

@@ -3,17 +3,6 @@
 CREATE DATABASE IF NOT EXISTS temuflix;
 USE temuflix;
 
-CREATE TABLE IF NOT EXISTS administradores (
-    id_administrador INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(80) NOT NULL,
-    apellido VARCHAR(80) NOT NULL,
-    username VARCHAR(60) NOT NULL,
-    contrasena VARCHAR(30) NOT NULL,
-    email VARCHAR(160) NOT NULL,
-    nivelAcceso INT NOT NULL,
-    baja BOOLEAN NOT NULL DEFAULT FALSE
-);
-
 CREATE TABLE IF NOT EXISTS usuarios (
     id_usuario INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(80) NOT NULL,
@@ -22,8 +11,10 @@ CREATE TABLE IF NOT EXISTS usuarios (
     contrasena VARCHAR(30) NOT NULL,
     email VARCHAR(160) NOT NULL,
     edad INT NOT NULL,
+    admin BOOLEAN NOT NULL,
     baja BOOLEAN NOT NULL DEFAULT FALSE
 );
+
 
 CREATE TABLE IF NOT EXISTS directores (
     id_director INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
