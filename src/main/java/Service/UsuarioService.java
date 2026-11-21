@@ -1,6 +1,7 @@
 package Service;
 
 import DAO.UsuarioDao;
+import Enumerados.Rol;
 import Excepciones.DatoInvalidoException;
 import Modelo.Usuario;
 
@@ -41,6 +42,7 @@ public class UsuarioService {
         if (usuario == null) {
             return null;
         }
+
         return copiar(usuario);
     }
 
@@ -64,6 +66,7 @@ public class UsuarioService {
         for (Usuario usuario : coleccion.values()) {
             usuarios.add(copiar(usuario));
         }
+
         return usuarios;
     }
 
@@ -77,15 +80,33 @@ public class UsuarioService {
         validarTexto(usuario.getUsername(), "username", 60);
         validarTexto(usuario.getPassword(), "contraseña", 30);
         validarTexto(usuario.getEmail(), "email", 160);
-        if (usuario.getEdad() < 1 || usuario.getEdad() > 120) {
+
+        if (usuario.getRol() == null) {
+            throw new DatoInvalidoException("El rol es obligatorio");
+        }
+
+        Integer edad = usuario.getEdad();
+        if (usuario.getRol() == Rol.USUARIO && edad == null) {
+            throw new DatoInvalidoException("La edad es obligatoria para el rol USUARIO");
+        }
+
+        if (edad != null && (edad < 1 || edad > 120)) {
             throw new DatoInvalidoException("La edad debe estar entre 1 y 120");
+        }
+
+        if (usuario.getRol() == Rol.USUARIO && usuario.isPuedeEliminar()) {
+            throw new DatoInvalidoException(
+                    "El permiso de eliminación corresponde al rol ADMINISTRADOR"
+            );
         }
     }
 
     private void validarTexto(String valor, String campo, int maximo) {
-        if (valor == null || valor.isBlank() || valor.codePointCount(0, valor.length()) > maximo) {
-            throw new DatoInvalidoException("El campo " + campo + " debe tener entre 1 y "
-                    + maximo + " caracteres");
+        if (valor == null || valor.isBlank()
+                || valor.codePointCount(0, valor.length()) > maximo) {
+            throw new DatoInvalidoException(
+                    "El campo " + campo + " debe tener entre 1 y " + maximo + " caracteres"
+            );
         }
     }
 
@@ -96,8 +117,11 @@ public class UsuarioService {
                 usuario.getEmail(),
                 usuario.getPassword(),
                 usuario.getUsername(),
-                usuario.getEdad()
+                usuario.getEdad(),
+                usuario.getRol(),
+                usuario.isPuedeEliminar()
         );
+
         copia.setId(usuario.getId());
         copia.setBaja(usuario.getBaja());
         return copia;
