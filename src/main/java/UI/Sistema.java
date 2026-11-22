@@ -1,5 +1,6 @@
 package UI;
 
+import Excepciones.DatoInvalidoException;
 import Excepciones.SesionInvalidaException;
 import Enumerados.Rol;
 import Modelo.Usuario;
@@ -141,6 +142,7 @@ public class Sistema {
     }
 
     private void crearCuenta() {
+        boolean reintentar = true;
         System.out.println("\n--- Crear cuenta ---");
         System.out.println("1. Usuario");
         System.out.println("2. Administrador");
@@ -157,43 +159,62 @@ public class Sistema {
         }
 
         Rol rol = "1".equals(opcion) ? Rol.USUARIO : Rol.ADMINISTRADOR;
-        System.out.print("Nombre: ");
-        String nombre = entrada.nextLine();
-        System.out.print("Apellido: ");
-        String apellido = entrada.nextLine();
+        while (reintentar) {
+            System.out.print("Nombre: ");
+            String nombre = entrada.nextLine();
+            System.out.print("Apellido: ");
+            String apellido = entrada.nextLine();
 
-        Integer edad = null;
-        if (rol == Rol.USUARIO) {
-            System.out.print("Edad: ");
-            edad = leerEntero();
-        }
-
-        System.out.print("Email: ");
-        String email = entrada.nextLine();
-        System.out.print("Contraseña: ");
-        String password = entrada.nextLine();
-        System.out.print("Nombre de usuario: ");
-        String username = entrada.nextLine();
-
-        boolean puedeEliminar = false;
-        if (rol == Rol.ADMINISTRADOR) {
-            System.out.println("¿Tiene permiso para eliminar definitivamente?");
-            System.out.println("1. Sí");
-            System.out.println("2. No");
-            System.out.print("Opción: ");
-            int permiso = leerEntero();
-            if (permiso != 1 && permiso != 2) {
-                System.out.println("Opción inválida");
-                return;
+            Integer edad = null;
+            if (rol == Rol.USUARIO) {
+                System.out.print("Edad: ");
+                edad = leerEntero();
             }
-            puedeEliminar = permiso == 1;
-        }
 
-        Usuario usuario = new Usuario(apellido, nombre, email, password, username,
-                edad, rol, puedeEliminar);
-        if (gestionCuenta.agregarUsuario(usuario)) {
-            System.out.println("Cuenta creada. Ya podés iniciar sesión.");
+            System.out.print("Email: ");
+            String email = entrada.nextLine();
+            System.out.print("Contraseña: ");
+            String password = entrada.nextLine();
+            System.out.print("Nombre de usuario: ");
+            String username = entrada.nextLine();
+
+            boolean puedeEliminar = false;
+            if (rol == Rol.ADMINISTRADOR) {
+                System.out.println("¿Tiene permiso para eliminar definitivamente?");
+                System.out.println("1. Sí");
+                System.out.println("2. No");
+                System.out.print("Opción: ");
+                int permiso = leerEntero();
+                if (permiso != 1 && permiso != 2) {
+                    System.out.println("Opción inválida");
+                    return;
+                }
+                puedeEliminar = permiso == 1;
+            }
+
+            Usuario usuario = new Usuario(apellido, nombre, email, password, username,
+                    edad, rol, puedeEliminar);
+            try {
+                if (gestionCuenta.agregarUsuario(usuario)) {
+                    System.out.println("Cuenta creada. Ya podés iniciar sesión.");
+                }
+                reintentar = false;
+            } catch (DatoInvalidoException e) {
+                System.out.println(e.getMessage());
+                System.out.println("desea volver a intentar crear una cuenta?");
+                System.out.println("1. reintentar");
+                System.out.println("2. volver al menu inicial");
+                int opcionDatoinvalido = entrada.nextInt();
+                entrada.nextLine();
+                if (opcionDatoinvalido == 1) {
+                    reintentar = true;
+                } else if (opcionDatoinvalido == 2) {
+                    reintentar = false;
+                } else {
+                    System.out.println("opcion invalida, volviendo al menu inicial");
+                    reintentar = false;
+                }
+            }
         }
     }
-
 }

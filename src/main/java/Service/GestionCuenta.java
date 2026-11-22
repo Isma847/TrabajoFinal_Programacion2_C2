@@ -49,8 +49,6 @@ public class GestionCuenta {
         try {
             verificarDisponible(usuario);
             return usuarios.agregar(usuario);
-        } catch (DatoInvalidoException e) {
-            System.out.println(e.getMessage());
         } catch (SQLException e) {
             System.out.println("No se pudo crear la cuenta: " + e.getMessage());
         }
