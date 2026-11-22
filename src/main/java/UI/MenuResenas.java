@@ -1,5 +1,6 @@
 package UI;
 
+import Enumerados.Rol;
 import Excepciones.DatoInvalidoException;
 import Modelo.ContenidoMultimedia;
 import Modelo.Resena;
@@ -31,7 +32,11 @@ public class MenuResenas {
         this.entrada = entrada;
     }
 
-    public void mostrarAdmin() {
+    public void mostrarAdmin(Usuario administrador) {
+        if (administrador == null || administrador.getRol() != Rol.ADMINISTRADOR) {
+            throw new DatoInvalidoException("Se requiere una cuenta administradora");
+        }
+
         while (true) {
             System.out.println("\n--- Gestionar reseñas ---");
             System.out.println("1. Listar todas");
@@ -44,7 +49,12 @@ public class MenuResenas {
                 switch (entrada.nextLine().trim()) {
                     case "1" -> listar(resenas.leerTodos());
                     case "2" -> mostrarResena(pedirResena());
-                    case "3" -> eliminar();
+                    case "3" -> {
+                        if (!administrador.isPuedeEliminar()) {
+                            throw new DatoInvalidoException("Tu cuenta requiere permiso de eliminación");
+                        }
+                        eliminar();
+                    }
                     case "0" -> {
                         return;
                     }

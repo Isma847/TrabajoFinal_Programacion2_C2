@@ -1,6 +1,5 @@
 import DAO.FavoritoDao;
 import Service.FavoritoService;
-import Service.AdministradorService;
 import Service.DirectorService;
 import Service.GestionCuenta;
 import Service.PeliculaService;
@@ -23,8 +22,7 @@ public class Main {
     public static void main(String[] args) {
         try (Scanner entrada = new Scanner(System.in)) {
             UsuarioService usuarios = new UsuarioService();
-            AdministradorService administradores = new AdministradorService();
-            GestionCuenta gestionCuenta = new GestionCuenta(usuarios, administradores);
+            GestionCuenta gestionCuenta = new GestionCuenta(usuarios);
 
             DirectorService directores = new DirectorService();
             PeliculaService peliculas = new PeliculaService();

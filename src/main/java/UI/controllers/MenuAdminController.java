@@ -1,6 +1,7 @@
 package UI.controllers;
 
 import Service.GestionCuenta;
+import Service.PeliculaService;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -13,6 +14,7 @@ import java.io.IOException;
 public class MenuAdminController {
 
     private GestionCuenta gestionCuenta;
+    private PeliculaService peliculaService;
 
     @FXML
     private Button btncerrarSesion;
@@ -21,6 +23,10 @@ public class MenuAdminController {
 
     public void setGestionCuenta(GestionCuenta gestionCuenta) {
         this.gestionCuenta = gestionCuenta;
+    }
+
+    public void setPeliculaService(PeliculaService peliculaService) {
+        this.peliculaService = peliculaService;
     }
 
 
@@ -57,6 +63,7 @@ public class MenuAdminController {
 
             LoginController controller = loader.getController();
             controller.setGestionCuenta(gestionCuenta);
+            controller.setPeliculaService(peliculaService);
 
             Stage stage = (Stage) btncerrarSesion.getScene().getWindow();
             stage.setScene(new Scene(root));

@@ -1,7 +1,7 @@
 package UI;
 
 import Excepciones.SesionInvalidaException;
-import Modelo.Administrador;
+import Enumerados.Rol;
 import Modelo.Usuario;
 import Service.GestionCuenta;
 
@@ -33,13 +33,13 @@ public class Sistema {
         while (true) {
             System.out.println("\n--- Temuflix ---");
             System.out.println("1. Iniciar sesión");
-            System.out.println("2. crear cuenta.");
+            System.out.println("2. Crear cuenta");
             System.out.println("0. Salir");
             System.out.print("Opción: ");
 
             switch (entrada.nextLine().trim()) {
                 case "1" -> iniciarSesion();
-                case "2" -> CrearCuenta();
+                case "2" -> crearCuenta();
                 case "0" -> {
                     return;
                 }
@@ -62,7 +62,7 @@ public class Sistema {
             return;
         }
 
-        if (gestionCuenta.getUsuarioActual() instanceof Administrador) {
+        if (gestionCuenta.getUsuarioActual().getRol() == Rol.ADMINISTRADOR) {
             mostrarMenuAdmin();
         } else {
             mostrarMenuUsuario();
@@ -70,6 +70,11 @@ public class Sistema {
     }
 
     public void mostrarMenuAdmin() {
+        Usuario administrador = gestionCuenta.getUsuarioActual();
+        if (administrador == null || administrador.getRol() != Rol.ADMINISTRADOR) {
+            return;
+        }
+
         while (true) {
             System.out.println("\n--- Menú administrador ---");
             System.out.println("1. Gestionar películas");
@@ -84,7 +89,7 @@ public class Sistema {
                 case "1" -> menuPeliculas.mostrar();
                 case "2" -> menuSeries.mostrar();
                 case "3" -> menuVideojuegos.mostrar();
-                case "4" -> menuResenas.mostrarAdmin();
+                case "4" -> menuResenas.mostrarAdmin(administrador);
                 case "5" -> menuFavoritos.mostrarAdmin();
                 case "0" -> {
                     gestionCuenta.cerrarSesion();
@@ -96,13 +101,14 @@ public class Sistema {
     }
 
     public void mostrarMenuUsuario() {
-        if (!(gestionCuenta.getUsuarioActual() instanceof Usuario usuario)) {
+        Usuario usuario = gestionCuenta.getUsuarioActual();
+        if (usuario == null || usuario.getRol() != Rol.USUARIO) {
             return;
         }
 
         while (true) {
             System.out.println("\n--- Menú usuario ---");
-            System.out.println("1. jugar videojuegos");
+            System.out.println("1. Consultar videojuegos");
             System.out.println("2. Reseñas");
             System.out.println("3. Consultar películas");
             System.out.println("4. Consultar series");
@@ -134,61 +140,60 @@ public class Sistema {
         }
     }
 
-    private void CrearCuenta (){
-        System.out.println("quiere crear una cuenta de usuario o administrador?");
-        System.out.println("1. usuario");
-        System.out.println("2. administradoer");
-        System.out.println("0. volver a la pantalla anterior");
+    private void crearCuenta() {
+        System.out.println("\n--- Crear cuenta ---");
+        System.out.println("1. Usuario");
+        System.out.println("2. Administrador");
+        System.out.println("0. Volver");
+        System.out.print("Opción: ");
 
-        switch (entrada.nextLine().trim()) {
-            case "1":
-                System.out.println("ingrese su nombre.");
-                String nombreUser = entrada.nextLine();
-                System.out.println("ingrese su apellido.");
-                String apellidoUser = entrada.nextLine();
-                System.out.println("ingrese su edad.");
-                int edad = leerEntero();
-                System.out.println("ingrese su email.");
-                String emailUSer = entrada.nextLine();
-                System.out.println("ingrese su password.");
-                String passwordUser = entrada.nextLine();
-                System.out.println("ingrese su nombre de usuario");
-                String usernameUSer = entrada.nextLine();
-
-                if (gestionCuenta.agregarUsuario(new Usuario (apellidoUser, nombreUser, emailUSer, passwordUser, usernameUSer, edad))) {
-                    System.out.println("Cuenta creada. Ya podés iniciar sesión.");
-                }
-                break;
-            case  "2":
-                System.out.println("ingrese su nombre");
-                String nombreAdmin = entrada.nextLine();
-                System.out.println("ingrese su apellido");
-                String apellidoAdmin = entrada.nextLine();
-                System.out.println("ingrese su email");
-                String emailAdmin = entrada.nextLine();
-                System.out.println("ingrese su password");
-                String passwordAdmin = entrada.nextLine();
-                System.out.println("ingrese su nombre de usuario");
-                String usernameAdmin = entrada.nextLine();
-                System.out.println("tiene permitido eliminar definitivamente?");
-                System.out.println("1. si");
-                System.out.println("2. no");
-                int eliminar = leerEntero();
-                if (eliminar == 1 || eliminar == 2) {
-                    if (gestionCuenta.agregarAdministrador(new Administrador(apellidoAdmin, nombreAdmin, emailAdmin, passwordAdmin, usernameAdmin, eliminar == 1))) {
-                        System.out.println("Cuenta creada. Ya podés iniciar sesión.");
-                    }
-                } else {
-                    System.out.println("comando no valido, volviendo al menu anterior.");
-                }
-                break;
-            case "0":
-                break;
-            default:
-                System.out.println("comando invalido.");
-                break;
+        String opcion = entrada.nextLine().trim();
+        if ("0".equals(opcion)) {
+            return;
+        }
+        if (!"1".equals(opcion) && !"2".equals(opcion)) {
+            System.out.println("Opción inválida");
+            return;
         }
 
+        Rol rol = "1".equals(opcion) ? Rol.USUARIO : Rol.ADMINISTRADOR;
+        System.out.print("Nombre: ");
+        String nombre = entrada.nextLine();
+        System.out.print("Apellido: ");
+        String apellido = entrada.nextLine();
 
+        Integer edad = null;
+        if (rol == Rol.USUARIO) {
+            System.out.print("Edad: ");
+            edad = leerEntero();
+        }
+
+        System.out.print("Email: ");
+        String email = entrada.nextLine();
+        System.out.print("Contraseña: ");
+        String password = entrada.nextLine();
+        System.out.print("Nombre de usuario: ");
+        String username = entrada.nextLine();
+
+        boolean puedeEliminar = false;
+        if (rol == Rol.ADMINISTRADOR) {
+            System.out.println("¿Tiene permiso para eliminar definitivamente?");
+            System.out.println("1. Sí");
+            System.out.println("2. No");
+            System.out.print("Opción: ");
+            int permiso = leerEntero();
+            if (permiso != 1 && permiso != 2) {
+                System.out.println("Opción inválida");
+                return;
+            }
+            puedeEliminar = permiso == 1;
+        }
+
+        Usuario usuario = new Usuario(apellido, nombre, email, password, username,
+                edad, rol, puedeEliminar);
+        if (gestionCuenta.agregarUsuario(usuario)) {
+            System.out.println("Cuenta creada. Ya podés iniciar sesión.");
+        }
     }
+
 }

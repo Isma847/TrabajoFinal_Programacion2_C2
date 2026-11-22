@@ -1,8 +1,7 @@
 package UI.controllers;
 
 import Excepciones.SesionInvalidaException;
-import Modelo.Administrador;
-import Modelo.Cuenta;
+import Enumerados.Rol;
 import Modelo.Usuario;
 import Service.GestionCuenta;
 import Service.PeliculaService;
@@ -14,7 +13,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import UI.controllers.MenuAdminController;
 
 import java.io.IOException;
 
@@ -59,12 +57,12 @@ public class LoginController {
             gestionCuenta.iniciarSesion(usuario, contrasena);
 
             // Obtenemos la cuenta que inició sesión
-            Cuenta cuenta = gestionCuenta.getUsuarioActual();
+            Usuario cuenta = gestionCuenta.getUsuarioActual();
 
             // Decidimos qué ventana abrir
-            if (cuenta instanceof Administrador) {
+            if (cuenta.getRol() == Rol.ADMINISTRADOR) {
                 cargarVentana("/vistas/menu-admin.fxml");
-            } else if (cuenta instanceof Usuario) {
+            } else if (cuenta.getRol() == Rol.USUARIO) {
                 cargarVentana("/vistas/menu-usuario.fxml");
             }
 
@@ -87,6 +85,7 @@ public class LoginController {
         if (ruta.equals("/vistas/menu-admin.fxml")) {
             MenuAdminController controller = loader.getController();
             controller.setGestionCuenta(gestionCuenta);
+            controller.setPeliculaService(peliculaService);
         }
 
         if (ruta.equals("/vistas/menu-usuario.fxml")) {

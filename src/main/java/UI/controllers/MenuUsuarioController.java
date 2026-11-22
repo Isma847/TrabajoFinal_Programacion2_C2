@@ -78,6 +78,7 @@ public class MenuUsuarioController {
 
             LoginController controller = loader.getController();
             controller.setGestionCuenta(gestionCuenta);
+            controller.setPeliculaService(peliculaService);
 
             Stage stage = (Stage) btncerrarSesion.getScene().getWindow();
             stage.setScene(new Scene(root));

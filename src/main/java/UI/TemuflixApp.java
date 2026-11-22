@@ -3,7 +3,6 @@ package UI;
 
 import Service.GestionCuenta;
 import Service.UsuarioService;
-import Service.AdministradorService;
 import Service.PeliculaService;
 import UI.controllers.LoginController;
 
@@ -19,11 +18,10 @@ public class TemuflixApp extends Application {
     public void start(Stage stage) throws Exception {
 
         UsuarioService usuarios = new UsuarioService();
-        AdministradorService administradores = new AdministradorService();
         PeliculaService peliculas = new PeliculaService();
 
         GestionCuenta gestionCuenta =
-                new GestionCuenta(usuarios, administradores);
+                new GestionCuenta(usuarios);
 
         FXMLLoader loader = new FXMLLoader(
                 getClass().getResource("/vistas/login.fxml")
