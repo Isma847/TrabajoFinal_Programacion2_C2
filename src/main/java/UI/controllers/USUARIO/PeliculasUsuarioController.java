@@ -1,24 +1,22 @@
-package UI.controllers;
+package UI.controllers.USUARIO;
 
 import Modelo.Pelicula;
 import Service.GestionCuenta;
 import Service.PeliculaService;
+import Service.SerieService;
+import UI.controllers.ControladorBase;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TableColumn;
-import javafx.stage.Stage;
 
-import java.io.IOException;
-
-public class PeliculasUsuarioController {
+public class PeliculasUsuarioController extends ControladorBase {
 
     private PeliculaService peliculaService;
+
+    private SerieService serieService;
 
     @FXML
     private TableView<Pelicula> tablaPeliculas;
@@ -54,6 +52,10 @@ public class PeliculasUsuarioController {
         cargarPeliculas();
     }
 
+    public void setSerieService(SerieService serieService) {
+        this.serieService = serieService;
+    }
+
     private void configurarColumnas() {
         colNombre.setCellValueFactory(datos ->
                 new SimpleStringProperty(datos.getValue().getNombre()));
@@ -80,26 +82,13 @@ public class PeliculasUsuarioController {
         );
     }
 
-    @FXML
-    private void volverMenu() {
-        try {
-            FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/vistas/menu-usuario.fxml")
-            );
+    public void volverMenu() {
+        volverAlMenuUsuario(
+                tablaPeliculas,
+                gestionCuenta,
+                peliculaService,
+                serieService
+        );
+    }
 
-            Parent root = loader.load();
-
-            // Le devolvemos los servicios al menú para no perder la sesión ni los datos
-            MenuUsuarioController controller = loader.getController();
-            controller.setGestionCuenta(gestionCuenta);
-            controller.setPeliculaService(peliculaService);
-
-            // Usamos tablaPeliculas para obtener la ventana actual
-            Stage stage = (Stage) tablaPeliculas.getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.show();
-
-        } catch (IOException e) {
-            System.out.println("Error al volver al menú: " + e.getMessage());
-        }
-    }}
+   }

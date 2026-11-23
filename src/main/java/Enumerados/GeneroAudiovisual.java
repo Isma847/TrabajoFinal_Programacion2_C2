@@ -12,8 +12,4 @@ public enum GeneroAudiovisual {
     Romance,
     Documental,
     Animacion;
-
-
-
-
 }

@@ -1,9 +1,7 @@
 
 package UI;
 
-import Service.GestionCuenta;
-import Service.UsuarioService;
-import Service.PeliculaService;
+import Service.*;
 import UI.controllers.LoginController;
 
 import javafx.application.Application;
@@ -18,8 +16,9 @@ public class TemuflixApp extends Application {
     public void start(Stage stage) throws Exception {
 
         UsuarioService usuarios = new UsuarioService();
+        AdministradorService administradores = new AdministradorService();
         PeliculaService peliculas = new PeliculaService();
-
+        SerieService serieService=new SerieService();
         GestionCuenta gestionCuenta =
                 new GestionCuenta(usuarios);
 
@@ -32,6 +31,7 @@ public class TemuflixApp extends Application {
         LoginController controller = loader.getController();
         controller.setGestionCuenta(gestionCuenta);
         controller.setPeliculaService(peliculas);
+        controller.setSerieService(serieService);
 
         Scene escena = new Scene(root, 800, 500);
 

@@ -52,7 +52,7 @@ public class AdministradorDao implements CRUDBase<Administrador> {
                         rs.getString("email"),
                         rs.getString("contrasena"),
                         rs.getString("username"),
-                        rs.getBoolean("puedeEliminar")
+                        false
                 );
                 administrador.setId(rs.getInt("id_administrador"));
                 administrador.setBaja(rs.getBoolean("baja"));

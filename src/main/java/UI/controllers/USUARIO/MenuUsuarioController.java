@@ -1,7 +1,9 @@
-package UI.controllers;
+package UI.controllers.USUARIO;
 
 import Service.GestionCuenta;
 import Service.PeliculaService;
+import Service.SerieService;
+import UI.controllers.LoginController;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -19,6 +21,11 @@ public class MenuUsuarioController {
     private Button btnPeliculas;
 
     private PeliculaService peliculaService;
+    private SerieService serieService;
+
+    public void setSerieService(SerieService serieService) {
+        this.serieService = serieService;
+    }
 
     public void setPeliculaService(PeliculaService peliculaService) {
         this.peliculaService = peliculaService;
@@ -35,6 +42,7 @@ public class MenuUsuarioController {
 
             PeliculasUsuarioController controller = loader.getController();
             controller.setPeliculaService(peliculaService);
+            controller.setSerieService(serieService);
             controller.setGestionCuenta(gestionCuenta); // <-- ¡Muy importante!
 
             Stage stage = (Stage) btnPeliculas.getScene().getWindow();
@@ -78,6 +86,7 @@ public class MenuUsuarioController {
 
             LoginController controller = loader.getController();
             controller.setGestionCuenta(gestionCuenta);
+            controller.setSerieService(serieService);
             controller.setPeliculaService(peliculaService);
 
             Stage stage = (Stage) btncerrarSesion.getScene().getWindow();
@@ -90,12 +99,32 @@ public class MenuUsuarioController {
     }
 
 
+
     @FXML
     private void abrirSeries() {
-        System.out.println("Abrir series");
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/vistas/series-usuario.fxml")
+            );
+
+            Parent root = loader.load();
+
+            SeriesUsuarioController controller = loader.getController();
+
+            // Primero configuramos el controlador
+            controller.setSerieService(serieService);
+            controller.setGestionCuenta(gestionCuenta);
+            controller.setPeliculaService(peliculaService);
+
+            // Después cambiamos la ventana
+            Stage stage = (Stage) btnPeliculas.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.show();
+
+        } catch (IOException e) {
+            System.out.println("Error al abrir series: " + e.getMessage());
+        }
     }
-
-
 
 
 }
