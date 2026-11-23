@@ -5,17 +5,14 @@ public class Resena {
     private int id;
     private int idContenido;
     private int idUsuario;
-    private String tipo;
     private int calificacion;
     private String comentario;
     private String fecha;
 
-    public Resena(int idContenido, int idUsuario, String tipo,
-                  int calificacion, String comentario, String fecha) {
+    public Resena(int idContenido, int idUsuario, int calificacion, String comentario, String fecha) {
         this(calificacion, comentario, fecha);
         this.idContenido = idContenido;
         this.idUsuario = idUsuario;
-        this.tipo = tipo;
     }
 
     public Resena(int calificacion, String comentario, String fecha) {
@@ -50,14 +47,6 @@ public class Resena {
         this.idUsuario = idUsuario;
     }
 
-    public String getTipo() {
-        return tipo;
-    }
-
-    public void setTipo(String tipo) {
-        this.tipo = tipo;
-    }
-
     public int getCalificacion() {
         return calificacion;
     }
@@ -88,7 +77,6 @@ public class Resena {
                 "id=" + id +
                 ", idContenido=" + idContenido +
                 ", idUsuario=" + idUsuario +
-                ", tipo='" + tipo + '\'' +
                 ", calificacion=" + calificacion +
                 ", comentario='" + comentario + '\'' +
                 ", fecha='" + fecha + '\'' +

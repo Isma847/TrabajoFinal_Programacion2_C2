@@ -10,15 +10,14 @@ import java.util.Collection;
 public class FavoritoDao {
 
     public int crear(Favorito favorito) throws SQLException {
-        String sql = "INSERT INTO favoritos (id_usuario, tipo, id_contenido) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO favoritos (id_usuario, id_contenido) VALUES (?, ?)";
 
         try (Connection cn = ConexionDB.conectar()) {
             cn.setAutoCommit(false);
 
             try (PreparedStatement ps = cn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
                 ps.setInt(1, favorito.getId_usaurio());
-                ps.setString(2, favorito.getTipo());
-                ps.setInt(3, favorito.getId_contenido());
+                ps.setInt(2, favorito.getId_contenido());
                 if (ps.executeUpdate() == 0) {
                     cn.rollback();
                     return -1;
@@ -53,8 +52,7 @@ public class FavoritoDao {
                 Favorito favorito = new Favorito(
                         rs.getInt("id_favorito"),
                         rs.getInt("id_usuario"),
-                        rs.getInt("id_contenido"),
-                        rs.getString("tipo")
+                        rs.getInt("id_contenido")
                 );
                 favoritos.add(favorito);
             }
@@ -84,13 +82,12 @@ public class FavoritoDao {
     }
 
     public int quitarDeUsuario(int idUsuario, int idContenido, String tipo) throws SQLException {
-        String sql = "DELETE FROM favoritos WHERE id_usuario = ? AND id_contenido = ? AND tipo = ?";
+        String sql = "DELETE FROM favoritos WHERE id_usuario = ? AND id_contenido = ?";
 
         try (Connection cn = ConexionDB.conectar();
              PreparedStatement ps = cn.prepareStatement(sql)) {
             ps.setInt(1, idUsuario);
             ps.setInt(2, idContenido);
-            ps.setString(3, tipo);
             return ps.executeUpdate();
         }
     }
