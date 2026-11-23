@@ -1,8 +1,6 @@
 package UI.controllers;
 
-import Service.GestionCuenta;
-import Service.PeliculaService;
-import Service.SerieService;
+import Service.*;
 import UI.controllers.USUARIO.MenuUsuarioController;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleStringProperty;
@@ -39,7 +37,9 @@ public class ControladorBase {
             Node componente,
             GestionCuenta gestionCuenta,
             PeliculaService peliculaService,
-            SerieService serieService) {
+            SerieService serieService,
+            VideojuegoService videojuegoService,
+            ResenaService resenaService) {
 
         try {
             FXMLLoader loader = new FXMLLoader(
@@ -53,6 +53,8 @@ public class ControladorBase {
             controller.setGestionCuenta(gestionCuenta);
             controller.setPeliculaService(peliculaService);
             controller.setSerieService(serieService);
+            controller.setVideojuegoService(videojuegoService);
+            controller.setResenaService(resenaService);
 
             Stage stage = (Stage) componente.getScene().getWindow();
             stage.setScene(new Scene(root));

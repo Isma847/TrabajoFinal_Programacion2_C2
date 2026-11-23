@@ -4,9 +4,7 @@ import Excepciones.SesionInvalidaException;
 import Modelo.Administrador;
 import Modelo.Cuenta;
 import Modelo.Usuario;
-import Service.GestionCuenta;
-import Service.PeliculaService;
-import Service.SerieService;
+import Service.*;
 import UI.controllers.USUARIO.MenuUsuarioController;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -19,9 +17,6 @@ import javafx.stage.Stage;
 import UI.controllers.ADMIN.MenuAdminController;
 
 import java.io.IOException;
-
-
-
 
 public class LoginController {
 
@@ -41,6 +36,10 @@ public class LoginController {
 
     private SerieService serieService;
 
+    private VideojuegoService videojuegoService;
+
+    private ResenaService resenaService;
+
     public void setPeliculaService(PeliculaService peliculaService) {
         this.peliculaService = peliculaService;
     }
@@ -52,6 +51,14 @@ public class LoginController {
 
     public void setSerieService(SerieService serieService) {
         this.serieService = serieService;
+    }
+
+    public void setVideojuegoService(VideojuegoService videojuegoService) {
+        this.videojuegoService = videojuegoService;
+    }
+
+    public void setResenaService(ResenaService resenaService) {
+        this.resenaService = resenaService;
     }
 
     //Metodo que conecta el boton con el controlador
@@ -103,6 +110,8 @@ public class LoginController {
             controller.setGestionCuenta(gestionCuenta);
             controller.setPeliculaService(peliculaService);
             controller.setSerieService(serieService);
+            controller.setVideojuegoService(videojuegoService);
+            controller.setResenaService(resenaService);
         }
 
         Stage stage = (Stage) btnIniciarSesion.getScene().getWindow();

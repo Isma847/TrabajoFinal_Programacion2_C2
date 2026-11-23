@@ -1,9 +1,7 @@
 package UI.controllers.USUARIO;
 
 import Modelo.Serie;
-import Service.GestionCuenta;
-import Service.PeliculaService;
-import Service.SerieService;
+import Service.*;
 import UI.controllers.ControladorBase;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleStringProperty;
@@ -16,6 +14,12 @@ import UI.controllers.USUARIO.SeriesUsuarioController;
 public class SeriesUsuarioController extends ControladorBase {
 
     private SerieService serieService;
+
+    private PeliculaService peliculaService;
+
+    private VideojuegoService videojuegoService;
+
+    private ResenaService resenaService;
 
     @FXML
     private TableView<Serie> tablaSeries;
@@ -53,12 +57,19 @@ public class SeriesUsuarioController extends ControladorBase {
         cargarSeries();
     }
 
-    private PeliculaService peliculaService;
-
     public void setPeliculaService(PeliculaService peliculaService) {
         this.peliculaService = peliculaService;
     }
 
+    public void setVideojuegoService(VideojuegoService videojuegoService) {
+        this.videojuegoService = videojuegoService;
+    }
+
+    public void setResenaService(ResenaService resenaService) {
+        this.resenaService = resenaService;
+    }
+
+    //METODOS DE SERIES
 
     private void configurarColumna(){
         this.colNombre.setCellValueFactory(datos ->
@@ -94,7 +105,9 @@ public class SeriesUsuarioController extends ControladorBase {
                 tablaSeries,
                 gestionCuenta,
                 peliculaService,
-                serieService
+                serieService,
+                videojuegoService,
+                resenaService
         );
     }
 

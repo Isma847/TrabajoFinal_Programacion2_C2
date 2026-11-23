@@ -1,9 +1,7 @@
 package UI.controllers.USUARIO;
 
 import Modelo.Pelicula;
-import Service.GestionCuenta;
-import Service.PeliculaService;
-import Service.SerieService;
+import Service.*;
 import UI.controllers.ControladorBase;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleStringProperty;
@@ -14,9 +12,17 @@ import javafx.scene.control.TableColumn;
 
 public class PeliculasUsuarioController extends ControladorBase {
 
+    //ATRIBUTOS
+
     private PeliculaService peliculaService;
 
     private SerieService serieService;
+
+    private VideojuegoService videojuegoService;
+
+    private ResenaService resenaService;
+
+    //FXML
 
     @FXML
     private TableView<Pelicula> tablaPeliculas;
@@ -40,11 +46,11 @@ public class PeliculasUsuarioController extends ControladorBase {
     private TableColumn<Pelicula, String> colDescripcion;
     private GestionCuenta gestionCuenta;
 
+    //SETTERS
+
     public void setGestionCuenta(GestionCuenta gestionCuenta) {
         this.gestionCuenta = gestionCuenta;
     }
-    
-    
 
     public void setPeliculaService(PeliculaService peliculaService) {
         this.peliculaService = peliculaService;
@@ -55,6 +61,16 @@ public class PeliculasUsuarioController extends ControladorBase {
     public void setSerieService(SerieService serieService) {
         this.serieService = serieService;
     }
+
+    public void setVideojuegoService(VideojuegoService videojuegoService) {
+        this.videojuegoService = videojuegoService;
+    }
+
+    public void setResenaService(ResenaService resenaService) {
+        this.resenaService = resenaService;
+    }
+
+    //METODOS DE PELICULAS
 
     private void configurarColumnas() {
         colNombre.setCellValueFactory(datos ->
@@ -87,7 +103,9 @@ public class PeliculasUsuarioController extends ControladorBase {
                 tablaPeliculas,
                 gestionCuenta,
                 peliculaService,
-                serieService
+                serieService,
+                videojuegoService,
+                resenaService
         );
     }
 

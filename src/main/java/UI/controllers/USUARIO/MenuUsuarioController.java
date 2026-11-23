@@ -1,8 +1,6 @@
 package UI.controllers.USUARIO;
 
-import Service.GestionCuenta;
-import Service.PeliculaService;
-import Service.SerieService;
+import Service.*;
 import UI.controllers.LoginController;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -22,6 +20,8 @@ public class MenuUsuarioController {
 
     private PeliculaService peliculaService;
     private SerieService serieService;
+    private VideojuegoService videojuegoService;
+    private ResenaService resenaService;
 
     public void setSerieService(SerieService serieService) {
         this.serieService = serieService;
@@ -29,6 +29,14 @@ public class MenuUsuarioController {
 
     public void setPeliculaService(PeliculaService peliculaService) {
         this.peliculaService = peliculaService;
+    }
+
+    public void setVideojuegoService(VideojuegoService videojuegoService) {
+        this.videojuegoService = videojuegoService;
+    }
+
+    public void setResenaService(ResenaService resenaService) {
+        this.resenaService = resenaService;
     }
 
     @FXML
@@ -43,6 +51,8 @@ public class MenuUsuarioController {
             PeliculasUsuarioController controller = loader.getController();
             controller.setPeliculaService(peliculaService);
             controller.setSerieService(serieService);
+            controller.setVideojuegoService(videojuegoService);
+            controller.setResenaService(resenaService);
             controller.setGestionCuenta(gestionCuenta); // <-- ¡Muy importante!
 
             Stage stage = (Stage) btnPeliculas.getScene().getWindow();
@@ -65,12 +75,54 @@ public class MenuUsuarioController {
 
     @FXML
     private void abrirVideojuegos() {
-        System.out.println("Abrir videojuegos");
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/vistas/videojuegos-usuario.fxml")
+            );
+
+            Parent root = loader.load();
+
+            VideojuegosUsuarioController controller = loader.getController();
+
+            controller.setVideojuegoService(videojuegoService);
+            controller.setGestionCuenta(gestionCuenta);
+            controller.setPeliculaService(peliculaService);
+            controller.setSerieService(serieService);
+            controller.setResenaService(resenaService);
+
+            Stage stage = (Stage) btnPeliculas.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.show();
+
+        } catch (IOException e) {
+            System.out.println("Error al abrir videojuegos: " + e.getMessage());
+        }
     }
 
     @FXML
     private void abrirResenas() {
-        System.out.println("Abrir reseñas");
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/vistas/resenas-usuario.fxml")
+            );
+
+            Parent root = loader.load();
+
+            ResenasUsuarioController controller = loader.getController();
+
+            controller.setResenaService(resenaService);
+            controller.setGestionCuenta(gestionCuenta);
+            controller.setPeliculaService(peliculaService);
+            controller.setSerieService(serieService);
+            controller.setVideojuegoService(videojuegoService);
+
+            Stage stage = (Stage) btnPeliculas.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.show();
+
+        } catch (IOException e) {
+            System.out.println("Error al abrir reseñas: " + e.getMessage());
+        }
     }
 
     @FXML
@@ -88,6 +140,7 @@ public class MenuUsuarioController {
             controller.setGestionCuenta(gestionCuenta);
             controller.setSerieService(serieService);
             controller.setPeliculaService(peliculaService);
+            controller.setVideojuegoService(videojuegoService);
 
             Stage stage = (Stage) btncerrarSesion.getScene().getWindow();
             stage.setScene(new Scene(root));
@@ -112,9 +165,11 @@ public class MenuUsuarioController {
             SeriesUsuarioController controller = loader.getController();
 
             // Primero configuramos el controlador
-            controller.setSerieService(serieService);
+            controller.setVideojuegoService(videojuegoService);
             controller.setGestionCuenta(gestionCuenta);
             controller.setPeliculaService(peliculaService);
+            controller.setSerieService(serieService);
+            controller.setResenaService(resenaService);
 
             // Después cambiamos la ventana
             Stage stage = (Stage) btnPeliculas.getScene().getWindow();

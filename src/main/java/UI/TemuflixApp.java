@@ -19,6 +19,9 @@ public class TemuflixApp extends Application {
         AdministradorService administradores = new AdministradorService();
         PeliculaService peliculas = new PeliculaService();
         SerieService serieService=new SerieService();
+        VideojuegoService videojuegoService=new VideojuegoService();
+        ResenaService resenaService=new ResenaService();
+
         GestionCuenta gestionCuenta =
                 new GestionCuenta(usuarios);
 
@@ -32,6 +35,8 @@ public class TemuflixApp extends Application {
         controller.setGestionCuenta(gestionCuenta);
         controller.setPeliculaService(peliculas);
         controller.setSerieService(serieService);
+        controller.setVideojuegoService(videojuegoService);
+        controller.setResenaService(resenaService);
 
         Scene escena = new Scene(root, 800, 500);
 
