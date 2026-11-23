@@ -32,6 +32,14 @@ public final class ContenidoService {
     /// Primero se realiza la operación en su respectivo service y si sale bien se realizan
     /// los cambios en el listado general (registro).
 
+    /*
+    Para realizar las acciones CRUD para los diferentes contenidos (Peliculas, series y videojuegos)
+    se tienen que realizar mediante esta clase, que se ocupa de subir la llamada al service correspondiente y
+    si la operación sale bien entonces hace algo en el listado, por ejemplo, para crear un contenido nuevo
+    se lo pasa a su service, si ese service da el positivo entonces agrega ese contenido al listado en la bdd
+    y luego con el id que devuelve lo agrega al listado local.
+     */
+
     public boolean agregar(ContenidoMultimedia contenido) throws SQLException {
         TipoContenido tipo = tipoDe(contenido);
         if (!agregarEnService(tipo, contenido)) return false;
@@ -59,9 +67,10 @@ public final class ContenidoService {
         return true;
     }
 
+    /// Alternar la baja
     public boolean darDeBaja(TipoContenido tipo, int idPropio) throws SQLException {
         return darDeBajaEnService(tipo, idPropio);
-    } /// Alternar la baja
+    }
 
     public boolean eliminar(TipoContenido tipo, int idPropio) throws SQLException {
         int idGeneral = buscarIdContenido(tipo, idPropio);
@@ -71,7 +80,7 @@ public final class ContenidoService {
         return true;
     }
 
-    public boolean eliminar(int idGeneral) throws SQLException {
+    public boolean eliminarPorID(int idGeneral) throws SQLException {
         ContenidoMultimedia contenido = registro.get(idGeneral);
         if (contenido == null) return false;
         return eliminar(tipoDe(contenido), contenido.getId());
@@ -82,7 +91,7 @@ public final class ContenidoService {
     }
 
     /// Los métodos que buscan id devuelven -1 si no se encontro
-
+    /// Busca el id general según el objeto
     public int buscarIdContenido(ContenidoMultimedia contenido) {
         for (Map.Entry<Integer, ContenidoMultimedia> entrada : registro.entrySet()) {
             if (entrada.getValue().equals(contenido)) {
@@ -90,8 +99,9 @@ public final class ContenidoService {
             }
         }
         return -1;
-    } /// Busca el id general según el objeto
+    }
 
+    /// Busca el id general según el tipo e id de tipo
     public int buscarIdContenido(TipoContenido tipo, int idPropio) {
         for (Map.Entry<Integer, ContenidoMultimedia> entrada : registro.entrySet()) {
             ContenidoMultimedia contenido = entrada.getValue();
@@ -100,13 +110,14 @@ public final class ContenidoService {
             }
         }
         return -1;
-    } /// Busca el id general según el tipo e id de tipo
+    }
 
+    /// Devuelve el tipo de contenido del objeto que posee dicha ID
     public TipoContenido getTipo(int idGeneral) throws DatoInvalidoException{
         ContenidoMultimedia contenido = registro.get(idGeneral);
         if (contenido == null) throw new DatoInvalidoException("No existe ningun contenido con ese id. Introduzca el id de contenido.");
         return tipoDe(contenido);
-    } /// Devuelve el tipo de contenido del objeto que posee dicha ID
+    }
 
     public ArrayList<ContenidoMultimedia> leerTodos() {
         return new ArrayList<>(registro.values());
