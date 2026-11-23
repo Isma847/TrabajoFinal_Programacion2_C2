@@ -39,7 +39,8 @@ public class ControladorBase {
             PeliculaService peliculaService,
             SerieService serieService,
             VideojuegoService videojuegoService,
-            ResenaService resenaService) {
+            ResenaService resenaService,
+            FavoritoService favoritoService) {
 
         try {
             FXMLLoader loader = new FXMLLoader(
@@ -55,6 +56,7 @@ public class ControladorBase {
             controller.setSerieService(serieService);
             controller.setVideojuegoService(videojuegoService);
             controller.setResenaService(resenaService);
+            controller.setFavoritoService(favoritoService);
 
             Stage stage = (Stage) componente.getScene().getWindow();
             stage.setScene(new Scene(root));

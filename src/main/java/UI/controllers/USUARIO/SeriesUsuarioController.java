@@ -21,6 +21,8 @@ public class SeriesUsuarioController extends ControladorBase {
 
     private ResenaService resenaService;
 
+    private FavoritoService favoritoService;
+
     @FXML
     private TableView<Serie> tablaSeries;
 
@@ -69,6 +71,10 @@ public class SeriesUsuarioController extends ControladorBase {
         this.resenaService = resenaService;
     }
 
+    public void setFavoritoService(FavoritoService favoritoService) {
+        this.favoritoService = favoritoService;
+    }
+
     //METODOS DE SERIES
 
     private void configurarColumna(){
@@ -107,7 +113,8 @@ public class SeriesUsuarioController extends ControladorBase {
                 peliculaService,
                 serieService,
                 videojuegoService,
-                resenaService
+                resenaService,
+                favoritoService
         );
     }
 

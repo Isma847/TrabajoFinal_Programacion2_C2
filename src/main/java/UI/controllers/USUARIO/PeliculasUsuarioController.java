@@ -22,6 +22,8 @@ public class PeliculasUsuarioController extends ControladorBase {
 
     private ResenaService resenaService;
 
+    private FavoritoService favoritoService;
+
     //FXML
 
     @FXML
@@ -70,6 +72,10 @@ public class PeliculasUsuarioController extends ControladorBase {
         this.resenaService = resenaService;
     }
 
+    public void setFavoritoService(FavoritoService favoritoService) {
+        this.favoritoService = favoritoService;
+    }
+
     //METODOS DE PELICULAS
 
     private void configurarColumnas() {
@@ -105,7 +111,8 @@ public class PeliculasUsuarioController extends ControladorBase {
                 peliculaService,
                 serieService,
                 videojuegoService,
-                resenaService
+                resenaService,
+                favoritoService
         );
     }
 

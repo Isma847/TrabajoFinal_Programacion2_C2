@@ -1,6 +1,7 @@
 
 package UI;
 
+import DAO.FavoritoDao;
 import Service.*;
 import UI.controllers.LoginController;
 
@@ -21,6 +22,7 @@ public class TemuflixApp extends Application {
         SerieService serieService=new SerieService();
         VideojuegoService videojuegoService=new VideojuegoService();
         ResenaService resenaService=new ResenaService();
+        FavoritoService favoritoService=new FavoritoService(new FavoritoDao());
 
         GestionCuenta gestionCuenta =
                 new GestionCuenta(usuarios);
@@ -37,6 +39,7 @@ public class TemuflixApp extends Application {
         controller.setSerieService(serieService);
         controller.setVideojuegoService(videojuegoService);
         controller.setResenaService(resenaService);
+        controller.setFavoritoService(favoritoService);
 
         Scene escena = new Scene(root, 800, 500);
 

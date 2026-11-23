@@ -40,6 +40,8 @@ public class LoginController {
 
     private ResenaService resenaService;
 
+    private FavoritoService favoritoService;
+
     public void setPeliculaService(PeliculaService peliculaService) {
         this.peliculaService = peliculaService;
     }
@@ -59,6 +61,10 @@ public class LoginController {
 
     public void setResenaService(ResenaService resenaService) {
         this.resenaService = resenaService;
+    }
+
+    public void setFavoritoService(FavoritoService favoritoService) {
+        this.favoritoService = favoritoService;
     }
 
     //Metodo que conecta el boton con el controlador
@@ -112,6 +118,7 @@ public class LoginController {
             controller.setSerieService(serieService);
             controller.setVideojuegoService(videojuegoService);
             controller.setResenaService(resenaService);
+            controller.setFavoritoService(favoritoService);
         }
 
         Stage stage = (Stage) btnIniciarSesion.getScene().getWindow();

@@ -18,6 +18,7 @@ public class VideojuegosUsuarioController extends ControladorBase {
     private PeliculaService peliculaService;
     private SerieService serieService;
     private ResenaService resenaService;
+    private FavoritoService favoritoService;
 
 
     @FXML
@@ -63,6 +64,10 @@ public class VideojuegosUsuarioController extends ControladorBase {
         this.resenaService = resenaService;
     }
 
+    public void setFavoritoService(FavoritoService favoritoService) {
+        this.favoritoService = favoritoService;
+    }
+
     private void configurarColumnas() {
         colNombre.setCellValueFactory(datos ->
                 new SimpleStringProperty(datos.getValue().getNombre()));
@@ -96,8 +101,8 @@ public class VideojuegosUsuarioController extends ControladorBase {
                 peliculaService,
                 serieService,
                 videojuegoService,
-                resenaService
-
+                resenaService,
+                favoritoService
         );
     }
 }

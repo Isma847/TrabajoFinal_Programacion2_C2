@@ -2,11 +2,7 @@ package UI.controllers.USUARIO;
 
 import Modelo.ContenidoMultimedia;
 import Modelo.Resena;
-import Service.GestionCuenta;
-import Service.PeliculaService;
-import Service.SerieService;
-import Service.VideojuegoService;
-import Service.ResenaService;
+import Service.*;
 import UI.controllers.ControladorBase;
 
 import javafx.collections.FXCollections;
@@ -23,7 +19,9 @@ public class ResenasUsuarioController extends ControladorBase {
     private PeliculaService peliculaService;
     private SerieService serieService;
     private VideojuegoService videojuegoService;
+    private FavoritoService favoritoService;
     private GestionCuenta gestionCuenta;
+
 
     @FXML
     private ComboBox<String> comboTipo;
@@ -64,6 +62,10 @@ public class ResenasUsuarioController extends ControladorBase {
 
     public void setVideojuegoService(VideojuegoService videojuegoService) {
         this.videojuegoService = videojuegoService;
+    }
+
+    public void setFavoritoService(FavoritoService favoritoService) {
+        this.favoritoService = favoritoService;
     }
 
     public void setGestionCuenta(GestionCuenta gestionCuenta) {
@@ -259,7 +261,8 @@ public class ResenasUsuarioController extends ControladorBase {
                 peliculaService,
                 serieService,
                 videojuegoService,
-                resenaService
+                resenaService,
+                favoritoService
         );
     }
 }

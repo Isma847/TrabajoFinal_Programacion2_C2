@@ -22,6 +22,7 @@ public class MenuUsuarioController {
     private SerieService serieService;
     private VideojuegoService videojuegoService;
     private ResenaService resenaService;
+    private FavoritoService favoritoService;
 
     public void setSerieService(SerieService serieService) {
         this.serieService = serieService;
@@ -39,6 +40,10 @@ public class MenuUsuarioController {
         this.resenaService = resenaService;
     }
 
+    public void setFavoritoService(FavoritoService favoritoService) {
+        this.favoritoService = favoritoService;
+    }
+
     @FXML
     private void abrirPeliculas() {
         try {
@@ -53,6 +58,7 @@ public class MenuUsuarioController {
             controller.setSerieService(serieService);
             controller.setVideojuegoService(videojuegoService);
             controller.setResenaService(resenaService);
+            controller.setFavoritoService(favoritoService);
             controller.setGestionCuenta(gestionCuenta); // <-- ¡Muy importante!
 
             Stage stage = (Stage) btnPeliculas.getScene().getWindow();
@@ -89,6 +95,7 @@ public class MenuUsuarioController {
             controller.setPeliculaService(peliculaService);
             controller.setSerieService(serieService);
             controller.setResenaService(resenaService);
+            controller.setFavoritoService(favoritoService);
 
             Stage stage = (Stage) btnPeliculas.getScene().getWindow();
             stage.setScene(new Scene(root));
@@ -115,6 +122,7 @@ public class MenuUsuarioController {
             controller.setPeliculaService(peliculaService);
             controller.setSerieService(serieService);
             controller.setVideojuegoService(videojuegoService);
+            controller.setFavoritoService(favoritoService);
 
             Stage stage = (Stage) btnPeliculas.getScene().getWindow();
             stage.setScene(new Scene(root));
@@ -141,6 +149,8 @@ public class MenuUsuarioController {
             controller.setSerieService(serieService);
             controller.setPeliculaService(peliculaService);
             controller.setVideojuegoService(videojuegoService);
+            controller.setResenaService(resenaService);
+            controller.setFavoritoService(favoritoService);
 
             Stage stage = (Stage) btncerrarSesion.getScene().getWindow();
             stage.setScene(new Scene(root));
@@ -170,6 +180,7 @@ public class MenuUsuarioController {
             controller.setPeliculaService(peliculaService);
             controller.setSerieService(serieService);
             controller.setResenaService(resenaService);
+            controller.setFavoritoService(favoritoService);
 
             // Después cambiamos la ventana
             Stage stage = (Stage) btnPeliculas.getScene().getWindow();
@@ -178,6 +189,34 @@ public class MenuUsuarioController {
 
         } catch (IOException e) {
             System.out.println("Error al abrir series: " + e.getMessage());
+        }
+    }
+    @FXML
+    private void abrirFavoritos() {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/vistas/favoritos-usuario.fxml")
+            );
+
+            Parent root = loader.load();
+
+            FavoritosUsuarioController controller = loader.getController();
+
+            controller.setFavoritoService(favoritoService);
+            controller.setGestionCuenta(gestionCuenta);
+            controller.setPeliculaService(peliculaService);
+            controller.setSerieService(serieService);
+            controller.setResenaService(resenaService);
+            controller.setVideojuegoService(videojuegoService);
+
+            controller.inicializarPantalla();
+
+            Stage stage = (Stage) btnPeliculas.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.show();
+
+        } catch (IOException e) {
+            System.out.println("Error al abrir favoritos: " + e.getMessage());
         }
     }
 
