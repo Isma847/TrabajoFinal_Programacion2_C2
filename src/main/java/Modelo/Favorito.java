@@ -2,6 +2,9 @@ package Modelo;
 
 import java.util.Objects;
 
+/**
+ * Contenido marcado como favorito por un usuario. Apunta al contenido por su id general.
+ */
 public class Favorito {
     private int id;
     private int id_usaurio;
@@ -39,6 +42,9 @@ public class Favorito {
         this.id_contenido = id_contenido;
     }
     
+    /**
+     * Dos favoritos son iguales si tienen el mismo id.
+     */
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;

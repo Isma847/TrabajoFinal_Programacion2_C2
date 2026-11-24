@@ -3,6 +3,10 @@ package Modelo;
 import Enumerados.ClasificacionEdad;
 import Enumerados.GeneroVideojuegos;
 
+/**
+ * Videojuego del catálogo: contenido con dificultad y género propio (GeneroVideojuegos). No tiene
+ * director.
+ */
 public class Videojuego extends ContenidoMultimedia {
     private int dificultad;
     private GeneroVideojuegos genero;

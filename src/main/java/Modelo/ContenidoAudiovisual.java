@@ -3,6 +3,10 @@ package Modelo;
 import Enumerados.ClasificacionEdad;
 import Enumerados.GeneroAudiovisual;
 
+/**
+ * Clase abstracta con lo común a Pelicula y Serie: el género y el director (idDirector 0
+ * significa sin director).
+ */
 public abstract class ContenidoAudiovisual extends ContenidoMultimedia {
     private GeneroAudiovisual genero;
     private int idDirector;

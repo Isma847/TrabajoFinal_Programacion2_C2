@@ -1,5 +1,9 @@
 package Modelo;
 
+/**
+ * Reseña de un usuario sobre un contenido, con calificación (1 a 10), comentario y fecha. Apunta
+ * al contenido por su id general.
+ */
 public class Resena {
 
     private int id;

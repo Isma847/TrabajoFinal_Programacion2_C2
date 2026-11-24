@@ -1,5 +1,9 @@
 package Modelo;
 
+/**
+ * Clase base abstracta de las personas del sistema: guarda nombre, apellido e id. De ella heredan
+ * Cuenta y Director.
+ */
 public abstract class Persona {
 
     private String nombre;

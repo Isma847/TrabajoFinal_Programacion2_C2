@@ -2,7 +2,10 @@ package Modelo;
 
 import Enumerados.TipoContenido;
 
-// Se utiliza para traer los registros de contenido al local.
+/**
+ * Una fila de la tabla pivote contenidoMultimedia: id general, tipo e id propio del contenido.
+ * Solo sirve para traer esos datos desde la base.
+ */
 public class RegistroContenido {
 
     private int id;

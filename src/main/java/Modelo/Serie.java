@@ -3,6 +3,9 @@ package Modelo;
 import Enumerados.ClasificacionEdad;
 import Enumerados.GeneroAudiovisual;
 
+/**
+ * Serie del catálogo: contenido audiovisual con cantidad de capítulos y de temporadas.
+ */
 public class Serie extends ContenidoAudiovisual {
 
     private int cantidadCapitulos;

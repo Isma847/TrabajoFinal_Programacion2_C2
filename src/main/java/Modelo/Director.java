@@ -1,6 +1,9 @@
 package Modelo;
 
 
+/**
+ * Persona que dirige películas y series. No tiene baja lógica: se puede eliminar de verdad.
+ */
 public class Director extends Persona {
     private String descripcion;
 
@@ -13,7 +16,4 @@ public class Director extends Persona {
         return descripcion;
     }
 
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
-    }
 }

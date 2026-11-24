@@ -46,3 +46,13 @@ planteadas para el administrador.</p>
         </p>
     </li>
 </ol>
+<p>Para ingresar al sistema, puede utilizar estas credenciales de prueba:</p>
+<ul>
+    <i>Credenciales para administrador</i>
+    <li><b>EMAIL: </b> admin@temuflix.com</li>
+    <li><b>CONTRASEÑA: </b> admin1234</li>
+    <br>
+    <i>Credenciales para administrador</i>
+    <li><b>EMAIL: </b> usuario@mail.com</li>
+    <li><b>CONTRASEÑA: </b> clave1234</li>
+</ul>

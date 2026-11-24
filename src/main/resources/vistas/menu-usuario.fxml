@@ -20,69 +20,62 @@
     </Label>
     <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="20.0">
         <VBox prefHeight="150.0" prefWidth="220.0" spacing="10.0">
-            <Button mnemonicParsing="false" onAction="#abrirVideojuegos" prefHeight="40.0" prefWidth="400.0"
-                    text="Videojuegos" textAlignment="CENTER">
+            <Button mnemonicParsing="false" onAction="#abrirVideojuegos" prefHeight="40.0" prefWidth="400.0" text="Videojuegos" textAlignment="CENTER">
                 <VBox.margin>
-                    <Insets/>
+                    <Insets />
                 </VBox.margin>
                 <font>
-                    <Font size="14.0"/>
+                    <Font size="14.0" />
                 </font>
             </Button>
 
-            <Button fx:id="btnPeliculas" mnemonicParsing="false" onAction="#abrirPeliculas" prefHeight="40.0"
-                    prefWidth="400.0" text="Peliculas" textAlignment="CENTER">
+            <Button fx:id="btnPeliculas" mnemonicParsing="false" onAction="#abrirPeliculas" prefHeight="40.0" prefWidth="400.0" text="Peliculas" textAlignment="CENTER">
                 <VBox.margin>
-                    <Insets/>
+                    <Insets />
                 </VBox.margin>
                 <font>
-                    <Font size="14.0"/>
+                    <Font size="14.0" />
                 </font>
             </Button>
 
-            <Button mnemonicParsing="false" onAction="#abrirSeries" prefHeight="40.0" prefWidth="400.0"
-                    text="Series" textAlignment="CENTER">
+            <Button mnemonicParsing="false" onAction="#abrirSeries" prefHeight="40.0" prefWidth="400.0" text="Series" textAlignment="CENTER">
                 <VBox.margin>
-                    <Insets/>
+                    <Insets />
                 </VBox.margin>
                 <font>
-                    <Font size="14.0"/>
+                    <Font size="14.0" />
                 </font>
             </Button>
         </VBox>
         <VBox prefHeight="150.0" prefWidth="220.0" spacing="10.0" HBox.hgrow="NEVER">
-            <Button mnemonicParsing="false" onAction="#abrirResenas" prefHeight="40.0" prefWidth="400.0"
-                    text="Reseñas" textAlignment="CENTER" VBox.vgrow="NEVER">
+         <Button fx:id="btnDirectores" mnemonicParsing="false" onAction="#abrirDirectores" prefHeight="40.0" prefWidth="400.0" text="Directores" textAlignment="CENTER" VBox.vgrow="ALWAYS" />
+            <Button mnemonicParsing="false" onAction="#abrirResenas" prefHeight="40.0" prefWidth="400.0" text="Reseñas" textAlignment="CENTER" VBox.vgrow="NEVER">
                 <VBox.margin>
-                    <Insets/>
+                    <Insets />
                 </VBox.margin>
                 <font>
-                    <Font size="14.0"/>
+                    <Font size="14.0" />
                 </font>
             </Button>
 
-            <Button mnemonicParsing="false" onAction="#abrirFavoritos" prefHeight="40.0" prefWidth="400.0"
-                    text="Favoritos" textAlignment="CENTER" VBox.vgrow="NEVER">
+            <Button mnemonicParsing="false" onAction="#abrirFavoritos" prefHeight="40.0" prefWidth="400.0" text="Favoritos" textAlignment="CENTER" VBox.vgrow="NEVER">
                 <VBox.margin>
-                    <Insets/>
+                    <Insets />
                 </VBox.margin>
                 <font>
-                    <Font size="14.0"/>
-                </font>
-            </Button>
-            <Button fx:id="btnMiCuenta" contentDisplay="CENTER" mnemonicParsing="false" onAction="#abrirMiCuenta" prefHeight="40.0" prefWidth="400.0"
-                    text="Mi Cuenta" textAlignment="CENTER" VBox.vgrow="NEVER">
-                <font>
-                    <Font size="14.0"/>
+                    <Font size="14.0" />
                 </font>
             </Button>
         </VBox>
     </HBox>
     <HBox alignment="CENTER" prefHeight="60.0" prefWidth="200.0" spacing="10.0">
-        <Button fx:id="btnAdministracion" mnemonicParsing="false" onAction="#volverAdministracion" prefHeight="40.0"
-                prefWidth="200.0" text="VOLVER A ADMINISTRACIÓN" HBox.hgrow="SOMETIMES"/>
+        <Button fx:id="btnAdministracion" mnemonicParsing="false" onAction="#volverAdministracion" prefHeight="40.0" prefWidth="200.0" text="VOLVER A ADMINISTRACIÓN" HBox.hgrow="SOMETIMES" />
 
-        <Button fx:id="btnCerrarSesion" mnemonicParsing="false" onAction="#cerrarSesion" prefHeight="40.0"
-                prefWidth="200.0" text="CERRAR SESIÓN" HBox.hgrow="SOMETIMES"/>
+        <Button fx:id="btnCerrarSesion" mnemonicParsing="false" onAction="#cerrarSesion" prefHeight="40.0" prefWidth="200.0" text="CERRAR SESIÓN" HBox.hgrow="SOMETIMES" />
+         <Button fx:id="btnMiCuenta" contentDisplay="CENTER" mnemonicParsing="false" onAction="#abrirMiCuenta" prefHeight="40.0" prefWidth="200.0" text="Mi Cuenta" textAlignment="CENTER">
+             <font>
+                 <Font size="14.0" />
+             </font>
+         </Button>
     </HBox>
 </VBox>

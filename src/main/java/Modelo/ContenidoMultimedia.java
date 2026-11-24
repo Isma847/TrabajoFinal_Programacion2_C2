@@ -5,6 +5,10 @@ import Interfaces.TieneBaja;
 
 import java.util.Objects;
 
+/**
+ * Clase base abstracta de todo el contenido del catálogo (película, serie y videojuego): guarda
+ * los datos comunes (id propio, nombre, duración, clasificación, descripción) y la baja lógica.
+ */
 public abstract class ContenidoMultimedia implements Comparable<ContenidoMultimedia>, TieneBaja {
     private int id;
     private String nombre;
@@ -85,6 +89,10 @@ public abstract class ContenidoMultimedia implements Comparable<ContenidoMultime
                 '}';
     }
 
+    /**
+     * Dos contenidos son iguales si son de la misma clase y tienen el mismo id propio (una
+     * película 1 y una serie 1 son distintas).
+     */
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
@@ -96,6 +104,9 @@ public abstract class ContenidoMultimedia implements Comparable<ContenidoMultime
         return Objects.hash(getClass(), id);
     }
 
+    /**
+     * Orden natural: por id propio.
+     */
     @Override
     public int compareTo(ContenidoMultimedia o) {
         return Integer.compare(this.id, o.getId());

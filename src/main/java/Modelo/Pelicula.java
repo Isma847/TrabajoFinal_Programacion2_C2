@@ -3,6 +3,9 @@ package Modelo;
 import Enumerados.ClasificacionEdad;
 import Enumerados.GeneroAudiovisual;
 
+/**
+ * Película del catálogo: contenido audiovisual con fecha de estreno (texto AAAA-MM-DD).
+ */
 public class Pelicula extends ContenidoAudiovisual {
 
     private String fechaEstreno;

@@ -4,6 +4,10 @@ import Interfaces.TieneBaja;
 
 import java.util.Objects;
 
+/**
+ * Persona con acceso al sistema: agrega username, contraseña, email y baja lógica (implementa
+ * TieneBaja). De ella hereda Usuario.
+ */
 public class Cuenta extends Persona implements TieneBaja {
 
     private String username;
@@ -56,6 +60,9 @@ public class Cuenta extends Persona implements TieneBaja {
         this.username = username;
     }
 
+    /**
+     * Dos cuentas son iguales si tienen el mismo email (que es único en el sistema).
+     */
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof Cuenta cuenta)) return false;

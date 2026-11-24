@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<VBox alignment="CENTER" prefHeight="600.0" prefWidth="900.0" spacing="10.0"
+      xmlns="http://javafx.com/javafx/26"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="UI.controllers.USUARIO.DirectoresUsuarioController">
+
+    <padding>
+        <Insets bottom="15" left="20" right="20" top="15" />
+    </padding>
+
+    <Label text="Listado de directores">
+        <font>
+            <Font name="System Bold" size="26.0" />
+        </font>
+    </Label>
+
+    <Label fx:id="lblCantidad" text="Disponibles: 0" />
+
+    <TableView fx:id="tablaPeliculas" prefHeight="300.0" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="colId" prefWidth="45" text="ID" />
+            <TableColumn fx:id="colNombre" prefWidth="140.0" text="Nombre" />
+            <TableColumn fx:id="colApellido" prefWidth="140.0" text="Apellido" />
+            <TableColumn fx:id="colProducciones" maxWidth="1.7976931348623157E308" prefWidth="554.0" text="Producciones" />
+        </columns>
+    </TableView>
+
+    <Label text="Descripción">
+        <font>
+            <Font name="System Bold" size="13.0" />
+        </font>
+    </Label>
+    <TextArea fx:id="txtDescripcion" editable="false" prefHeight="90.0" wrapText="true" />
+
+    <Button fx:id="btnVolver" mnemonicParsing="false" onAction="#volverMenu" text="Volver al menú principal" />
+</VBox>

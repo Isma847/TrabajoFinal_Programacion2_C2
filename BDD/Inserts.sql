@@ -2,7 +2,7 @@
 START TRANSACTION;
 
 INSERT INTO usuarios (id_usuario, nombre, apellido, username, contrasena, email, edad, rol, puedeEliminar, baja) VALUES
-                                                                                                                     (1, 'Valentina', 'Pérez', 'valentinaperez', 'clave1234', 'valentina.perez@mail.com', 28, 'USUARIO', FALSE, FALSE),
+                                                                                                                     (1, 'Usu', 'Ario', 'usuario', 'clave1234', 'usuario@mail.com', 20, 'USUARIO', FALSE, FALSE),
                                                                                                                      (2, 'Tomás', 'Gómez', 'tomasgomez', 'clave1234', 'tomas.gomez@mail.com', 11, 'USUARIO', FALSE, FALSE),
                                                                                                                      (3, 'Martina', 'Rodríguez', 'martirodriguez', 'clave1234', 'martina.rodriguez@mail.com', 15, 'USUARIO', FALSE, FALSE),
                                                                                                                      (4, 'Santiago', 'Fernández', 'santif', 'clave1234', 'santiago.fernandez@mail.com', 34, 'USUARIO', FALSE, FALSE),

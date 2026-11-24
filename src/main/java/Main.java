@@ -25,35 +25,28 @@ public class Main {
 
     public static void main(String[] args) {
         try (Scanner entrada = new Scanner(System.in)) {
+
+            /** Creación de clases Service **/
             UsuarioService usuarios = new UsuarioService();
-            GestionCuenta gestionCuenta = new GestionCuenta(usuarios);
-
             DirectorService directores = new DirectorService();
-
             PeliculaService peliculas = new PeliculaService();
             SerieService series = new SerieService();
             VideojuegoService videojuegos = new VideojuegoService();
-
-            ContenidoService contenidos = new ContenidoService(peliculas, series, videojuegos, new ContenidoDao());
-
             ResenaService resenas = new ResenaService();
-
             FavoritoService favoritos = new FavoritoService(new FavoritoDao());
 
+            /** Creación de clases gestoras **/
+            ContenidoService contenidos = new ContenidoService(peliculas, series, videojuegos, new ContenidoDao());
+            GestionCuenta gestionCuenta = new GestionCuenta(usuarios);
+
+            /** Creación de clases Menú **/
             MenuPeliculas menuPeliculas = new MenuPeliculas(contenidos, directores, entrada);
-
             MenuSeries menuSeries = new MenuSeries(contenidos, directores, entrada);
-
             MenuVideojuegos menuVideojuegos = new MenuVideojuegos(contenidos, entrada);
-
             MenuResenas menuResenas = new MenuResenas(resenas, contenidos, entrada);
-
             MenuFavoritos menuFavoritos = new MenuFavoritos(favoritos, contenidos, usuarios, entrada);
-
             MenuDirectores menuDirectores = new MenuDirectores(directores, peliculas, series, entrada);
-
             MenuCuentas menuCuentas = new MenuCuentas(usuarios, entrada);
-
             MenuMiCuenta menuMiCuenta = new MenuMiCuenta(gestionCuenta, resenas, favoritos, contenidos, entrada);
 
             Sistema sistema = new Sistema(

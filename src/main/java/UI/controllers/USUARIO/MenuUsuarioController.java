@@ -14,6 +14,7 @@ public class MenuUsuarioController extends ControladorBase {
     @FXML private Button btnAdministracion;
     @FXML private Button btnMiCuenta;
     @FXML private Button btnCerrarSesion;
+    @FXML private Button btnDirectores;
 
     @Override
     protected void cargarDatos() {
@@ -27,52 +28,49 @@ public class MenuUsuarioController extends ControladorBase {
 
     @FXML
     private void abrirPeliculas() {
-        cambiarVista(btnPeliculas, "/vistas/peliculas-usuario.fxml",
-                "Temuflix - Peliculas");
+        cambiarVista(btnPeliculas, "/vistas/peliculas-usuario.fxml", "Temuflix - Peliculas");
     }
 
     @FXML
     private void abrirSeries() {
-        cambiarVista(btnPeliculas, "/vistas/series-usuario.fxml",
-                "Temuflix - Series");
+        cambiarVista(btnPeliculas, "/vistas/series-usuario.fxml", "Temuflix - Series");
     }
 
     @FXML
     private void abrirVideojuegos() {
-        cambiarVista(btnPeliculas, "/vistas/videojuegos-usuario.fxml",
-                "Temuflix - Videojuegos");
+        cambiarVista(btnPeliculas, "/vistas/videojuegos-usuario.fxml", "Temuflix - Videojuegos");
     }
 
     @FXML
     private void abrirResenas() {
-        cambiarVista(btnPeliculas, "/vistas/resenas-usuario.fxml",
-                "Temuflix - Resenas");
+        cambiarVista(btnPeliculas, "/vistas/resenas-usuario.fxml", "Temuflix - Resenas");
     }
 
     @FXML
     private void abrirFavoritos() {
-        cambiarVista(btnPeliculas, "/vistas/favoritos-usuario.fxml",
-                "Temuflix - Favoritos");
+        cambiarVista(btnPeliculas, "/vistas/favoritos-usuario.fxml", "Temuflix - Favoritos");
     }
 
     @FXML
     private void abrirMiCuenta() {
-        cambiarVista(btnMiCuenta, "/vistas/gestion-mi-cuenta.fxml",
-                "Temuflix - Mi cuenta");
+        cambiarVista(btnMiCuenta, "/vistas/gestion-mi-cuenta.fxml", "Temuflix - Mi cuenta");
+    }
+
+    @FXML
+    private void abrirDirectores() {
+        cambiarVista(btnDirectores, "/vistas/directores-usuario.fxml", "Temuflix - Directores");
     }
 
     @FXML
     private void volverAdministracion() {
         if (comprobarAdministrador()) {
-            cambiarVista(btnAdministracion, "/vistas/menu-admin.fxml",
-                    "Temuflix - Administracion");
+            cambiarVista(btnAdministracion, "/vistas/menu-admin.fxml", "Temuflix - Administracion");
         }
     }
 
     @FXML
     private void cerrarSesion() {
         gestionCuenta.cerrarSesion();
-        cambiarVista(btnCerrarSesion, "/vistas/login.fxml",
-                "Temuflix - Iniciar sesion");
+        cambiarVista(btnCerrarSesion, "/vistas/login.fxml", "Temuflix - Iniciar sesion");
     }
 }

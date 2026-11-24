@@ -2,6 +2,10 @@ package Modelo;
 
 import Enumerados.Rol;
 
+/**
+ * Cuenta del sistema, tanto de usuarios como de administradores: el rol define los permisos. La
+ * edad es null para los administradores y puedeEliminar solo aplica a ellos.
+ */
 public class Usuario extends Cuenta {
 
     private Integer edad;
