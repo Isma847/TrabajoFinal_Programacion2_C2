@@ -27,6 +27,18 @@
                           promptText="Filtrar series"
                           maxWidth="Infinity"/>
 
+                <HBox spacing="8">
+                    <TextField fx:id="txtBuscarId"
+                               promptText="Ingresar ID general"
+                               HBox.hgrow="ALWAYS"/>
+
+                    <Button text="BUSCAR"
+                            onAction="#buscarSerie"/>
+
+                    <Button text="MOSTRAR TODAS"
+                            onAction="#mostrarTodasLasSeries"/>
+                </HBox>
+
                 <TableView fx:id="tablaSeries"
                            prefHeight="300"
                            VBox.vgrow="NEVER">

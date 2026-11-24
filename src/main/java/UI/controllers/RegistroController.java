@@ -37,9 +37,9 @@ public class RegistroController extends ControladorBase {
             }
 
             String contrasena = txtContrasena.getText();
-            if (contrasena.isBlank() || contrasena.length() > 30) {
+            if (contrasena.length() > 30 || contrasena.length() < 6) {
                 throw new DatoInvalidoException(
-                        "La contrasena debe tener entre 1 y 30 caracteres.");
+                        "La contrasena debe tener entre 6 y 30 caracteres.");
             }
 
             Usuario nuevo = new Usuario(apellido, nombre, email, contrasena, username, edad);

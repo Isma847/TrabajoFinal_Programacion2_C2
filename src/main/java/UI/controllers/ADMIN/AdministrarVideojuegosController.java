@@ -24,6 +24,7 @@ public class AdministrarVideojuegosController extends ControladorBase {
 
     @FXML private Button btnVolver;
     @FXML private TableView<Videojuego> tablaVideojuegos;
+    @FXML private TextField txtBuscarId;
     @FXML private TableColumn<Videojuego, Integer> colId;
     @FXML private TableColumn<Videojuego, String> colNombre;
     @FXML private TableColumn<Videojuego, Integer> colDuracion;
@@ -202,6 +203,49 @@ public class AdministrarVideojuegosController extends ControladorBase {
         cmbClasificacion.getSelectionModel().clearSelection();
         cmbGenero.getSelectionModel().clearSelection();
         txtDificultad.clear();
+    }
+
+    @FXML
+    private void buscarVideojuego() {
+        if (!comprobarAdministrador()) {
+            return;
+        }
+
+        try {
+            int id = Integer.parseInt(txtBuscarId.getText());
+
+            ContenidoMultimedia contenido = contenidoService.buscarPorId(id);
+
+            if (contenido == null) {
+                mostrarMensaje("Búsqueda", "No se encontró ningún contenido con ese ID.");
+                return;
+            }
+
+            if (!(contenido instanceof Videojuego)) {
+                mostrarMensaje("Búsqueda", "El ID corresponde a otro tipo de contenido.");
+                return;
+            }
+
+            Videojuego videojuego = (Videojuego) contenido;
+
+            String filtro = cmbFiltroBaja.getValue();
+
+            if (("Activos".equals(filtro) && videojuego.getBaja())
+                    || ("De baja".equals(filtro) && !videojuego.getBaja())) {
+                mostrarMensaje("Búsqueda", "El videojuego no coincide con el filtro seleccionado.");
+                return;
+            }
+
+            tablaVideojuegos.getItems().setAll(videojuego);
+
+        } catch (NumberFormatException e) {
+            mostrarMensaje("Búsqueda", "Ingresá un ID numérico válido.");
+        }
+    }
+
+    @FXML
+    private void mostrarTodosLosVideojuegos() {
+        cargarDatos();
     }
 
     @FXML
