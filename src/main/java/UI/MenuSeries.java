@@ -21,8 +21,7 @@ public class MenuSeries {
     private final Scanner entrada;
     private final ContenidoService contenidos;
 
-    public MenuSeries(ContenidoService contenidos,
-                      DirectorService directores, Scanner entrada) {
+    public MenuSeries(ContenidoService contenidos, DirectorService directores, Scanner entrada) {
         this.contenidos = contenidos;
         this.series = contenidos.getSeries();
         this.directores = directores;

@@ -33,7 +33,6 @@
 
                 <ComboBox fx:id="cmbFiltroBaja"
                           promptText="Filtrar por estado"
-                          onAction="#filtrarVideojuegos"
                           maxWidth="Infinity"/>
 
                 <TableView fx:id="tablaVideojuegos"
@@ -41,6 +40,7 @@
                     <columns>
                         <TableColumn fx:id="colId" text="ID" prefWidth="45"/>
                         <TableColumn fx:id="colNombre" text="Nombre" prefWidth="145"/>
+                        <TableColumn fx:id="colDuracion" prefWidth="75" text="Duración"/>
                         <TableColumn fx:id="colGenero" text="Género" prefWidth="100"/>
                         <TableColumn fx:id="colClasificacion" text="Clasificación" prefWidth="100"/>
                         <TableColumn fx:id="colDificultad" text="Dificultad" prefWidth="85"/>

@@ -21,7 +21,6 @@ import UI.MenuMiCuenta;
 
 import java.sql.SQLException;
 import java.util.Scanner;
-/*
 public class Main {
 
     public static void main(String[] args) {
@@ -35,48 +34,27 @@ public class Main {
             SerieService series = new SerieService();
             VideojuegoService videojuegos = new VideojuegoService();
 
-            ContenidoService contenidos = new ContenidoService(
-                    peliculas,
-                    series,
-                    videojuegos,
-                    new ContenidoDao()
-            );
+            ContenidoService contenidos = new ContenidoService(peliculas, series, videojuegos, new ContenidoDao());
 
             ResenaService resenas = new ResenaService();
-            FavoritoService favoritos = new FavoritoService(
-                    new FavoritoDao()
-            );
 
-            MenuPeliculas menuPeliculas = new MenuPeliculas(
-                    peliculas, directores, entrada
-            );
+            FavoritoService favoritos = new FavoritoService(new FavoritoDao());
 
-            MenuSeries menuSeries = new MenuSeries(
-                    series, directores, entrada
-            );
+            MenuPeliculas menuPeliculas = new MenuPeliculas(contenidos, directores, entrada);
 
-            MenuVideojuegos menuVideojuegos = new MenuVideojuegos(
-                    videojuegos, entrada
-            );
+            MenuSeries menuSeries = new MenuSeries(contenidos, directores, entrada);
 
-            MenuResenas menuResenas = new MenuResenas(
-                    resenas, contenidos, entrada
-            );
+            MenuVideojuegos menuVideojuegos = new MenuVideojuegos(contenidos, entrada);
 
-            MenuFavoritos menuFavoritos = new MenuFavoritos(
-                    favoritos, contenidos, usuarios, entrada
-            );
+            MenuResenas menuResenas = new MenuResenas(resenas, contenidos, entrada);
 
-            MenuDirectores menuDirectores = new MenuDirectores(
-                    directores, peliculas, series, entrada
-            );
+            MenuFavoritos menuFavoritos = new MenuFavoritos(favoritos, contenidos, usuarios, entrada);
 
-            MenuCuentas menuCuentas = new MenuCuentas(
-                    usuarios, entrada
-            );
-            MenuMiCuenta menuMiCuenta = new MenuMiCuenta(
-                    gestionCuenta, resenas, favoritos, contenidos, entrada
-            );
+            MenuDirectores menuDirectores = new MenuDirectores(directores, peliculas, series, entrada);
+
+            MenuCuentas menuCuentas = new MenuCuentas(usuarios, entrada);
+
+            MenuMiCuenta menuMiCuenta = new MenuMiCuenta(gestionCuenta, resenas, favoritos, contenidos, entrada);
 
             Sistema sistema = new Sistema(
                     gestionCuenta,
@@ -94,9 +72,7 @@ public class Main {
             sistema.mostrarMenuInicio();
 
         } catch (SQLException e) {
-            System.err.println(
-                    "No se pudo iniciar Temuflix. " + e.getMessage()
-            );
+            System.err.println("No se pudo iniciar Temuflix. " + e.getMessage());
         }
     }
-}*/
+}

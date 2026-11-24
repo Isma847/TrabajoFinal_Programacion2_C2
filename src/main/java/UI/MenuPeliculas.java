@@ -5,6 +5,7 @@ import Enumerados.GeneroAudiovisual;
 import Excepciones.DatoInvalidoException;
 import Modelo.Director;
 import Modelo.Pelicula;
+import Service.ContenidoService;
 import Service.DirectorService;
 import Service.PeliculaService;
 
@@ -12,7 +13,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-import Service.ContenidoService;
 
 public class MenuPeliculas {
 
@@ -21,8 +21,7 @@ public class MenuPeliculas {
     private final Scanner entrada;
     private final ContenidoService contenidos;
 
-    public MenuPeliculas(ContenidoService contenidos,
-                         DirectorService directores, Scanner entrada) {
+    public MenuPeliculas(ContenidoService contenidos, DirectorService directores, Scanner entrada) {
         this.contenidos = contenidos;
         this.peliculas = contenidos.getPeliculas();
         this.directores = directores;

@@ -1,39 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity"
-      minHeight="-Infinity" minWidth="-Infinity"
-      prefHeight="400.0" prefWidth="600.0"
+<VBox alignment="CENTER" spacing="10.0"
+      prefHeight="600.0" prefWidth="900.0"
       xmlns="http://javafx.com/javafx/26"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="UI.controllers.USUARIO.VideojuegosUsuarioController">
 
-    <children>
-        <Label text="Catalogo de videojuegos">
-            <font>
-                <Font name="System Bold" size="26.0" />
-            </font>
-        </Label>
+    <padding>
+        <Insets top="15" right="20" bottom="15" left="20"/>
+    </padding>
 
-        <TableView fx:id="tablaVideojuegos" prefHeight="200.0" prefWidth="509.0">
-            <columns>
-                <TableColumn fx:id="colNombre" prefWidth="105.0" text="nombre" />
-                <TableColumn fx:id="colGenero" prefWidth="82.0" text="genero" />
-                <TableColumn fx:id="colDuracion" prefWidth="94.0" text="duracion" />
-                <TableColumn fx:id="colClasificacion" prefWidth="95.0" text="clasificacion" />
-                <TableColumn fx:id="colDificultad" prefWidth="90.0" text="dificultad" />
-                <TableColumn fx:id="colDescripcion" prefWidth="103.0" text="descripcion" />
-            </columns>
-        </TableView>
+    <Label text="Catálogo de videojuegos">
+        <font>
+            <Font name="System Bold" size="26.0"/>
+        </font>
+    </Label>
 
-        <Button fx:id="btnVolver" mnemonicParsing="false"
-                onAction="#volverMenu"
-                text="Volver al menu principal" />
-    </children>
+    <Label fx:id="lblCantidad" text="Disponibles: 0"/>
+
+    <TableView fx:id="tablaVideojuegos" prefHeight="300.0" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="colId" prefWidth="45" text="ID"/>
+            <TableColumn fx:id="colNombre" prefWidth="190" text="Nombre"/>
+            <TableColumn fx:id="colGenero" prefWidth="110" text="Género"/>
+            <TableColumn fx:id="colDuracion" prefWidth="85" text="Duración"/>
+            <TableColumn fx:id="colClasificacion" prefWidth="110" text="Clasificación"/>
+            <TableColumn fx:id="colDificultad" prefWidth="95" text="Dificultad"/>
+            <TableColumn fx:id="colDescripcion" prefWidth="230" text="Descripción"/>
+        </columns>
+    </TableView>
+
+    <Label text="Descripción">
+        <font>
+            <Font name="System Bold" size="13.0"/>
+        </font>
+    </Label>
+    <TextArea fx:id="txtDescripcion" editable="false" wrapText="true"
+              prefHeight="90.0"/>
+
+    <Button fx:id="btnVolver" mnemonicParsing="false"
+            onAction="#volverMenu" text="Volver al menú principal"/>
 </VBox>

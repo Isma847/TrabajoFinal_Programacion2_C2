@@ -1,5 +1,3 @@
--- Temuflix: creación completa desde cero y datos de prueba para MySQL 8.
--- ATENCIÓN: al ejecutarse elimina la base temuflix y todos sus datos anteriores.
 -- Cuentas unificadas en usuarios. El rol distingue USUARIO y ADMINISTRADOR.
 -- puedeEliminar representa el permiso de borrado físico; todas las cuentas lo tienen en FALSE salvo admin.
 -- Los administradores de prueba tienen edad NULL; los usuarios comunes conservan su edad.

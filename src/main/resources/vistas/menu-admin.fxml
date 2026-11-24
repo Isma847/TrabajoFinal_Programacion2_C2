@@ -13,38 +13,35 @@
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="UI.controllers.ADMIN.MenuAdminController">
 
-   <children>
+   <Label text="TEMUFLIX">
+      <font>
+         <Font name="System Bold" size="48.0"/>
+      </font>
+   </Label>
 
-      <Label text="TEMUFLIX">
-         <font>
-            <Font name="System Bold" size="48.0"/>
-         </font>
-      </Label>
+   <Label fx:id="lblCuenta" text="Panel de administración">
+      <font>
+         <Font name="System Bold" size="16.0"/>
+      </font>
+   </Label>
 
-      <Label text="Panel de administración">
-         <font>
-            <Font name="System Bold" size="16.0"/>
-         </font>
-      </Label>
+   <Button
+           text="MENÚ DE USUARIO"
+           onAction="#abrirMenuUsuario"
+           prefHeight="45.0"
+           prefWidth="320.0"/>
 
-      <Button
-              text="MENÚ DE USUARIO"
-              onAction="#abrirMenuUsuario"
-              prefHeight="45.0"
-              prefWidth="320.0"/>
+   <Button
+           text="GESTIÓN ADMIN"
+           onAction="#abrirGestionAdmin"
+           prefHeight="45.0"
+           prefWidth="320.0"/>
 
-      <Button
-              text="GESTIÓN ADMIN"
-              onAction="#abrirGestionAdmin"
-              prefHeight="45.0"
-              prefWidth="320.0"/>
+   <Button
+           fx:id="btnCerrarSesion"
+           text="CERRAR SESIÓN"
+           onAction="#cerrarSesion"
+           prefHeight="40.0"
+           prefWidth="320.0"/>
 
-      <Button
-              fx:id="btnCerrarSesion"
-              text="CERRAR SESIÓN"
-              onAction="#cerrarSesion"
-              prefHeight="40.0"
-              prefWidth="320.0"/>
-
-   </children>
 </VBox>
