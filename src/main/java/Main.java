@@ -1,4 +1,6 @@
+import DAO.ContenidoDao;
 import DAO.FavoritoDao;
+import Service.ContenidoService;
 import Service.FavoritoService;
 import Service.DirectorService;
 import Service.GestionCuenta;
@@ -29,15 +31,15 @@ public class Main {
             SerieService series = new SerieService();
             VideojuegoService videojuegos = new VideojuegoService();
             ResenaService resenas = new ResenaService();
+            ContenidoService contenidos = new ContenidoService(peliculas, series, videojuegos, new ContenidoDao());
             FavoritoService favoritos = new FavoritoService(new FavoritoDao());
 
             MenuPeliculas menuPeliculas = new MenuPeliculas(peliculas, directores, entrada);
             MenuSeries menuSeries = new MenuSeries(series, directores, entrada);
             MenuVideojuegos menuVideojuegos = new MenuVideojuegos(videojuegos, entrada);
 
-            MenuResenas menuResenas = new MenuResenas(resenas, peliculas, series, videojuegos, entrada);
-            MenuFavoritos menuFavoritos = new MenuFavoritos(favoritos, peliculas, series, videojuegos,
-                    usuarios, entrada);
+            MenuResenas menuResenas = new MenuResenas(resenas, contenidos, entrada);
+            MenuFavoritos menuFavoritos = new MenuFavoritos(favoritos, contenidos, usuarios, entrada);
             Sistema sistema = new Sistema(gestionCuenta, entrada, menuPeliculas, menuSeries,
                     menuVideojuegos, menuResenas, menuFavoritos);
             sistema.mostrarMenuInicio();

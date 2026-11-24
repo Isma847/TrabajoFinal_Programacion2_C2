@@ -81,7 +81,7 @@ public class FavoritoDao {
         }
     }
 
-    public int quitarDeUsuario(int idUsuario, int idContenido, String tipo) throws SQLException {
+    public int quitarDeUsuario(int idUsuario, int idContenido) throws SQLException {
         String sql = "DELETE FROM favoritos WHERE id_usuario = ? AND id_contenido = ?";
 
         try (Connection cn = ConexionDB.conectar();
@@ -91,6 +91,4 @@ public class FavoritoDao {
             return ps.executeUpdate();
         }
     }
-
-
 }

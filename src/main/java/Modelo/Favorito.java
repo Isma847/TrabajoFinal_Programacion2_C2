@@ -1,5 +1,7 @@
 package Modelo;
 
+import java.util.Objects;
+
 public class Favorito {
     private int id;
     private int id_usaurio;
@@ -35,5 +37,17 @@ public class Favorito {
 
     public void setId_contenido(int id_contenido) {
         this.id_contenido = id_contenido;
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Favorito favorito = (Favorito) o;
+        return getId() == favorito.getId();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(getId());
     }
 }

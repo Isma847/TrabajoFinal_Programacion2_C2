@@ -1,41 +1,33 @@
 package UI;
 
+import Enumerados.TipoContenido;
 import Excepciones.DatoInvalidoException;
 import Modelo.ContenidoMultimedia;
 import Modelo.Favorito;
-import Modelo.Pelicula;
-import Modelo.Serie;
 import Modelo.Usuario;
+import Service.ContenidoService;
 import Service.FavoritoService;
-import Service.PeliculaService;
-import Service.SerieService;
 import Service.UsuarioService;
-import Service.VideojuegoService;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Scanner;
 
 public class MenuFavoritos {
 
+    /// Un contenido con su id general y su tipo, que ya no se guarda en el favorito.
+    private record Item(int idGeneral, TipoContenido tipo, ContenidoMultimedia contenido) {}
+
     private final FavoritoService favoritos;
-    private final PeliculaService peliculas;
-    private final SerieService series;
-    private final VideojuegoService videojuegos;
+    private final ContenidoService contenidos;
     private final UsuarioService usuarios;
     private final Scanner entrada;
 
-    public MenuFavoritos(FavoritoService favoritos, PeliculaService peliculas,
-                         SerieService series, VideojuegoService videojuegos,
+    public MenuFavoritos(FavoritoService favoritos, ContenidoService contenidos,
                          UsuarioService usuarios, Scanner entrada) {
         this.favoritos = favoritos;
-        this.peliculas = peliculas;
-        this.series = series;
-        this.videojuegos = videojuegos;
+        this.contenidos = contenidos;
         this.usuarios = usuarios;
         this.entrada = entrada;
     }
@@ -98,44 +90,53 @@ public class MenuFavoritos {
 
     private void mostrarTotales() {
         System.out.println("\nTipo | Favoritos");
-        System.out.println("PELICULA | " + favoritos.obtenerEstadisticaPorTipo("PELICULA"));
-        System.out.println("SERIE | " + favoritos.obtenerEstadisticaPorTipo("SERIE"));
-        System.out.println("JUEGO | " + favoritos.obtenerEstadisticaPorTipo("JUEGO"));
+        // El favorito no guarda el tipo: se suman los favoritos de cada contenido de ese tipo.
+        for (TipoContenido tipo : TipoContenido.values()) {
+            int total = 0;
+            for (Item item : catalogo(tipo, false)) {
+                total += favoritos.obtenerEstadisticaPorContenido(item.idGeneral());
+            }
+            System.out.println(tipo + " | " + total);
+        }
     }
 
     private void mostrarPopularidad(boolean soloActivos, boolean topCinco) {
-        String tipo = elegirTipo(true);
-        Map<ContenidoMultimedia, Integer> cantidades = new LinkedHashMap<>();
-        for (ContenidoMultimedia contenido : catalogo(tipo, soloActivos)) {
-            int cantidad = favoritos.obtenerEstadisticaPorContenido(contenido.getId(), tipoDe(contenido));
+        TipoContenido tipo = elegirTipo(true);
+        ArrayList<Item> lista = new ArrayList<>();
+        ArrayList<Integer> cantidades = new ArrayList<>();
+        for (Item item : catalogo(tipo, soloActivos)) {
+            int cantidad = favoritos.obtenerEstadisticaPorContenido(item.idGeneral());
             if (!topCinco || cantidad > 0) {
-                cantidades.put(contenido, cantidad);
+                lista.add(item);
+                cantidades.add(cantidad);
             }
         }
-
-        ArrayList<Map.Entry<ContenidoMultimedia, Integer>> lista = new ArrayList<>(cantidades.entrySet());
-        lista.sort(Comparator.<Map.Entry<ContenidoMultimedia, Integer>>comparingInt(Map.Entry::getValue)
-                .reversed()
-                .thenComparing(item -> tipoDe(item.getKey()))
-                .thenComparingInt(item -> item.getKey().getId()));
 
         if (lista.isEmpty()) {
             System.out.println("No hay contenidos para mostrar en esta consulta.");
             return;
         }
 
-        int limite = topCinco ? Math.min(5, lista.size()) : lista.size();
+        ArrayList<Integer> orden = new ArrayList<>();
+        for (int i = 0; i < lista.size(); i++) {
+            orden.add(i);
+        }
+        orden.sort(Comparator.<Integer>comparingInt(cantidades::get).reversed()
+                .thenComparing(i -> lista.get(i).tipo())
+                .thenComparingInt(i -> lista.get(i).idGeneral()));
+
+        int limite = topCinco ? Math.min(5, orden.size()) : orden.size();
         System.out.println("\nTipo | ID | Nombre | Favoritos | Estado");
         for (int i = 0; i < limite; i++) {
-            Map.Entry<ContenidoMultimedia, Integer> item = lista.get(i);
-            ContenidoMultimedia contenido = item.getKey();
-            System.out.printf("%s | %d | %s | %d | %s%n", tipoDe(contenido), contenido.getId(),
-                    contenido.getNombre(), item.getValue(), contenido.getBaja() ? "De baja" : "Activo");
+            Item item = lista.get(orden.get(i));
+            System.out.printf("%s | %d | %s | %d | %s%n", item.tipo(), item.idGeneral(),
+                    item.contenido().getNombre(), cantidades.get(orden.get(i)),
+                    item.contenido().getBaja() ? "De baja" : "Activo");
         }
     }
 
     private void mostrarCuentas() {
-        Map<Integer, Integer> cantidades = favoritos.contarPorUsuario();
+        java.util.Map<Integer, Integer> cantidades = favoritos.contarPorUsuario();
         int maximo = cantidades.values().stream().mapToInt(Integer::intValue).max().orElse(0);
         if (maximo == 0) {
             System.out.println("Todavía no hay cuentas con favoritos.");
@@ -156,62 +157,57 @@ public class MenuFavoritos {
 
     private ArrayList<Favorito> listarPropios(int idUsuario) {
         ArrayList<Favorito> lista = new ArrayList<>(favoritos.leerPorUsuario(idUsuario));
-        lista.sort(Comparator.comparing(Favorito::getTipo)
-                .thenComparingInt(Favorito::getId_contenido)
-                .thenComparingInt(Favorito::getId));
+        // El tipo se deriva del contenido: se ordena por tipo y luego por id general.
+        lista.sort(Comparator.<Favorito, Integer>comparing(f -> tipoOrden(f.getId_contenido()))
+                .thenComparingInt(Favorito::getId_contenido));
 
-        ArrayList<Favorito> unicos = new ArrayList<>();
-        HashSet<String> mostrados = new HashSet<>();
-        for (Favorito favorito : lista) {
-            if (mostrados.add(favorito.getTipo() + ":" + favorito.getId_contenido())) {
-                unicos.add(favorito);
-            }
-        }
-
-        if (unicos.isEmpty()) {
+        if (lista.isEmpty()) {
             System.out.println("Todavía no tenés favoritos.");
-            return unicos;
+            return lista;
         }
 
         System.out.println("\nOpción | Tipo | ID del contenido | Nombre | Estado");
-        for (int i = 0; i < unicos.size(); i++) {
-            Favorito favorito = unicos.get(i);
-            ContenidoMultimedia contenido = buscarContenido(favorito.getTipo(), favorito.getId_contenido());
+        for (int i = 0; i < lista.size(); i++) {
+            Favorito favorito = lista.get(i);
+            ContenidoMultimedia contenido = contenidos.buscarPorId(favorito.getId_contenido());
+            String tipo = contenido == null ? "-" : contenidos.getTipo(favorito.getId_contenido()).toString();
             String nombre = contenido == null ? "Contenido eliminado" : contenido.getNombre();
             String estado = contenido == null ? "No disponible" : contenido.getBaja() ? "De baja" : "Activo";
-            System.out.printf("%d | %s | %d | %s | %s%n", i + 1, favorito.getTipo(),
+            System.out.printf("%d | %s | %d | %s | %s%n", i + 1, tipo,
                     favorito.getId_contenido(), nombre, estado);
         }
-        return unicos;
+        return lista;
     }
 
     private void agregar(int idUsuario) throws SQLException {
-        String tipo = elegirTipo(false);
-        ArrayList<ContenidoMultimedia> contenidos = catalogo(tipo, true);
-        if (contenidos.isEmpty()) {
+        // El tipo sigue sirviendo para filtrar el listado; el favorito guarda solo el id general.
+        TipoContenido tipo = elegirTipo(false);
+        ArrayList<Item> items = catalogo(tipo, true);
+        if (items.isEmpty()) {
             System.out.println("No hay contenidos activos de este tipo.");
             return;
         }
 
         System.out.println("\nID | Nombre");
-        for (ContenidoMultimedia contenido : contenidos) {
-            System.out.println(contenido.getId() + " | " + contenido.getNombre());
+        for (Item item : items) {
+            System.out.println(item.idGeneral() + " | " + item.contenido().getNombre());
         }
 
         int id = leerEntero("ID del contenido (0 para volver)");
         if (id == 0) {
             return;
         }
-        ContenidoMultimedia contenido = buscarContenido(tipo, id);
-        if (contenido == null || contenido.getBaja()) {
-            throw new IllegalArgumentException("No existe un contenido activo con ese ID.");
+        // El service de favoritos no conoce los contenidos: la existencia se valida acá.
+        boolean enLista = items.stream().anyMatch(item -> item.idGeneral() == id);
+        if (!enLista) {
+            throw new IllegalArgumentException("No existe un contenido activo de ese tipo con ese ID.");
         }
-        if (favoritos.contiene(idUsuario, id, tipo)) {
+        if (favoritos.contiene(idUsuario, id)) {
             System.out.println("Ese contenido ya está en tus favoritos.");
             return;
         }
 
-        if (favoritos.crear(new Favorito(0, idUsuario, id, tipo))) {
+        if (favoritos.crear(new Favorito(0, idUsuario, id))) {
             System.out.println("Contenido agregado a tus favoritos.");
         } else {
             System.out.println("No se pudo agregar el favorito.");
@@ -233,45 +229,34 @@ public class MenuFavoritos {
         }
 
         Favorito favorito = lista.get(opcion - 1);
-        favoritos.quitarDeUsuario(idUsuario, favorito.getId_contenido(), favorito.getTipo());
+        favoritos.quitarDeUsuario(idUsuario, favorito.getId_contenido());
         System.out.println("Contenido quitado de tus favoritos.");
     }
 
-    private ArrayList<ContenidoMultimedia> catalogo(String tipo, boolean soloActivos) {
-        ArrayList<ContenidoMultimedia> contenidos = new ArrayList<>();
-        if ("TODOS".equals(tipo) || "PELICULA".equals(tipo)) {
-            contenidos.addAll(peliculas.leerTodos());
+    /// Contenidos del registro general, filtrados por tipo (null = todos) y por baja.
+    private ArrayList<Item> catalogo(TipoContenido tipo, boolean soloActivos) {
+        ArrayList<Item> items = new ArrayList<>();
+        for (ContenidoMultimedia contenido : contenidos.leerTodos()) {
+            int idGeneral = contenidos.buscarIdContenido(contenido);
+            if (idGeneral == -1) {
+                continue;
+            }
+            TipoContenido tipoContenido = contenidos.getTipo(idGeneral);
+            if ((tipo == null || tipoContenido == tipo) && !(soloActivos && contenido.getBaja())) {
+                items.add(new Item(idGeneral, tipoContenido, contenido));
+            }
         }
-        if ("TODOS".equals(tipo) || "SERIE".equals(tipo)) {
-            contenidos.addAll(series.leerTodos());
-        }
-        if ("TODOS".equals(tipo) || "JUEGO".equals(tipo)) {
-            contenidos.addAll(videojuegos.leerTodos());
-        }
-        contenidos.removeIf(contenido -> soloActivos && contenido.getBaja());
-        return contenidos;
+        items.sort(Comparator.comparingInt(Item::idGeneral));
+        return items;
     }
 
-    private ContenidoMultimedia buscarContenido(String tipo, int id) {
-        return switch (tipo) {
-            case "PELICULA" -> peliculas.buscarPorId(id);
-            case "SERIE" -> series.buscarPorId(id);
-            case "JUEGO" -> videojuegos.buscarPorId(id);
-            default -> null;
-        };
+    private int tipoOrden(int idGeneral) {
+        return contenidos.buscarPorId(idGeneral) == null
+                ? Integer.MAX_VALUE : contenidos.getTipo(idGeneral).ordinal();
     }
 
-    private String tipoDe(ContenidoMultimedia contenido) {
-        if (contenido instanceof Pelicula) {
-            return "PELICULA";
-        }
-        if (contenido instanceof Serie) {
-            return "SERIE";
-        }
-        return "JUEGO";
-    }
-
-    private String elegirTipo(boolean incluirTodos) {
+    /// Devuelve null cuando se eligen todos los tipos.
+    private TipoContenido elegirTipo(boolean incluirTodos) {
         System.out.println("\n1. Películas");
         System.out.println("2. Series");
         System.out.println("3. Videojuegos");
@@ -281,14 +266,14 @@ public class MenuFavoritos {
         System.out.print("Tipo: ");
 
         return switch (entrada.nextLine().trim()) {
-            case "1" -> "PELICULA";
-            case "2" -> "SERIE";
-            case "3" -> "JUEGO";
+            case "1" -> TipoContenido.PELICULA;
+            case "2" -> TipoContenido.SERIE;
+            case "3" -> TipoContenido.JUEGO;
             case "4" -> {
                 if (!incluirTodos) {
                     throw new IllegalArgumentException("Opción inválida");
                 }
-                yield "TODOS";
+                yield null;
             }
             default -> throw new IllegalArgumentException("Opción inválida");
         };
@@ -303,4 +288,3 @@ public class MenuFavoritos {
         }
     }
 }
-
