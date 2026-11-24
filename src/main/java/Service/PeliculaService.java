@@ -7,6 +7,8 @@ import Modelo.Pelicula;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 
 public class PeliculaService extends Service<Pelicula> {
 
@@ -16,11 +18,32 @@ public class PeliculaService extends Service<Pelicula> {
 
     @Override
     protected void validar(Pelicula p) {
-        if(p.getGenero() == null) {
+        if (p == null) {
+            throw new DatoInvalidoException("La película es obligatoria");
+        }
+
+        if (p.getGenero() == null) {
             throw new DatoInvalidoException("El género es obligatorio");
         }
-        if(p.getClasificacionEdad() == null) {
-            throw new DatoInvalidoException("El clasificacion es obligatorio");
+
+        if (p.getClasificacionEdad() == null) {
+            throw new DatoInvalidoException("La clasificación es obligatoria");
+        }
+
+        String fecha = p.getFechaEstreno();
+
+        if (fecha == null || fecha.length() != 10) {
+            throw new DatoInvalidoException(
+                    "La fecha de estreno debe tener el formato AAAA-MM-DD"
+            );
+        }
+
+        try {
+            LocalDate.parse(fecha);
+        } catch (DateTimeParseException e) {
+            throw new DatoInvalidoException(
+                    "La fecha de estreno no es válida. Usá AAAA-MM-DD"
+            );
         }
     }
 

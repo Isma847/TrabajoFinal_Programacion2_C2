@@ -1,12 +1,14 @@
 import DAO.FavoritoDao;
-import Service.FavoritoService;
 import Service.DirectorService;
+import Service.FavoritoService;
 import Service.GestionCuenta;
 import Service.PeliculaService;
 import Service.ResenaService;
 import Service.SerieService;
 import Service.UsuarioService;
 import Service.VideojuegoService;
+import UI.MenuCuentas;
+import UI.MenuDirectores;
 import UI.MenuFavoritos;
 import UI.MenuPeliculas;
 import UI.MenuResenas;
@@ -31,15 +33,40 @@ public class Main {
             ResenaService resenas = new ResenaService();
             FavoritoService favoritos = new FavoritoService(new FavoritoDao());
 
-            MenuPeliculas menuPeliculas = new MenuPeliculas(peliculas, directores, entrada);
-            MenuSeries menuSeries = new MenuSeries(series, directores, entrada);
-            MenuVideojuegos menuVideojuegos = new MenuVideojuegos(videojuegos, entrada);
+            MenuPeliculas menuPeliculas = new MenuPeliculas(
+                    peliculas, directores, entrada
+            );
 
-            MenuResenas menuResenas = new MenuResenas(resenas, peliculas, series, videojuegos, entrada);
-            MenuFavoritos menuFavoritos = new MenuFavoritos(favoritos, peliculas, series, videojuegos,
-                    usuarios, entrada);
-            Sistema sistema = new Sistema(gestionCuenta, entrada, menuPeliculas, menuSeries,
-                    menuVideojuegos, menuResenas, menuFavoritos);
+            MenuSeries menuSeries = new MenuSeries(
+                    series, directores, entrada
+            );
+
+            MenuVideojuegos menuVideojuegos = new MenuVideojuegos(
+                    videojuegos, entrada
+            );
+
+            MenuResenas menuResenas = new MenuResenas(
+                    resenas, peliculas, series, videojuegos, entrada
+            );
+
+            MenuFavoritos menuFavoritos = new MenuFavoritos(
+                    favoritos, peliculas, series, videojuegos, usuarios, entrada
+            );
+
+            MenuDirectores menuDirectores = new MenuDirectores(
+                    directores, peliculas, series, entrada
+            );
+
+            MenuCuentas menuCuentas = new MenuCuentas(
+                    usuarios, entrada
+            );
+
+            Sistema sistema = new Sistema(
+                    gestionCuenta, entrada, menuPeliculas, menuSeries,
+                    menuVideojuegos, menuResenas, menuFavoritos,
+                    menuDirectores, menuCuentas
+            );
+
             sistema.mostrarMenuInicio();
         } catch (SQLException e) {
             System.err.println("No se pudo iniciar Temuflix. " + e.getMessage());

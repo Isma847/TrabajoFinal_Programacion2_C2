@@ -17,7 +17,6 @@ public class TemuflixApp extends Application {
     public void start(Stage stage) throws Exception {
 
         UsuarioService usuarios = new UsuarioService();
-        AdministradorService administradores = new AdministradorService();
         PeliculaService peliculas = new PeliculaService();
         SerieService serieService=new SerieService();
         VideojuegoService videojuegoService=new VideojuegoService();

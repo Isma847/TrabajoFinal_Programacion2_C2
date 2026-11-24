@@ -17,10 +17,14 @@ public class Sistema {
     private final MenuVideojuegos menuVideojuegos;
     private final MenuResenas menuResenas;
     private final MenuFavoritos menuFavoritos;
+    private final MenuDirectores menuDirectores;
+    private final MenuCuentas menuCuentas;
 
-    public Sistema(GestionCuenta gestionCuenta, Scanner entrada, MenuPeliculas menuPeliculas,
-                   MenuSeries menuSeries, MenuVideojuegos menuVideojuegos,
-                   MenuResenas menuResenas, MenuFavoritos menuFavoritos) {
+    public Sistema(GestionCuenta gestionCuenta, Scanner entrada,
+                   MenuPeliculas menuPeliculas, MenuSeries menuSeries,
+                   MenuVideojuegos menuVideojuegos, MenuResenas menuResenas,
+                   MenuFavoritos menuFavoritos, MenuDirectores menuDirectores,
+                   MenuCuentas menuCuentas) {
         this.gestionCuenta = gestionCuenta;
         this.entrada = entrada;
         this.menuPeliculas = menuPeliculas;
@@ -28,7 +32,10 @@ public class Sistema {
         this.menuVideojuegos = menuVideojuegos;
         this.menuResenas = menuResenas;
         this.menuFavoritos = menuFavoritos;
+        this.menuDirectores = menuDirectores;
+        this.menuCuentas = menuCuentas;
     }
+
 
     public void mostrarMenuInicio() {
         while (true) {
@@ -72,6 +79,7 @@ public class Sistema {
 
     public void mostrarMenuAdmin() {
         Usuario administrador = gestionCuenta.getUsuarioActual();
+
         if (administrador == null || administrador.getRol() != Rol.ADMINISTRADOR) {
             return;
         }
@@ -83,6 +91,8 @@ public class Sistema {
             System.out.println("3. Gestionar videojuegos");
             System.out.println("4. Gestionar reseñas");
             System.out.println("5. Estadísticas de favoritos");
+            System.out.println("6. Gestionar directores");
+            System.out.println("7. Gestionar cuentas");
             System.out.println("0. Cerrar sesión");
             System.out.print("Opción: ");
 
@@ -92,15 +102,24 @@ public class Sistema {
                 case "3" -> menuVideojuegos.mostrar();
                 case "4" -> menuResenas.mostrarAdmin(administrador);
                 case "5" -> menuFavoritos.mostrarAdmin();
+                case "6" -> menuDirectores.mostrar(administrador);
+                case "7" -> {
+                    if (menuCuentas.mostrar(administrador)) {
+                        gestionCuenta.cerrarSesion();
+                        System.out.println(
+                                "Tu cuenta fue modificada. Iniciá sesión nuevamente."
+                        );
+                        return;
+                    }
+                }
                 case "0" -> {
                     gestionCuenta.cerrarSesion();
                     return;
                 }
-                default -> System.out.println("Opción inválida");
+                default -> System.out.println("Opción inválida.");
             }
         }
     }
-
     public void mostrarMenuUsuario() {
         Usuario usuario = gestionCuenta.getUsuarioActual();
         if (usuario == null || usuario.getRol() != Rol.USUARIO) {
@@ -204,7 +223,7 @@ public class Sistema {
                 System.out.println("desea volver a intentar crear una cuenta?");
                 System.out.println("1. reintentar");
                 System.out.println("2. volver al menu inicial");
-                int opcionDatoinvalido = entrada.nextInt();
+                int opcionDatoinvalido = leerEntero();
                 entrada.nextLine();
                 if (opcionDatoinvalido == 1) {
                     reintentar = true;

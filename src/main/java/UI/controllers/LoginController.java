@@ -1,7 +1,6 @@
 package UI.controllers;
 
 import Excepciones.SesionInvalidaException;
-import Modelo.Administrador;
 import Modelo.Cuenta;
 import Modelo.Usuario;
 import Service.*;
@@ -83,7 +82,7 @@ public class LoginController {
             Cuenta cuenta = gestionCuenta.getUsuarioActual();
 
             // Decidimos qué ventana abrir
-            if (cuenta instanceof Administrador) {
+            if (cuenta instanceof Usuario && ((Usuario) cuenta).getRol().equals("ADMINISTRADOR") ) {
                 cargarVentana("/vistas/menu-admin.fxml");
             } else if (cuenta instanceof Usuario) {
                 cargarVentana("/vistas/menu-usuario.fxml");

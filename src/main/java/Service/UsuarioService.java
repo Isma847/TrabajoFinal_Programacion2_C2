@@ -46,21 +46,47 @@ public class UsuarioService {
         return copiar(usuario);
     }
 
+    private int contarAdministradoresActivos() {
+        int cantidad = 0;
+
+        for (Usuario usuario : coleccion.values()) {
+            if (usuario.getRol() == Rol.ADMINISTRADOR && !usuario.getBaja()) {
+                cantidad++;
+            }
+        }
+
+        return cantidad;
+    }
+
     public boolean modificar(Usuario usuario) throws SQLException {
         validar(usuario);
-        int id = usuario.getId();
-        if (!coleccion.containsKey(id)) {
+
+        Usuario actual = coleccion.get(usuario.getId());
+        if (actual == null) {
             return false;
+        }
+
+        boolean eraAdministradorActivo =
+                actual.getRol() == Rol.ADMINISTRADOR && !actual.getBaja();
+
+        boolean seguiraSiendoAdministradorActivo =
+                usuario.getRol() == Rol.ADMINISTRADOR && !usuario.getBaja();
+
+        if (eraAdministradorActivo
+                && !seguiraSiendoAdministradorActivo
+                && contarAdministradoresActivos() <= 1) {
+            throw new DatoInvalidoException(
+                    "Debe quedar al menos un administrador activo."
+            );
         }
 
         if (dao.actualizar(usuario) <= 0) {
             return false;
         }
 
-        coleccion.put(id, copiar(usuario));
+        coleccion.put(usuario.getId(), copiar(usuario));
         return true;
     }
-
     public ArrayList<Usuario> leerTodos() {
         ArrayList<Usuario> usuarios = new ArrayList<>();
         for (Usuario usuario : coleccion.values()) {
