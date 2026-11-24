@@ -44,5 +44,10 @@ public class LoginController extends ControladorBase {
             mostrarMensaje("Iniciar sesion", e.getMessage());
         }
     }
-}
 
+    @FXML
+    private void abrirRegistro() {
+        cambiarVista(btnIniciarSesion, "/vistas/registro.fxml",
+                "Temuflix - Crear cuenta");
+    }
+}

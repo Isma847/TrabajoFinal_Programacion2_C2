@@ -63,7 +63,7 @@ public class ControladorBase {
 
     protected void cambiarVista(Node componente, String ruta, String titulo) {
         try {
-            if (!"/vistas/login.fxml".equals(ruta)) {
+            if (!"/vistas/login.fxml".equals(ruta) && !"/vistas/registro.fxml".equals(ruta)) {
                 usuarioActual();
             }
 
