@@ -57,6 +57,18 @@ public class PeliculaService extends Service<Pelicula> {
         return resultado;
     }
 
+    public ArrayList<Pelicula> filtrarPorDirector(int idDirector, boolean baja) {
+        ArrayList<Pelicula> resultado = new ArrayList<>();
+
+        for (Pelicula pelicula : getLista(baja)) {
+            if (pelicula.getIdDirector() == idDirector) {
+                resultado.add(pelicula);
+            }
+        }
+
+        return resultado;
+    }
+
     // Se llama despues de eliminar un director desde la clase de sistema
     public void quitarDirector(int idDirector) {
         for(Pelicula p : coleccion.values()) {

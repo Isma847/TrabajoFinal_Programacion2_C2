@@ -11,6 +11,7 @@ import Service.SerieService;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Scanner;
+import Modelo.Pelicula;
 
 public class MenuDirectores {
 
@@ -190,6 +191,7 @@ public class MenuDirectores {
         return texto;
     }
 
+
     private int leerEntero(String campo) {
         System.out.print(campo + ": ");
 
@@ -199,4 +201,67 @@ public class MenuDirectores {
             throw new IllegalArgumentException(campo + " debe ser un número entero.");
         }
     }
+
+    //Interfaz Usuario
+    public void mostrarUsuario() {
+        while (true) {
+            System.out.println("\n--- Consultar directores ---");
+            System.out.println("1. Listar directores");
+            System.out.println("2. Consultar director y películas por ID");
+            System.out.println("3. Buscar por nombre o apellido");
+            System.out.println("0. Volver");
+            System.out.print("Opción: ");
+
+            try {
+                switch (entrada.nextLine().trim()) {
+                    case "1" -> listar();
+                    case "2" -> mostrarDirectorConPeliculas(pedirDirector());
+                    case "3" -> buscarDirectoresUsuario();
+                    case "0" -> {
+                        return;
+                    }
+                    default -> System.out.println("Opción inválida.");
+                }
+            } catch (IllegalArgumentException | DatoInvalidoException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+
+    private void buscarDirectoresUsuario() {
+        String texto = leerTexto("Nombre o apellido", 80);
+        ArrayList<Director> resultado = directores.buscarPorNombre(texto);
+
+        if (resultado.isEmpty()) {
+            System.out.println("No se encontraron directores.");
+            return;
+        }
+
+        for (Director director : resultado) {
+            mostrarDirectorConPeliculas(director);
+        }
+    }
+
+    private void mostrarDirectorConPeliculas(Director director) {
+        mostrarDirector(director);
+
+        ArrayList<Pelicula> resultado =
+                peliculas.filtrarPorDirector(director.getId(), false);
+
+        if (resultado.isEmpty()) {
+            System.out.println("Este director no tiene películas activas cargadas.");
+            return;
+        }
+
+        System.out.println("\nID | Película | Duración | Género");
+
+        for (Pelicula pelicula : resultado) {
+            System.out.printf("%d | %s | %d min | %s%n",
+                    pelicula.getId(),
+                    pelicula.getNombre(),
+                    pelicula.getDuracionMinutos(),
+                    pelicula.getGenero());
+        }
+    }
+
 }

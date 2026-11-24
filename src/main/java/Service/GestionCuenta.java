@@ -57,18 +57,88 @@ public class GestionCuenta {
 
     private void verificarDisponible(Usuario nueva) {
         if (nueva == null) {
-            throw new DatoInvalidoException("La cuenta es obligatoria");
+            throw new DatoInvalidoException("La cuenta es obligatoria.");
         }
 
         for (Usuario usuario : usuarios.leerTodos()) {
+            if (usuario.getId() == nueva.getId()) {
+                continue;
+            }
+
             if (usuario.getUsername() != null
                     && usuario.getUsername().equalsIgnoreCase(nueva.getUsername())) {
-                throw new DatoInvalidoException("Ese nombre de usuario ya está en uso");
+                throw new DatoInvalidoException(
+                        "Ese nombre de usuario ya está en uso."
+                );
             }
-            if (usuario.getEmail() != null && usuario.getEmail().equalsIgnoreCase(nueva.getEmail())) {
-                throw new DatoInvalidoException("Ese email ya está registrado");
+
+            if (usuario.getEmail() != null
+                    && usuario.getEmail().equalsIgnoreCase(nueva.getEmail())) {
+                throw new DatoInvalidoException(
+                        "Ese email ya está registrado."
+                );
             }
         }
     }
+
+    public Usuario consultarMiCuenta() {
+        if (usuarioActual == null) {
+            throw new DatoInvalidoException("Debés iniciar sesión.");
+        }
+
+        Usuario usuario = usuarios.buscarPorId(usuarioActual.getId());
+
+        if (usuario == null || usuario.getBaja()) {
+            cerrarSesion();
+            throw new DatoInvalidoException("Tu cuenta no está disponible.");
+        }
+
+        return usuario;
+    }
+
+    public boolean modificarMiCuenta(Usuario cambios) throws SQLException {
+        if (cambios == null) {
+            throw new DatoInvalidoException("Los datos son obligatorios.");
+        }
+
+        Usuario usuario = consultarMiCuenta();
+
+        // Solo se copian los datos personales permitidos.
+        usuario.setNombre(cambios.getNombre());
+        usuario.setApellido(cambios.getApellido());
+        usuario.setUsername(cambios.getUsername());
+        usuario.setEmail(cambios.getEmail());
+        usuario.setPassword(cambios.getPassword());
+        usuario.setEdad(cambios.getEdad());
+
+        verificarDisponible(usuario);
+
+        if (!usuarios.modificar(usuario)) {
+            return false;
+        }
+
+        usuarioActual = usuarios.buscarPorId(usuario.getId());
+        return true;
+    }
+
+    public boolean darDeBajaMiCuenta() throws SQLException {
+        Usuario usuario = consultarMiCuenta();
+
+        if (usuario.getRol() != Enumerados.Rol.USUARIO) {
+            throw new DatoInvalidoException(
+                    "Los administradores no pueden darse de baja a sí mismos."
+            );
+        }
+
+        usuario.setBaja(true);
+
+        if (!usuarios.modificar(usuario)) {
+            return false;
+        }
+
+        cerrarSesion();
+        return true;
+    }
+
 }
 

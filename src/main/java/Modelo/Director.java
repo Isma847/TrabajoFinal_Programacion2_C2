@@ -1,5 +1,6 @@
 package Modelo;
 
+
 public class Director extends Persona {
     private String descripcion;
 

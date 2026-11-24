@@ -19,12 +19,13 @@ public class Sistema {
     private final MenuFavoritos menuFavoritos;
     private final MenuDirectores menuDirectores;
     private final MenuCuentas menuCuentas;
+    private final MenuMiCuenta menuMiCuenta;
 
     public Sistema(GestionCuenta gestionCuenta, Scanner entrada,
                    MenuPeliculas menuPeliculas, MenuSeries menuSeries,
                    MenuVideojuegos menuVideojuegos, MenuResenas menuResenas,
                    MenuFavoritos menuFavoritos, MenuDirectores menuDirectores,
-                   MenuCuentas menuCuentas) {
+                   MenuCuentas menuCuentas, MenuMiCuenta menuMiCuenta) {
         this.gestionCuenta = gestionCuenta;
         this.entrada = entrada;
         this.menuPeliculas = menuPeliculas;
@@ -34,6 +35,7 @@ public class Sistema {
         this.menuFavoritos = menuFavoritos;
         this.menuDirectores = menuDirectores;
         this.menuCuentas = menuCuentas;
+        this.menuMiCuenta = menuMiCuenta;
     }
 
 
@@ -120,19 +122,23 @@ public class Sistema {
             }
         }
     }
-    public void mostrarMenuUsuario() {
-        Usuario usuario = gestionCuenta.getUsuarioActual();
-        if (usuario == null || usuario.getRol() != Rol.USUARIO) {
-            return;
-        }
 
+    public void mostrarMenuUsuario() {
         while (true) {
+            Usuario usuario = gestionCuenta.getUsuarioActual();
+
+            if (usuario == null || usuario.getRol() != Rol.USUARIO) {
+                return;
+            }
+
             System.out.println("\n--- Menú usuario ---");
             System.out.println("1. Consultar videojuegos");
             System.out.println("2. Reseñas");
             System.out.println("3. Consultar películas");
             System.out.println("4. Consultar series");
             System.out.println("5. Favoritos");
+            System.out.println("6. Consultar directores y películas");
+            System.out.println("7. Mi cuenta y estadísticas");
             System.out.println("0. Cerrar sesión");
             System.out.print("Opción: ");
 
@@ -142,14 +148,17 @@ public class Sistema {
                 case "3" -> menuPeliculas.mostrarUsuario();
                 case "4" -> menuSeries.mostrarUsuario();
                 case "5" -> menuFavoritos.mostrarUsuario(usuario);
+                case "6" -> menuDirectores.mostrarUsuario();
+                case "7" -> menuMiCuenta.mostrar();
                 case "0" -> {
                     gestionCuenta.cerrarSesion();
                     return;
                 }
-                default -> System.out.println("Opción inválida");
+                default -> System.out.println("Opción inválida.");
             }
         }
     }
+
 
     // Lee una linea y la convierte a entero; devuelve -1 si no es un numero
     private int leerEntero() {

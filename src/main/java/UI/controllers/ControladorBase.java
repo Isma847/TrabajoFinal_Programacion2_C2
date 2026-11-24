@@ -32,6 +32,11 @@ public class ControladorBase {
     }
 
 
+    protected ContenidoService contenidoService;
+
+    public void setContenidoService(ContenidoService contenidoService) {
+        this.contenidoService = contenidoService;
+    }
 
     protected void volverAlMenuUsuario(
             Node componente,
@@ -51,12 +56,14 @@ public class ControladorBase {
 
             MenuUsuarioController controller = loader.getController();
 
+
             controller.setGestionCuenta(gestionCuenta);
             controller.setPeliculaService(peliculaService);
             controller.setSerieService(serieService);
             controller.setVideojuegoService(videojuegoService);
             controller.setResenaService(resenaService);
             controller.setFavoritoService(favoritoService);
+
 
             Stage stage = (Stage) componente.getScene().getWindow();
             stage.setScene(new Scene(root));

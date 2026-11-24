@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Locale;
 
 public class DirectorService {
 
@@ -100,4 +101,28 @@ public class DirectorService {
         coleccion.remove(id);
         return true;
     }
+
+    public ArrayList<Director> buscarPorNombre(String texto) {
+        if (texto == null || texto.isBlank()) {
+            throw new DatoInvalidoException(
+                    "Ingresá un nombre o apellido para buscar."
+            );
+        }
+
+        String consulta = texto.trim().toLowerCase(Locale.ROOT);
+        ArrayList<Director> resultado = new ArrayList<>();
+
+        for (Director director : coleccion.values()) {
+            String nombreCompleto =
+                    director.getNombre() + " " + director.getApellido();
+
+            if (nombreCompleto.toLowerCase(Locale.ROOT).contains(consulta)) {
+                resultado.add(copiar(director));
+            }
+        }
+
+        return resultado;
+    }
+
+
 }
