@@ -13,4 +13,7 @@ public class Director extends Persona {
         return descripcion;
     }
 
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
 }

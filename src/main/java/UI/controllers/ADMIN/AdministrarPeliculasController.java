@@ -25,6 +25,7 @@ import java.sql.SQLException;
 public class AdministrarPeliculasController extends ControladorBase {
 
     @FXML private Button btnVolver;
+    @FXML private TextField txtBuscarId;
     @FXML private TableView<Pelicula> tablaPeliculas;
     @FXML private TableColumn<Pelicula, Integer> colId;
     @FXML private TableColumn<Pelicula, String> colNombre;
@@ -236,6 +237,43 @@ public class AdministrarPeliculasController extends ControladorBase {
         cmbDirector.getSelectionModel().clearSelection();
         txtFecha.clear();
     }
+
+    @FXML
+    private void buscarPelicula() {
+        try {
+            int id = Integer.parseInt(txtBuscarId.getText());
+
+            ContenidoMultimedia contenido = contenidoService.buscarPorId(id);
+
+            if (contenido == null) {
+                mostrarMensaje("Búsqueda", "No se encontró ningún contenido con ese ID.");
+                return;
+            }
+
+            if (!(contenido instanceof Pelicula)) {
+                mostrarMensaje("Búsqueda", "El ID corresponde a otro tipo de contenido.");
+                return;
+            }
+
+            Pelicula pelicula = (Pelicula) contenido;
+
+            if (pelicula.getBaja() && !"Todos".equals(cmbFiltroBaja.getValue())) {
+                mostrarMensaje("Búsqueda", "La película no coincide con el filtro seleccionado.");
+                return;
+            }
+
+            tablaPeliculas.getItems().setAll(pelicula);
+
+        } catch (NumberFormatException e) {
+            mostrarMensaje("Búsqueda", "Ingresá un ID numérico válido.");
+        }
+    }
+
+    @FXML
+    private void mostrarTodasLasPeliculas() {
+        cargarDatos();
+    }
+
 
     @FXML
     private void volver() {
