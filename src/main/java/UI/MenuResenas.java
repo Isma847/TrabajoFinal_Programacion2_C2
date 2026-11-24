@@ -73,6 +73,7 @@ public class MenuResenas {
             System.out.println("1. Películas");
             System.out.println("2. Series");
             System.out.println("3. Videojuegos");
+            System.out.println("4. Ver mis reseñas");
             System.out.println("0. Volver");
             System.out.print("Opción: ");
 
@@ -81,6 +82,7 @@ public class MenuResenas {
                     case "1" -> elegirContenido(usuario, TipoContenido.PELICULA);
                     case "2" -> elegirContenido(usuario, TipoContenido.SERIE);
                     case "3" -> elegirContenido(usuario, TipoContenido.JUEGO);
+                    case "4" -> listar(resenas.leerPorUsuario(usuario.getId()));
                     case "0" -> {
                         return;
                     }
@@ -215,9 +217,11 @@ public class MenuResenas {
     }
 
     private void modificar(int idUsuario, int idContenido) throws SQLException {
-        Resena resena = pedirResena();
-        if (resena.getIdUsuario() != idUsuario || resena.getIdContenido() != idContenido) {
-            throw new DatoInvalidoException("Elegí una reseña tuya de este título.");
+        Resena resena = resenas.buscarPorContenidoYUsuario(idContenido, idUsuario);
+
+        if (resena == null) {
+            System.out.println("Todavía no publicaste una reseña de este título.");
+            return;
         }
 
         mostrarResena(resena);

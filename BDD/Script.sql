@@ -101,7 +101,8 @@ CREATE TABLE IF NOT EXISTS resenas (
     comentario TEXT,
     fecha VARCHAR(10) NOT NULL,
     constraint fk_usuario_resena FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE,
-    constraint fk_contenido_resena FOREIGN KEY (id_contenido) REFERENCES contenidoMultimedia(id_contenidoMultimedia) ON DELETE CASCADE
+    constraint fk_contenido_resena FOREIGN KEY (id_contenido) REFERENCES contenidoMultimedia(id_contenidoMultimedia) ON DELETE CASCADE,
+    CONSTRAINT uq_resenas_usuario_contenido UNIQUE (id_usuario, id_contenido)
 ) ENGINE=InnoDB;
 
 CREATE TABLE favoritos (
