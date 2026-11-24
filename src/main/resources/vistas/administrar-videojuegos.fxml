@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="UI.controllers.ADMIN.AdministrarVideojuegosController"
+            prefWidth="1000.0" prefHeight="600.0">
+
+    <top>
+        <VBox alignment="CENTER" spacing="10">
+            <padding>
+                <Insets top="20" bottom="15"/>
+            </padding>
+            <Label text="GESTIÓN DE VIDEOJUEGOS"
+                   style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
+        </VBox>
+    </top>
+
+    <center>
+        <HBox spacing="20" alignment="TOP_CENTER">
+            <padding>
+                <Insets top="10" right="20" bottom="20" left="20"/>
+            </padding>
+
+            <!-- LISTADO DE VIDEOJUEGOS -->
+            <VBox spacing="12" HBox.hgrow="ALWAYS">
+
+                <Label text="Listado de videojuegos"
+                       style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+
+                <ComboBox fx:id="cmbFiltroBaja"
+                          promptText="Filtrar por estado"
+                          onAction="#filtrarVideojuegos"
+                          maxWidth="Infinity"/>
+
+                <TableView fx:id="tablaVideojuegos"
+                           VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colId" text="ID" prefWidth="45"/>
+                        <TableColumn fx:id="colNombre" text="Nombre" prefWidth="145"/>
+                        <TableColumn fx:id="colGenero" text="Género" prefWidth="100"/>
+                        <TableColumn fx:id="colClasificacion" text="Clasificación" prefWidth="100"/>
+                        <TableColumn fx:id="colDificultad" text="Dificultad" prefWidth="85"/>
+                        <TableColumn fx:id="colBaja" text="Baja" prefWidth="55"/>
+                    </columns>
+                </TableView>
+
+                <!-- BOTONES DEBAJO DE LA TABLA -->
+                <HBox spacing="10" alignment="CENTER">
+                    <Button text="AGREGAR"
+                            onAction="#agregarVideojuego"/>
+
+                    <Button text="MODIFICAR"
+                            onAction="#modificarVideojuego"/>
+
+                    <Button text="DAR DE BAJA / REACTIVAR"
+                            onAction="#cambiarEstadoVideojuego"/>
+                </HBox>
+
+                <Button fx:id="btnVolver"
+                        text="VOLVER ATRÁS"
+                        onAction="#volver"
+                        maxWidth="Infinity"/>
+
+            </VBox>
+
+            <!-- FORMULARIO -->
+            <VBox spacing="12" prefWidth="300">
+
+                <Label text="Datos del videojuego"
+                       style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+
+                <Label text="Nombre"/>
+                <TextField fx:id="txtNombre"
+                           promptText="Nombre del videojuego"/>
+
+                <Label text="Duración (minutos)"/>
+                <TextField fx:id="txtDuracion"
+                           promptText="Duración"/>
+
+                <Label text="Clasificación"/>
+                <ComboBox fx:id="cmbClasificacion"
+                          promptText="Seleccionar clasificación"
+                          maxWidth="Infinity"/>
+
+                <Label text="Género"/>
+                <ComboBox fx:id="cmbGenero"
+                          promptText="Seleccionar género"
+                          maxWidth="Infinity"/>
+
+                <Label text="Dificultad"/>
+                <TextField fx:id="txtDificultad"
+                           promptText="Dificultad"/>
+
+                <Label text="Descripción"/>
+                <TextArea fx:id="txtDescripcion"
+                          promptText="Descripción del videojuego"
+                          prefRowCount="4"
+                          wrapText="true"/>
+
+            </VBox>
+        </HBox>
+    </center>
+
+</BorderPane>

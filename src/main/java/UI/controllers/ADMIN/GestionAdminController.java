@@ -82,14 +82,54 @@ public class GestionAdminController extends ControladorBase {
     }
 
     @FXML
-    private void abrirGestionSeries() {
-        System.out.println("Abrir gestión de series");
+    public void abrirGestionSeries() throws IOException {
+
+        FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("/vistas/administrar-series.fxml")
+        );
+
+        Parent root = loader.load();
+
+        AdministrarSeriesController controller = loader.getController();
+
+        controller.setGestionCuenta(gestionCuenta);
+        controller.setPeliculaService(peliculaService);
+        controller.setSerieService(serieService);
+        controller.setVideojuegoService(videojuegoService);
+        controller.setResenaService(resenaService);
+        controller.setFavoritoService(favoritoService);
+        controller.setDirectorService(directorService);
+
+        Stage stage = (Stage) btnVolver.getScene().getWindow();
+        stage.setScene(new Scene(root));
+        stage.show();
     }
 
+
     @FXML
-    private void abrirGestionVideojuegos() {
-        System.out.println("Abrir gestión de videojuegos");
+    public void abrirGestionVideojuegos() throws IOException {
+
+        FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("/vistas/administrar-videojuegos.fxml")
+        );
+
+        Parent root = loader.load();
+
+        AdministrarVideojuegosController controller = loader.getController();
+
+        controller.setGestionCuenta(gestionCuenta);
+        controller.setPeliculaService(peliculaService);
+        controller.setSerieService(serieService);
+        controller.setVideojuegoService(videojuegoService);
+        controller.setResenaService(resenaService);
+        controller.setFavoritoService(favoritoService);
+        controller.setDirectorService(directorService);
+
+        Stage stage = (Stage) btnVolver.getScene().getWindow();
+        stage.setScene(new Scene(root));
+        stage.show();
     }
+
 
     @FXML
     private void volver() {

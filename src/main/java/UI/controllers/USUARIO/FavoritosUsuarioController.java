@@ -1,11 +1,7 @@
 
 package UI.controllers.USUARIO;
 
-import Modelo.Favorito;
-import Modelo.Cuenta;
-import Modelo.Pelicula;
-import Modelo.Serie;
-import Modelo.Videojuego;
+import Modelo.*;
 
 import Service.*;
 
@@ -53,6 +49,7 @@ public class FavoritosUsuarioController extends ControladorBase {
     private SerieService serieService;
     private VideojuegoService videojuegoService;
     private ResenaService resenaService;
+    private ContenidoService contenidoService;
 
     public void setFavoritoService(FavoritoService favoritoService) {
         this.favoritoService = favoritoService;
@@ -76,6 +73,10 @@ public class FavoritosUsuarioController extends ControladorBase {
 
     public void setResenaService(ResenaService resenaService) {
         this.resenaService = resenaService;
+    }
+
+    public void setContenidoService(ContenidoService contenidoService) {
+        this.contenidoService = contenidoService;
     }
 
     public void inicializarPantalla() {
@@ -121,25 +122,14 @@ public class FavoritosUsuarioController extends ControladorBase {
 
     private String obtenerNombreContenido(Favorito favorito) {
 
-        int id = favorito.getId_contenido();
+        ContenidoMultimedia contenido =
+                contenidoService.buscarPorId(favorito.getId_contenido());
 
-        switch (favorito.getTipo()) {
-
-            case "PELICULA":
-                Pelicula pelicula = peliculaService.buscarPorId(id);
-                return pelicula != null ? pelicula.getNombre() : "Contenido no disponible";
-
-            case "SERIE":
-                Serie serie = serieService.buscarPorId(id);
-                return serie != null ? serie.getNombre() : "Contenido no disponible";
-
-            case "JUEGO":
-                Videojuego videojuego = videojuegoService.buscarPorId(id);
-                return videojuego != null ? videojuego.getNombre() : "Contenido no disponible";
-
-            default:
-                return "Desconocido";
+        if (contenido != null) {
+            return contenido.getNombre();
         }
+
+        return "Contenido no disponible";
     }
 
     @FXML
@@ -157,8 +147,7 @@ public class FavoritosUsuarioController extends ControladorBase {
 
             favoritoService.quitarDeUsuario(
                     idUsuario,
-                    seleccionado.getId_contenido(),
-                    seleccionado.getTipo()
+                    seleccionado.getId_contenido()
             );
 
             cargarFavoritos();
@@ -235,7 +224,7 @@ public class FavoritosUsuarioController extends ControladorBase {
         ArrayList<Pelicula> peliculas = peliculaService.getLista(false);
 
         if (peliculas.isEmpty()) {
-            mostrarMensaje("ATENCION","No hay películas disponibles");
+            mostrarMensaje("ATENCION", "No hay películas disponibles");
             return;
         }
 
@@ -249,9 +238,16 @@ public class FavoritosUsuarioController extends ControladorBase {
 
         Optional<Pelicula> seleccion = dialog.showAndWait();
 
-        seleccion.ifPresent(pelicula -> guardarFavorito(
-                pelicula.getId(), "PELICULA"
-        ));
+        seleccion.ifPresent(pelicula -> {
+            int idGeneral = contenidoService.buscarIdContenido(pelicula);
+
+            if (idGeneral == -1) {
+                mostrarMensaje("ERROR", "No se encontró el contenido");
+                return;
+            }
+
+            guardarFavorito(idGeneral);
+        });
     }
 
     private void agregarSerie() {
@@ -273,9 +269,16 @@ public class FavoritosUsuarioController extends ControladorBase {
 
         Optional<Serie> seleccion = dialog.showAndWait();
 
-        seleccion.ifPresent(serie -> guardarFavorito(
-                serie.getId(), "SERIE"
-        ));
+        seleccion.ifPresent(serie -> {
+            int idGeneral = contenidoService.buscarIdContenido(serie);
+
+            if (idGeneral == -1) {
+                mostrarMensaje("ERROR", "No se encontró el contenido");
+                return;
+            }
+
+            guardarFavorito(idGeneral);
+        });
     }
 
     private void agregarVideojuego() {
@@ -297,18 +300,25 @@ public class FavoritosUsuarioController extends ControladorBase {
 
         Optional<Videojuego> seleccion = dialog.showAndWait();
 
-        seleccion.ifPresent(videojuego -> guardarFavorito(
-                videojuego.getId(), "JUEGO"
-        ));
+        seleccion.ifPresent(serie -> {
+            int idGeneral = contenidoService.buscarIdContenido(serie);
+
+            if (idGeneral == -1) {
+                mostrarMensaje("ERROR", "No se encontró el contenido");
+                return;
+            }
+
+            guardarFavorito(idGeneral);
+        });
     }
 
 
-    private void guardarFavorito(int idContenido, String tipo) {
+    private void guardarFavorito(int idContenido) {
 
         Cuenta cuenta = gestionCuenta.getUsuarioActual();
         int idUsuario = cuenta.getId();
 
-        if (favoritoService.contiene(idUsuario, idContenido, tipo)) {
+        if (favoritoService.contiene(idUsuario, idContenido)) {
             mostrarMensaje("ATENCION","Este contenido ya está en tus favoritos.");
             return;
         }
@@ -316,8 +326,7 @@ public class FavoritosUsuarioController extends ControladorBase {
         Favorito favorito = new Favorito(
                 0,
                 idUsuario,
-                idContenido,
-                tipo
+                idContenido
         );
 
         try {

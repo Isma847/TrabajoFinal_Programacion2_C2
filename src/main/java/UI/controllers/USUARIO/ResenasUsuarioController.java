@@ -135,10 +135,7 @@ public class ResenasUsuarioController extends ControladorBase {
 
         tablaResenas.setItems(
                 FXCollections.observableArrayList(
-                        resenaService.filtrarPorContenido(
-                                comboTipo.getValue(),
-                                contenido.getId()
-                        )
+                        resenaService.filtrarPorContenido(contenido.getId())
                 )
         );
     }
@@ -165,7 +162,6 @@ public class ResenasUsuarioController extends ControladorBase {
             Resena resena = new Resena(
                     contenido.getId(),
                     gestionCuenta.getUsuarioActual().getId(),
-                    comboTipo.getValue(),
                     calificacion,
                     comentario == null || comentario.isBlank()
                             ? null : comentario.trim(),
