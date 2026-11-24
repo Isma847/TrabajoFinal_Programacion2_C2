@@ -35,6 +35,7 @@ public class MenuCuentas {
             System.out.println("4. Modificar un campo");
             System.out.println("5. Dar de baja o reactivar");
             System.out.println("6. Asignar rol administrador por ID");
+            System.out.println("7. Quitar rol administrador por ID");
             System.out.println("0. Volver");
             System.out.print("Opción: ");
 
@@ -55,6 +56,11 @@ public class MenuCuentas {
                     }
                     case "6" -> {
                         if (asignarRolAdministrador(administrador.getId())) {
+                            return true;
+                        }
+                    }
+                    case "7" -> {
+                        if (quitarRolAdministrador(administrador.getId())) {
                             return true;
                         }
                     }
@@ -199,6 +205,27 @@ public class MenuCuentas {
                 usuario.setEdad(leerEdad(rol));
             }
         }
+    }
+
+    private boolean quitarRolAdministrador(int idAdministrador)
+            throws SQLException {
+        Usuario usuario = pedirCuenta();
+
+        if (usuario.getRol() != Rol.ADMINISTRADOR) {
+            System.out.println("La cuenta no tiene el rol ADMINISTRADOR.");
+            return false;
+        }
+
+        mostrarCuenta(usuario);
+
+        usuario.setRol(Rol.USUARIO);
+        usuario.setPuedeEliminar(false);
+
+        if (usuario.getEdad() == null) {
+            usuario.setEdad(leerEdad(Rol.USUARIO));
+        }
+
+        return guardarCambio(usuario, idAdministrador);
     }
 
     private boolean cambiarEstado(int idAdministrador) throws SQLException {
