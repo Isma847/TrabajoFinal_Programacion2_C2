@@ -105,9 +105,17 @@ public class ResenaService {
             throw new DatoInvalidoException("La reseña es obligatoria");
         }
 
+        if (resena.getCalificacion() < 1 || resena.getCalificacion() > 10) {
+            throw new DatoInvalidoException(
+                    "La calificación debe estar entre 1 y 10"
+            );
+        }
+
         String fecha = resena.getFecha();
         if (fecha == null || fecha.codePointCount(0, fecha.length()) > 10) {
-            throw new DatoInvalidoException("La fecha es obligatoria y admite hasta 10 caracteres");
+            throw new DatoInvalidoException(
+                    "La fecha es obligatoria y admite hasta 10 caracteres"
+            );
         }
     }
 

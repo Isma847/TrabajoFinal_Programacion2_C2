@@ -1,24 +1,30 @@
-package UI.controllers;
+package UI.controllers.USUARIO;
 
 import Modelo.Pelicula;
-import Service.GestionCuenta;
-import Service.PeliculaService;
+import Service.*;
+import UI.controllers.ControladorBase;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TableColumn;
-import javafx.stage.Stage;
 
-import java.io.IOException;
+public class PeliculasUsuarioController extends ControladorBase {
 
-public class PeliculasUsuarioController {
+    //ATRIBUTOS
 
     private PeliculaService peliculaService;
+
+    private SerieService serieService;
+
+    private VideojuegoService videojuegoService;
+
+    private ResenaService resenaService;
+
+    private FavoritoService favoritoService;
+
+    //FXML
 
     @FXML
     private TableView<Pelicula> tablaPeliculas;
@@ -42,17 +48,35 @@ public class PeliculasUsuarioController {
     private TableColumn<Pelicula, String> colDescripcion;
     private GestionCuenta gestionCuenta;
 
+    //SETTERS
+
     public void setGestionCuenta(GestionCuenta gestionCuenta) {
         this.gestionCuenta = gestionCuenta;
     }
-    
-    
 
     public void setPeliculaService(PeliculaService peliculaService) {
         this.peliculaService = peliculaService;
         configurarColumnas();
         cargarPeliculas();
     }
+
+    public void setSerieService(SerieService serieService) {
+        this.serieService = serieService;
+    }
+
+    public void setVideojuegoService(VideojuegoService videojuegoService) {
+        this.videojuegoService = videojuegoService;
+    }
+
+    public void setResenaService(ResenaService resenaService) {
+        this.resenaService = resenaService;
+    }
+
+    public void setFavoritoService(FavoritoService favoritoService) {
+        this.favoritoService = favoritoService;
+    }
+
+    //METODOS DE PELICULAS
 
     private void configurarColumnas() {
         colNombre.setCellValueFactory(datos ->
@@ -80,26 +104,16 @@ public class PeliculasUsuarioController {
         );
     }
 
-    @FXML
-    private void volverMenu() {
-        try {
-            FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/vistas/menu-usuario.fxml")
-            );
+    public void volverMenu() {
+        volverAlMenuUsuario(
+                tablaPeliculas,
+                gestionCuenta,
+                peliculaService,
+                serieService,
+                videojuegoService,
+                resenaService,
+                favoritoService
+        );
+    }
 
-            Parent root = loader.load();
-
-            // Le devolvemos los servicios al menú para no perder la sesión ni los datos
-            MenuUsuarioController controller = loader.getController();
-            controller.setGestionCuenta(gestionCuenta);
-            controller.setPeliculaService(peliculaService);
-
-            // Usamos tablaPeliculas para obtener la ventana actual
-            Stage stage = (Stage) tablaPeliculas.getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.show();
-
-        } catch (IOException e) {
-            System.out.println("Error al volver al menú: " + e.getMessage());
-        }
-    }}
+   }

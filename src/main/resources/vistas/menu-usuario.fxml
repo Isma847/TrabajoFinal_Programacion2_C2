@@ -6,56 +6,79 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="UI.controllers.MenuUsuarioController"><children>
-      <Label text="TEMUFLIX">
-         <font>
-            <Font name="System Bold" size="48.0" />
-         </font>
-      </Label>
-      <Label text="Bienvenido">
-         <font>
-            <Font name="System Bold" size="13.0" />
-         </font>
-      </Label>
-      <Button fx:id="btnPeliculas" mnemonicParsing="false" onAction="#abrirPeliculas" prefHeight="40.0" prefWidth="400.0" text="Peliculas">
-         <VBox.margin>
-            <Insets bottom="10.0" top="10.0" />
-         </VBox.margin>
-         <font>
-            <Font size="14.0" />
-         </font>
-      </Button>
-      <Button mnemonicParsing="false" onAction="#abrirSeries" prefHeight="40.0" prefWidth="400.0" text="Series">
-         <VBox.margin>
-            <Insets bottom="10.0" top="10.0" />
-         </VBox.margin>
-         <font>
-            <Font size="14.0" />
-         </font>
-      </Button>
-      <Button mnemonicParsing="false" onAction="#abrirVideojuegos" prefHeight="40.0" prefWidth="400.0" text="Videojuegos">
-         <VBox.margin>
-            <Insets bottom="10.0" top="10.0" />
-         </VBox.margin>
-         <font>
-            <Font size="14.0" />
-         </font>
-      </Button>
-      <Button mnemonicParsing="false" onAction="#abrirResenas" prefHeight="40.0" prefWidth="400.0" text="Reseñas">
-         <VBox.margin>
-            <Insets bottom="10.0" top="10.0" />
-         </VBox.margin>
-         <font>
-            <Font size="14.0" />
-         </font>
-      </Button>
-      <Button fx:id="btncerrarSesion" mnemonicParsing="false" onAction="#cerrarSesion" prefHeight="40.0" prefWidth="400.0" text="CERRAR SESION">
-         <VBox.margin>
-            <Insets bottom="10.0" top="10.0" />
-         </VBox.margin>
-         <font>
-            <Font size="18.0" />
-         </font>
-      </Button>
-   </children>
+<VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity"
+      minHeight="-Infinity" minWidth="-Infinity"
+      prefHeight="550.0" prefWidth="800.0"
+      xmlns="http://javafx.com/javafx/26"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="UI.controllers.USUARIO.MenuUsuarioController">
+
+    <children>
+        <Label text="TEMUFLIX">
+            <font>
+                <Font name="System Bold" size="48.0"/>
+            </font>
+        </Label>
+
+        <Label text="Bienvenido">
+            <font>
+                <Font name="System Bold" size="13.0"/>
+            </font>
+        </Label>
+
+        <Button fx:id="btnPeliculas" mnemonicParsing="false"
+                onAction="#abrirPeliculas"
+                prefHeight="40.0" prefWidth="400.0" text="Peliculas">
+            <VBox.margin>
+                <Insets bottom="10.0" top="10.0"/>
+            </VBox.margin>
+            <font><Font size="14.0"/></font>
+        </Button>
+
+        <Button mnemonicParsing="false" onAction="#abrirSeries"
+                prefHeight="40.0" prefWidth="400.0" text="Series">
+            <VBox.margin>
+                <Insets bottom="10.0" top="10.0"/>
+            </VBox.margin>
+            <font><Font size="14.0"/></font>
+        </Button>
+
+        <Button mnemonicParsing="false" onAction="#abrirVideojuegos"
+                prefHeight="40.0" prefWidth="400.0" text="Videojuegos">
+            <VBox.margin>
+                <Insets bottom="10.0" top="10.0"/>
+            </VBox.margin>
+            <font><Font size="14.0"/></font>
+        </Button>
+
+        <Button mnemonicParsing="false" onAction="#abrirResenas"
+                prefHeight="40.0" prefWidth="400.0" text="Reseñas">
+            <VBox.margin>
+                <Insets bottom="10.0" top="10.0"/>
+            </VBox.margin>
+            <font><Font size="14.0"/></font>
+        </Button>
+
+        <Button mnemonicParsing="false"
+                onAction="#abrirFavoritos"
+                prefHeight="40.0"
+                prefWidth="400.0"
+                text="Favoritos">
+            <VBox.margin>
+                <Insets bottom="10.0" top="10.0"/>
+            </VBox.margin>
+            <font>
+                <Font size="14.0"/>
+            </font>
+        </Button>
+
+        <Button fx:id="btncerrarSesion" mnemonicParsing="false"
+                onAction="#cerrarSesion"
+                prefHeight="40.0" prefWidth="400.0" text="CERRAR SESION">
+            <VBox.margin>
+                <Insets bottom="10.0" top="10.0"/>
+            </VBox.margin>
+            <font><Font size="18.0"/></font>
+        </Button>
+    </children>
 </VBox>
