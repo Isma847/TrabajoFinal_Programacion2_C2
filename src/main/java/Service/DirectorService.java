@@ -10,17 +10,39 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Locale;
 
+/**
+ * Service de directores. No extiende {@code Service<T>} porque el director no tiene baja lógica
+ * (no implementa TieneBaja): solo se puede agregar, buscar, modificar, listar y eliminar. Sigue
+ * igual la Alternativa B: carga la colección una vez y escribe primero en la base.
+ *
+ * Devuelve y guarda copias de los directores (método copiar), así que modificar un objeto
+ * obtenido de acá no cambia la colección: para que un cambio quede hay que pasar por modificar,
+ * que valida y guarda en la base.
+ */
 public class DirectorService {
 
     private final DirectorDao dao = new DirectorDao();
+
+    /**
+     * Colección en memoria con el id como clave. Se usa un Map porque la búsqueda, modificación y
+     * eliminación son por id (acceso directo), y LinkedHashMap para conservar el orden de la base
+     * en los listados.
+     */
     private final Map<Integer, Director> coleccion = new LinkedHashMap<>();
 
+    /**
+     * Carga todos los directores desde la base una sola vez.
+     */
     public DirectorService() throws SQLException {
         for (Director director : dao.leerTodos()) {
             coleccion.put(director.getId(), director);
         }
     }
 
+    /**
+     * Valida, rechaza al director que ya trae un id (no es nuevo), lo guarda en la base y, si
+     * salió bien, guarda una copia en la colección.
+     */
     public boolean agregar(Director director) throws SQLException {
         validar(director);
         if (director.getId() != 0) {
@@ -37,6 +59,9 @@ public class DirectorService {
         return true;
     }
 
+    /**
+     * Devuelve una copia del director, o null si no existe.
+     */
     public Director buscarPorId(int id) {
         Director director = coleccion.get(id);
         if (director == null) {
@@ -45,6 +70,10 @@ public class DirectorService {
         return copiar(director);
     }
 
+    /**
+     * Valida y actualiza en la base; si salió bien reemplaza la entrada de la colección por una
+     * copia. Devuelve false si el id no existe.
+     */
     public boolean modificar(Director director) throws SQLException {
         validar(director);
         int id = director.getId();
@@ -60,6 +89,9 @@ public class DirectorService {
         return true;
     }
 
+    /**
+     * Devuelve una lista nueva con copias de todos los directores.
+     */
     public ArrayList<Director> leerTodos() {
         ArrayList<Director> directores = new ArrayList<>();
         for (Director director : coleccion.values()) {
@@ -68,6 +100,10 @@ public class DirectorService {
         return directores;
     }
 
+    /**
+     * Nombre y apellido obligatorios, de hasta 80 caracteres (el largo de la columna). Lanza
+     * DatoInvalidoException si no se cumple.
+     */
     private void validar(Director director) {
         if (director == null) {
             throw new DatoInvalidoException("El director es obligatorio");
@@ -84,13 +120,21 @@ public class DirectorService {
         }
     }
 
+    /**
+     * Crea un director nuevo con los mismos datos, para no exponer el objeto guardado en la
+     * colección.
+     */
     private Director copiar(Director director) {
         Director copia = new Director(director.getApellido(), director.getNombre(), director.getDescripcion());
         copia.setId(director.getId());
         return copia;
     }
 
-    // Llamar a PeliculaService.quitarDirector(id) y SerieService.quitarDirector(id) despues de usarlo
+    /**
+     * Borrado definitivo del director. La base deja sin director a sus películas y series (SET
+     * NULL), pero la memoria no se actualiza sola: después de llamarlo hay que llamar a
+     * PeliculaService.quitarDirector y SerieService.quitarDirector.
+     */
     public boolean eliminar(int id) throws SQLException {
         if (!coleccion.containsKey(id)) {
             return false;
@@ -102,6 +146,11 @@ public class DirectorService {
         return true;
     }
 
+    /**
+     * Busca directores cuyo "nombre apellido" contenga el texto, sin distinguir mayúsculas
+     * (Locale.ROOT evita diferencias por idioma). Lanza DatoInvalidoException si el texto está
+     * vacío. Devuelve copias.
+     */
     public ArrayList<Director> buscarPorNombre(String texto) {
         if (texto == null || texto.isBlank()) {
             throw new DatoInvalidoException(

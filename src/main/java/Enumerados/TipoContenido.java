@@ -1,6 +1,7 @@
 package Enumerados;
 
-// Los valores coinciden con la columna tipo de la tabla contenidoMultimedia
+/// Su uso es orientado al sistema
+
 public enum TipoContenido {
 
     PELICULA,

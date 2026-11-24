@@ -6,22 +6,38 @@ import Modelo.Usuario;
 
 import java.sql.SQLException;
 
+/**
+ * Maneja la sesión y las operaciones de una persona sobre su propia cuenta: iniciar y cerrar
+ * sesión, crear una cuenta y consultar, modificar o dar de baja la cuenta actual. No tiene
+ * colección propia: trabaja sobre UsuarioService.
+ *
+ * Los permisos por rol (qué puede hacer un administrador o un usuario) no se controlan acá, sino
+ * en los menús y pantallas, porque esta clase solo sabe quién inició sesión.
+ */
 public class GestionCuenta {
 
     private final UsuarioService usuarios;
+
+    /**
+     * Cuenta con la sesión iniciada, o null si no hay ninguna.
+     */
     private Usuario usuarioActual;
 
     public GestionCuenta(UsuarioService usuarios) {
         this.usuarios = usuarios;
     }
 
-    public void iniciarSesion(String username, String password) throws SesionInvalidaException {
+    /**
+     * Busca una cuenta activa (no dada de baja) con ese username y contraseña. Si no hay ninguna
+     * o hay más de una lanza SesionInvalidaException (excepción verificada, hay que capturarla).
+     */
+    public void iniciarSesion(String email, String password) throws SesionInvalidaException {
         usuarioActual = null;
         Usuario cuentaEncontrada = null;
 
         for (Usuario usuario : usuarios.leerTodos()) {
             if (!usuario.getBaja()
-                    && usuario.getUsername().equals(username)
+                    && usuario.getEmail().equals(email)
                     && usuario.getPassword().equals(password)) {
                 if (cuentaEncontrada != null) {
                     throw new SesionInvalidaException("Las credenciales coinciden con más de una cuenta");
@@ -31,20 +47,31 @@ public class GestionCuenta {
         }
 
         if (cuentaEncontrada == null) {
-            throw new SesionInvalidaException("Usuario o contraseña incorrectos");
+            throw new SesionInvalidaException("Correo o contraseña incorrectos");
         }
 
         usuarioActual = cuentaEncontrada;
     }
 
+    /**
+     * Devuelve la cuenta con sesión iniciada, o null.
+     */
     public Usuario getUsuarioActual() {
         return usuarioActual;
     }
 
+    /**
+     * Cierra la sesión actual.
+     */
     public void cerrarSesion() {
         usuarioActual = null;
     }
 
+    /**
+     * Crea una cuenta nueva. Primero verifica que username y email estén libres y recién ahí la
+     * delega en UsuarioService. Los datos inválidos propagan DatoInvalidoException; los errores
+     * de la base se muestran por consola y devuelven false.
+     */
     public boolean agregarUsuario(Usuario usuario) {
         try {
             verificarDisponible(usuario);
@@ -55,6 +82,11 @@ public class GestionCuenta {
         return false;
     }
 
+    /**
+     * Verifica que ningún otro usuario tenga el mismo username o email (sin distinguir
+     * mayúsculas). Se saltea la propia cuenta comparando por id, así se puede modificar una
+     * cuenta sin que choque consigo misma. Lanza DatoInvalidoException si ya están en uso.
+     */
     private void verificarDisponible(Usuario nueva) {
         if (nueva == null) {
             throw new DatoInvalidoException("La cuenta es obligatoria.");
@@ -81,6 +113,11 @@ public class GestionCuenta {
         }
     }
 
+    /**
+     * Devuelve una copia actualizada de la cuenta con sesión iniciada. Si no hay sesión lanza
+     * DatoInvalidoException; si la cuenta ya no existe o fue dada de baja, cierra la sesión y
+     * lanza la excepción.
+     */
     public Usuario consultarMiCuenta() {
         if (usuarioActual == null) {
             throw new DatoInvalidoException("Debés iniciar sesión.");
@@ -96,6 +133,11 @@ public class GestionCuenta {
         return usuario;
     }
 
+    /**
+     * Modifica los datos personales de la cuenta actual (nombre, apellido, username, email,
+     * contraseña y edad). El rol, la baja y los permisos no se pueden cambiar desde acá. Trabaja
+     * sobre una copia y, si todo sale bien, actualiza la cuenta de la sesión.
+     */
     public boolean modificarMiCuenta(Usuario cambios) throws SQLException {
         if (cambios == null) {
             throw new DatoInvalidoException("Los datos son obligatorios.");
@@ -121,6 +163,10 @@ public class GestionCuenta {
         return true;
     }
 
+    /**
+     * Da de baja la cuenta actual y cierra la sesión. Solo vale para el rol USUARIO: los
+     * administradores no pueden darse de baja a sí mismos.
+     */
     public boolean darDeBajaMiCuenta() throws SQLException {
         Usuario usuario = consultarMiCuenta();
 

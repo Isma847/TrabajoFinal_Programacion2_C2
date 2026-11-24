@@ -7,8 +7,18 @@ import Modelo.Resena;
 import java.sql.*;
 import java.util.ArrayList;
 
+/**
+ * DAO de reseñas: tabla {@code resenas}. Implementa solo CRUDBase porque las reseñas no tienen
+ * baja lógica: se borran de verdad.
+ *
+ * La reseña apunta al contenido por el id general (pivote) y la base garantiza una sola reseña
+ * por usuario y contenido con un UNIQUE.
+ */
 public class ResenaDao implements CRUDBase<Resena> {
 
+    /**
+     * Inserta la reseña y devuelve su id generado, o -1 si no se insertó.
+     */
     @Override
     public int crear(Resena resena) throws SQLException {
         String sql = "INSERT INTO resenas (calificacion, comentario, fecha, id_contenido, id_usuario) "
@@ -34,6 +44,9 @@ public class ResenaDao implements CRUDBase<Resena> {
         }
     }
 
+    /**
+     * Lee todas las reseñas; el Service la usa al iniciarse.
+     */
     @Override
     public ArrayList<Resena> leerTodos() throws SQLException {
         String sql = "SELECT id_resena, id_contenido, id_usuario, calificacion, comentario, fecha "
@@ -59,6 +72,10 @@ public class ResenaDao implements CRUDBase<Resena> {
         return resenas;
     }
 
+    /**
+     * Solo se pueden cambiar calificación, comentario y fecha; el usuario y el contenido de la
+     * reseña no se modifican.
+     */
     @Override
     public int actualizar(Resena resena) throws SQLException {
         String sql = "UPDATE resenas SET calificacion = ?, comentario = ?, fecha = ? "
@@ -73,6 +90,9 @@ public class ResenaDao implements CRUDBase<Resena> {
         }
     }
 
+    /**
+     * Elimina la reseña por su id.
+     */
     @Override
     public int eliminar(int id) throws SQLException {
         String sql = "DELETE FROM resenas WHERE id_resena = ?";
@@ -84,6 +104,10 @@ public class ResenaDao implements CRUDBase<Resena> {
         }
     }
 
+    /**
+     * Carga los tres datos que comparten el INSERT y el UPDATE (calificación, comentario y fecha,
+     * posiciones 1 a 3). Después cada método agrega los que le faltan.
+     */
     private void cargarParametros(PreparedStatement ps, Resena resena) throws SQLException {
         ps.setInt(1, resena.getCalificacion());
         ps.setString(2, resena.getComentario());

@@ -111,25 +111,3 @@ CREATE TABLE favoritos (
     constraint fk_usuario_fav FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE,
     constraint fk_contenido_fav FOREIGN KEY (id_contenido) REFERENCES contenidoMultimedia(id_contenidoMultimedia) ON DELETE CASCADE
 ) ENGINE=InnoDB;
-
-CREATE TABLE historial (
-    id_historial INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    id_usuario INT NOT NULL,
-    fecha VARCHAR(10) NOT NULL,
-    -- El numero despues de la coma del tiempo se utiliza como minutos por si se ven en una misma hora
-    tiempo DOUBLE NOT NULL,
-    id_contenido INT NOT NULL,
-    constraint fk_usuario_hist FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE,
-    constraint fk_contenido_hist FOREIGN KEY (id_contenido) REFERENCES contenidoMultimedia(id_contenidoMultimedia) ON DELETE CASCADE
-) ENGINE=InnoDB;
-
-CREATE TABLE progresos (
-    id_progreso INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    id_usuario INT NOT NULL,
-    id_videojuego INT NOT NULL,
-    estado VARCHAR(12) NOT NULL,
-    CONSTRAINT uq_progresos_usuario_juego UNIQUE (id_usuario, id_videojuego),
-    CONSTRAINT fk_progresos_usuario FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE,
-    CONSTRAINT fk_progresos_videojuego FOREIGN KEY (id_videojuego) REFERENCES videojuegos(id_videojuego) ON DELETE CASCADE,
-    CONSTRAINT ck_progresos_estado CHECK (estado IN ('PENDIENTE','JUGANDO','COMPLETADO'))
-) ENGINE=InnoDB;

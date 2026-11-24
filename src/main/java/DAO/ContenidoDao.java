@@ -11,14 +11,24 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
-// Acceso a la tabla pivote contenidoMultimedia.
-// No hay actualizar ni eliminar: la fila del pivote se borra sola (ON DELETE CASCADE)
-// cuando se borra la pelicula, serie o videojuego al que apunta.
+/**
+ * DAO de la tabla pivote 'contenidoMultimedia'. Le asigna a cada película, serie o
+ * videojuego un "id general" para que reseñas y favoritos puedan apuntar a cualquier tipo de
+ * contenido con una sola clave foránea.
+ *
+ * No implementa CRUDBase, ya que solo tiene crear y leerTodos. No hay actualizar ni eliminar
+ * porque la fila del pivote se borra sola en cascada cuando se borra la película, serie
+ * o videojuego al que apunta.
+ */
 public class ContenidoDao {
 
     public ContenidoDao() {}
 
-    // Registra un contenido y devuelve su id general
+    /**
+     * Registra un contenido en el pivote y devuelve su id general autogenerado, o -1 si no se
+     * insertó. Solo se completa la columna del tipo correspondiente (id_pelicula, id_serie o
+     * id_videojuego) y las otras quedan en NULL, como exige el CHECK de la tabla.
+     */
     public int crear(TipoContenido tipo, int idPropio) throws SQLException {
         String sql = "INSERT INTO contenidoMultimedia (tipo, " + columnaDe(tipo) + ") VALUES (?, ?)";
 
@@ -41,6 +51,11 @@ public class ContenidoDao {
         }
     }
 
+    /**
+     * Lee todo el pivote y devuelve una lista de RegistroContenido (id general, tipo e id
+     * propio). ContenidoService la usa una sola vez, al iniciar, para armar su registro. Se usa
+     * ArrayList porque solo se va a recorrer en orden.
+     */
     public ArrayList<RegistroContenido> leerTodos() throws SQLException {
         String sql = "SELECT id_contenidoMultimedia, tipo, id_pelicula, id_serie, id_videojuego "
                 + "FROM contenidoMultimedia ORDER BY id_contenidoMultimedia";
@@ -61,7 +76,10 @@ public class ContenidoDao {
         return registros;
     }
 
-    // Columna del pivote que guarda el id propio de cada tipo
+    /**
+     * Devuelve qué columna del pivote guarda el id propio según el tipo. Se usa al insertar y al
+     * leer, así el switch queda en un solo lugar.
+     */
     private String columnaDe(TipoContenido tipo) {
         return switch (tipo) {
             case PELICULA -> "id_pelicula";

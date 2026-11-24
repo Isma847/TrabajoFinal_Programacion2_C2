@@ -13,7 +13,17 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 
+/**
+ * DAO de videojuegos: tabla {@code videojuegos}. Funciona igual que PeliculaDao (ver ese DAO para
+ * el patrón general).
+ *
+ * Diferencias: el videojuego no tiene director ni fecha de estreno; en cambio guarda la
+ * dificultad y su género es del enum GeneroVideojuegos.
+ */
 public class VideojuegoDao implements BajaLogicaEnDao<Videojuego> {
+    /**
+     * Igual que PeliculaDao.crear, pero guardando la dificultad.
+     */
     @Override
     public int crear(Videojuego obj) throws SQLException {
         String query = "Insert into videojuegos (nombre, duracionMinutos, clasificacion, baja, genero, dificultad, descripcion) values (?,?,?,?,?,?,?)";
@@ -44,6 +54,9 @@ public class VideojuegoDao implements BajaLogicaEnDao<Videojuego> {
         return -1;
     }
 
+    /**
+     * Lee todos los videojuegos (incluidos los dados de baja).
+     */
     @Override
     public Collection<Videojuego> leerTodos() throws SQLException {
         String query = "Select * from videojuegos";
@@ -70,6 +83,9 @@ public class VideojuegoDao implements BajaLogicaEnDao<Videojuego> {
         return videojuegos;
     }
 
+    /**
+     * Actualiza los datos del videojuego por id; no modifica la baja.
+     */
     @Override
     public int actualizar(Videojuego obj) throws SQLException {
         String query = "Update videojuegos set nombre = ?, duracionMinutos = ?, clasificacion = ?, genero = ?, dificultad = ?, descripcion = ? where id_videojuego = ?";
@@ -91,6 +107,10 @@ public class VideojuegoDao implements BajaLogicaEnDao<Videojuego> {
         return result;
     }
 
+    /**
+     * Borrado físico; la base borra por cascada su fila del pivote, lo que dependa de ella y sus
+     * progresos.
+     */
     @Override
     public int eliminar(int id) throws SQLException {
         String query = "Delete from videojuegos where id_videojuego = ?";
@@ -106,6 +126,9 @@ public class VideojuegoDao implements BajaLogicaEnDao<Videojuego> {
         return result;
     }
 
+    /**
+     * Cambia solo la columna baja del videojuego.
+     */
     public int bajaLogica(int id, boolean baja) throws SQLException {
         String query = "Update videojuegos set baja = ? where id_videojuego = ?";
         int result = 0;

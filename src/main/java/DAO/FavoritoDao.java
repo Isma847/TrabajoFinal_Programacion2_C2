@@ -7,8 +7,20 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collection;
 
+/**
+ * DAO de favoritos: tabla {@code favoritos}, que relaciona un usuario con un contenido (por el id
+ * general del pivote). No implementa CRUDBase porque un favorito nunca se modifica: se agrega o
+ * se quita, por eso no tiene actualizar.
+ *
+ * La base impide repetir el par (usuario, contenido) con un UNIQUE; el Service lo controla antes
+ * para no llegar a ese error.
+ */
 public class FavoritoDao {
 
+    /**
+     * Inserta el favorito y devuelve su id generado, o -1 si no se insertó. Usa una transacción
+     * manual (setAutoCommit(false)): si algo falla se hace rollback, si sale bien commit.
+     */
     public int crear(Favorito favorito) throws SQLException {
         String sql = "INSERT INTO favoritos (id_usuario, id_contenido) VALUES (?, ?)";
 
@@ -41,6 +53,9 @@ public class FavoritoDao {
     }
 
 
+    /**
+     * Lee todos los favoritos de todos los usuarios; el Service la usa al iniciarse.
+     */
     public Collection<Favorito> leerTodos() throws SQLException {
         String sql = "SELECT * FROM favoritos";
         ArrayList<Favorito> favoritos = new ArrayList<>();
@@ -61,6 +76,9 @@ public class FavoritoDao {
         return favoritos;
     }
 
+    /**
+     * Elimina un favorito por su propio id.
+     */
     public int eliminar(int id) throws SQLException {
         String sql = "DELETE FROM favoritos WHERE id_favorito = ?";
 
@@ -71,6 +89,9 @@ public class FavoritoDao {
         }
     }
 
+    /**
+     * Elimina todos los favoritos de un usuario. Devuelve cuántos borró.
+     */
     public int eliminarPorUsuario(int idUsuario) throws SQLException {
         String sql = "DELETE FROM favoritos WHERE id_usuario = ?";
 
@@ -81,6 +102,10 @@ public class FavoritoDao {
         }
     }
 
+    /**
+     * Elimina el favorito de un usuario para un contenido puntual (es lo que hace el usuario al
+     * quitar un contenido de su lista).
+     */
     public int quitarDeUsuario(int idUsuario, int idContenido) throws SQLException {
         String sql = "DELETE FROM favoritos WHERE id_usuario = ? AND id_contenido = ?";
 

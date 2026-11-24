@@ -194,39 +194,4 @@ INSERT INTO favoritos (id_usuario, id_contenido) VALUES
                                                            (10, 20),
                                                            (12, 38),
                                                            (14, 12);
-
-INSERT INTO historial (id_usuario, fecha, tiempo, id_contenido) VALUES
-                                                                          (1, '2026-11-01', 2.28, 1),
-                                                                          (1, '2026-11-02', 0.47, 16),
-                                                                          (1, '2026-11-03', 1.30, 31),
-                                                                          (2, '2026-11-02', 1.21, 10),
-                                                                          (2, '2026-11-04', 0.45, 43),
-                                                                          (3, '2026-11-05', 0.22, 30),
-                                                                          (4, '2026-11-06', 2.34, 3),
-                                                                          (4, '2026-11-07', 1.00, 24),
-                                                                          (5, '2026-11-08', 2.00, 34),
-                                                                          (6, '2026-11-08', 2.35, 5),
-                                                                          (8, '2026-11-09', 1.00, 22),
-                                                                          (9, '2026-11-10', 1.21, 10),
-                                                                          (10, '2026-11-11', 0.58, 20),
-                                                                          (12, '2026-11-12', 3.00, 38),
-                                                                          (14, '2026-11-13', 2.42, 12);
-
-INSERT INTO progresos (id_usuario, id_videojuego, estado) VALUES
-                                                              (1, 1, 'COMPLETADO'),
-                                                              (1, 2, 'JUGANDO'),
-                                                              (2, 13, 'COMPLETADO'),
-                                                              (2, 5, 'JUGANDO'),
-                                                              (3, 4, 'PENDIENTE'),
-                                                              (4, 9, 'JUGANDO'),
-                                                              (4, 14, 'PENDIENTE'),
-                                                              (5, 4, 'COMPLETADO'),
-                                                              (5, 3, 'JUGANDO'),
-                                                              (6, 12, 'JUGANDO'),
-                                                              (8, 7, 'COMPLETADO'),
-                                                              (9, 13, 'JUGANDO'),
-                                                              (12, 8, 'COMPLETADO'),
-                                                              (12, 10, 'JUGANDO'),
-                                                              (14, 6, 'PENDIENTE');
-
 COMMIT;

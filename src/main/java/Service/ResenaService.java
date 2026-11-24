@@ -11,13 +11,31 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * Service de reseñas. No extiende {@code Service<T>} porque la reseña no tiene baja lógica (se
+ * borra de verdad) y porque su colección tiene otra clave. Sigue la Alternativa B (carga única y
+ * escritura primero en la base) y devuelve copias de las reseñas.
+ *
+ * Regla principal: un usuario solo puede hacer una reseña por contenido, igual que el UNIQUE de
+ * la base.
+ */
 public class ResenaService {
 
     private final ResenaDao dao = new ResenaDao();
 
-    // Clave: idContenidoGeneral:idUsuario
+    /**
+     * Colección en memoria. Se eligió un Map con clave compuesta "idContenido:idUsuario" porque
+     * la regla del negocio es una reseña por usuario y contenido: con esa clave, saber si ya
+     * existe o buscar la reseña de un usuario sobre un contenido es un acceso directo
+     * (containsKey / get) en lugar de recorrer todo. Es LinkedHashMap para conservar el orden de
+     * la base. La clave se arma y se descompone con codificar y decodificar.
+     */
     private final Map<String, Resena> coleccion = new LinkedHashMap<>();
 
+    /**
+     * Carga las reseñas desde la base. Si encuentra dos para el mismo usuario y contenido lanza
+     * SQLException, porque la base estaría inconsistente.
+     */
     public ResenaService() throws SQLException {
         for (Resena resena : dao.leerTodos()) {
             String clave = codificar(
@@ -34,6 +52,9 @@ public class ResenaService {
         }
     }
 
+    /**
+     * Arma la clave "idContenido:idUsuario" (y valida que ambos ids sean mayores que cero).
+     */
     private String codificar(int idContenido, int idUsuario) {
         validarId(idContenido, "contenido");
         validarId(idUsuario, "usuario");
@@ -41,9 +62,10 @@ public class ResenaService {
         return idContenido + ":" + idUsuario;
     }
 
-    // Posición 0: ID general del contenido.
-    // Posición 1: ID del usuario.
-    // Se utiliza únicamente con claves creadas por codificar().
+    /**
+     * Hace lo inverso de codificar: separa la clave en [idContenido, idUsuario]. Solo se usa con
+     * claves creadas por codificar.
+     */
     private int[] decodificar(String clave) {
         String[] partes = clave.split(":");
 
@@ -53,6 +75,11 @@ public class ResenaService {
         };
     }
 
+    /**
+     * Agrega una reseña nueva: la valida, rechaza la que ya trae id y lanza DatoInvalidoException
+     * si el usuario ya reseñó ese contenido. Se guarda en la base y, si salió bien, una copia en
+     * la colección.
+     */
     public boolean agregar(Resena resena) throws SQLException {
         validarDatos(resena);
 
@@ -84,6 +111,10 @@ public class ResenaService {
         return true;
     }
 
+    /**
+     * Devuelve la reseña de un usuario sobre un contenido (copia), o null si no existe. Es la
+     * búsqueda directa por clave.
+     */
     public Resena buscarPorContenidoYUsuario(int idContenido, int idUsuario) {
         String clave = codificar(idContenido, idUsuario);
         Resena resena = coleccion.get(clave);
@@ -91,6 +122,10 @@ public class ResenaService {
         return resena == null ? null : copiar(resena);
     }
 
+    /**
+     * Devuelve las reseñas de un usuario. Como la clave empieza por el contenido, hay que
+     * recorrer y decodificar cada clave.
+     */
     public ArrayList<Resena> leerPorUsuario(int idUsuario) {
         validarId(idUsuario, "usuario");
 
@@ -107,6 +142,9 @@ public class ResenaService {
         return resultado;
     }
 
+    /**
+     * Devuelve todas las reseñas de un contenido (por su id general).
+     */
     public ArrayList<Resena> filtrarPorContenido(int idContenido) {
         validarId(idContenido, "contenido");
 
@@ -123,6 +161,10 @@ public class ResenaService {
         return resultado;
     }
 
+    /**
+     * Busca por el id propio de la reseña. Se recorre porque la clave del Map no incluye ese id.
+     * Devuelve una copia o null.
+     */
     public Resena buscarPorId(int idResena) {
         for (Resena resena : coleccion.values()) {
             if (resena.getId() == idResena) {
@@ -133,6 +175,9 @@ public class ResenaService {
         return null;
     }
 
+    /**
+     * Devuelve una lista nueva con copias de todas las reseñas.
+     */
     public ArrayList<Resena> leerTodos() {
         ArrayList<Resena> resultado = new ArrayList<>();
 
@@ -143,6 +188,11 @@ public class ResenaService {
         return resultado;
     }
 
+    /**
+     * Modifica calificación, comentario y fecha de una reseña existente (se identifica por su
+     * id). El usuario y el contenido originales se conservan. Se actualiza la base y recién ahí
+     * la colección.
+     */
     public boolean modificar(Resena cambios) throws SQLException {
         validarDatos(cambios);
 
@@ -172,6 +222,9 @@ public class ResenaService {
         return true;
     }
 
+    /**
+     * Elimina la reseña por su id, primero en la base y luego en la colección.
+     */
     public boolean eliminar(int idResena) throws SQLException {
         Resena resena = buscarPorId(idResena);
 
@@ -193,6 +246,10 @@ public class ResenaService {
         return true;
     }
 
+    /**
+     * Reglas de la reseña: calificación entre 1 y 10 y fecha real con formato AAAA-MM-DD. Lanza
+     * DatoInvalidoException si no se cumplen.
+     */
     private void validarDatos(Resena resena) {
         if (resena == null) {
             throw new DatoInvalidoException("La reseña es obligatoria.");
@@ -219,6 +276,9 @@ public class ResenaService {
         }
     }
 
+    /**
+     * Verifica que un id sea mayor que cero.
+     */
     private void validarId(int id, String campo) {
         if (id <= 0) {
             throw new DatoInvalidoException(
@@ -227,6 +287,9 @@ public class ResenaService {
         }
     }
 
+    /**
+     * Crea una reseña nueva con los mismos datos, para no exponer el objeto guardado.
+     */
     private Resena copiar(Resena resena) {
         Resena copia = new Resena(
                 resena.getIdContenido(),

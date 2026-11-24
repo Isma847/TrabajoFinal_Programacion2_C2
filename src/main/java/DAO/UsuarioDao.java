@@ -14,8 +14,19 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collection;
 
+/**
+ * DAO de cuentas: tabla 'usuarios', que guarda tanto usuarios como administradores, que se
+ * los distingue la columna rol. No implementa BajaLogicaEnDao para facilitar la rehabilitación
+ * de cuentas que se dieron de baja. La baja es una columna más que se lee y se guarda junto con el
+ * resto de los datos en actualizar. La edad es NULL para los administradores, por eso se usa
+ * setNull al guardar y getObject(..., Integer.class) al leer (getInt devolvería 0).
+ */
 public class UsuarioDao implements CRUDBase<Usuario> {
 
+    /**
+     * Inserta la cuenta y devuelve su id generado, o -1 si no se insertó.
+     * Realiza commit si sale bien, rollback si falla.
+     */
     @Override
     public int crear(Usuario usuario) throws SQLException {
         String sql = "INSERT INTO usuarios (nombre, apellido, username, contrasena, email, "
@@ -49,6 +60,7 @@ public class UsuarioDao implements CRUDBase<Usuario> {
         }
     }
 
+    /// Lee todas las cuentas, incluidas las dadas de baja; el Service la usa al iniciarse.
     @Override
     public Collection<Usuario> leerTodos() throws SQLException {
         String sql = "SELECT id_usuario, nombre, apellido, username, contrasena, email, "
@@ -79,6 +91,10 @@ public class UsuarioDao implements CRUDBase<Usuario> {
         return usuarios;
     }
 
+    /**
+     * Actualiza todos los datos de la cuenta por id, incluida la baja. Los nueve primeros
+     * parámetros salen de cargarParametros y el id va último (posición 10).
+     */
     @Override
     public int actualizar(Usuario usuario) throws SQLException {
         String sql = "UPDATE usuarios SET nombre = ?, apellido = ?, username = ?, "
@@ -94,6 +110,7 @@ public class UsuarioDao implements CRUDBase<Usuario> {
         }
     }
 
+    /// Borrado físico de la cuenta; la base borra por cascada sus dependencias.
     @Override
     public int eliminar(int id) throws SQLException {
         String sql = "DELETE FROM usuarios WHERE id_usuario = ?";
@@ -106,6 +123,7 @@ public class UsuarioDao implements CRUDBase<Usuario> {
         }
     }
 
+    /// Carga los nueve datos que comparten el INSERT y el UPDATE, en el mismo orden de columnas.
     private void cargarParametros(PreparedStatement ps, Usuario usuario) throws SQLException {
         ps.setString(1, usuario.getNombre());
         ps.setString(2, usuario.getApellido());

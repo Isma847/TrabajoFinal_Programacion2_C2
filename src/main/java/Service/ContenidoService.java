@@ -10,15 +10,40 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * Coordina los tres services de contenido (películas, series y videojuegos) y les da un id
+ * general, el de la tabla pivote contenidoMultimedia. Con ese id las reseñas y los favoritos
+ * pueden apuntar a cualquier tipo de contenido.
+ *
+ * No extiende {@code Service<T>}: se compone de PeliculaService, SerieService, VideojuegoService
+ * y ContenidoDao, que recibe por constructor. Cada contenido tiene dos ids: el propio (el de su
+ * tabla) y el general (el del pivote).
+ *
+ * Todas las altas, modificaciones y bajas de contenido deben hacerse por esta clase y no por el
+ * service de cada tipo, porque si no el pivote y el registro quedan desactualizados. En cada
+ * operación primero se actúa sobre el service del tipo y, si sale bien, recién ahí se actualiza
+ * el registro.
+ */
 public final class ContenidoService {
 
-    private PeliculaService peliculas;
-    private SerieService series;
-    private VideojuegoService videojuegos;
+    private final PeliculaService peliculas;
+    private final SerieService series;
+    private final VideojuegoService videojuegos;
 
-    private ContenidoDao dao;
+    private final ContenidoDao dao;
+
+    /**
+     * Registro de todos los contenidos, con el id general como clave. Se eligió un Map porque
+     * reseñas y favoritos buscan por id general (acceso directo) y LinkedHashMap para conservar
+     * el orden de los listados. Guarda las mismas instancias que los services de cada tipo, no
+     * copias; por eso, cuando un service reemplaza un objeto (modificar), acá hay que reemplazar
+     * la entrada también.
+     */
     private final Map<Integer, ContenidoMultimedia> registro = new LinkedHashMap<>();
 
+    /**
+     * Recibe los tres services y el DAO del pivote y arma el registro.
+     */
     public ContenidoService(PeliculaService peliculas, SerieService series, VideojuegoService videojuegos, ContenidoDao dao) throws SQLException {
         this.peliculas = peliculas;
         this.series = series;
@@ -27,19 +52,15 @@ public final class ContenidoService {
         cargar();
     }
 
-    public ContenidoService() {}
-
-    /// Primero se realiza la operación en su respectivo service y si sale bien se realizan
-    /// los cambios en el listado general (registro).
-
-    /*
-    Para realizar las acciones CRUD para los diferentes contenidos (Peliculas, series y videojuegos)
-    se tienen que realizar mediante esta clase, que se ocupa de subir la llamada al service correspondiente y
-    si la operación sale bien entonces hace algo en el listado, por ejemplo, para crear un contenido nuevo
-    se lo pasa a su service, si ese service da el positivo entonces agrega ese contenido al listado en la bdd
-    y luego con el id que devuelve lo agrega al listado local.
+    /**
+     * Da de alta un contenido nuevo (película, serie o videojuego) en dos pasos: 1) lo agrega en
+     * el service de su tipo, que lo valida y lo guarda en la base; 2) crea su fila en el pivote,
+     * que genera el id general, y lo guarda en el registro.
+     *
+     * Si falla el paso 2 se deshace el paso 1 (se elimina el contenido recién creado) y se
+     * relanza el error, para no dejar un contenido sin id general. Lanza DatoInvalidoException si
+     * el contenido ya trae un id propio distinto de cero.
      */
-
     public boolean agregar(ContenidoMultimedia contenido) throws SQLException {
         TipoContenido tipo = tipoDe(contenido);
 
@@ -74,6 +95,11 @@ public final class ContenidoService {
         return true;
     }
 
+    /**
+     * Modifica un contenido existente delegando en el service de su tipo. Como ese service
+     * reemplaza su instancia por la recibida, se reemplaza también la entrada del registro. Lanza
+     * DatoInvalidoException si el contenido no tiene id general.
+     */
     public boolean modificar(ContenidoMultimedia contenido) throws SQLException {
         TipoContenido tipo = tipoDe(contenido);
         int idGeneral = buscarIdContenido(tipo, contenido.getId());
@@ -92,6 +118,10 @@ public final class ContenidoService {
         return true;
     }
 
+    /**
+     * Alterna la baja lógica (da de baja o reactiva) de un contenido identificado por tipo e id
+     * propio, y refresca el registro.
+     */
     public boolean darDeBaja(TipoContenido tipo, int idPropio)
             throws SQLException {
         int idGeneral = buscarIdContenido(tipo, idPropio);
@@ -110,10 +140,17 @@ public final class ContenidoService {
         return true;
     }
 
+    /**
+     * Igual que el anterior, pero recibiendo el objeto, para que los menús y pantallas no tengan
+     * que conocer su tipo ni su id propio.
+     */
     public boolean darDeBaja(ContenidoMultimedia contenido) throws SQLException {
         return darDeBaja(tipoDe(contenido), contenido.getId());
     }
 
+    /**
+     * Contenidos de un tipo (PELICULA, SERIE o JUEGO) según su estado de baja (false = activos).
+     */
     public ArrayList<ContenidoMultimedia> filtrarPorTipo(
             TipoContenido tipo, boolean baja) {
         ArrayList<ContenidoMultimedia> resultado = new ArrayList<>();
@@ -128,6 +165,13 @@ public final class ContenidoService {
     }
 
 
+    /**
+     * Borrado definitivo de un contenido, por tipo e id propio. Se elimina en el service del tipo
+     * y la base borra por cascada su fila del pivote y sus reseñas, favoritos e historial; acá se
+     * quita la entrada del registro. Las colecciones en memoria de reseñas y favoritos no se
+     * enteran: quien llame a este método debe limpiarlas. Es una acción excepcional, lo habitual
+     * es la baja lógica.
+     */
     public boolean eliminar(TipoContenido tipo, int idPropio) throws SQLException {
         int idGeneral = buscarIdContenido(tipo, idPropio);
 
@@ -136,18 +180,27 @@ public final class ContenidoService {
         return true;
     }
 
+    /**
+     * Igual que eliminar, pero a partir del id general.
+     */
     public boolean eliminarPorID(int idGeneral) throws SQLException {
         ContenidoMultimedia contenido = registro.get(idGeneral);
         if (contenido == null) return false;
         return eliminar(tipoDe(contenido), contenido.getId());
     }
 
+    /**
+     * Busca un contenido por id general. Devuelve la instancia real (no una copia) o null si no
+     * existe.
+     */
     public ContenidoMultimedia buscarPorId(int idGeneral) {
         return registro.get(idGeneral);
     }
 
-    /// Los métodos que buscan id devuelven -1 si no se encontro
-    /// Busca el id general según el objeto
+    /**
+     * Devuelve el id general de un contenido comparándolo con equals (clase e id propio). Los
+     * métodos que buscan id devuelven -1 si no se encontró.
+     */
     public int buscarIdContenido(ContenidoMultimedia contenido) {
         for (Map.Entry<Integer, ContenidoMultimedia> entrada : registro.entrySet()) {
             if (entrada.getValue().equals(contenido)) {
@@ -157,7 +210,9 @@ public final class ContenidoService {
         return -1;
     }
 
-    /// Busca el id general según el tipo e id de tipo
+    /**
+     * Devuelve el id general a partir del tipo y el id propio, o -1 si no existe.
+     */
     public int buscarIdContenido(TipoContenido tipo, int idPropio) {
         for (Map.Entry<Integer, ContenidoMultimedia> entrada : registro.entrySet()) {
             ContenidoMultimedia contenido = entrada.getValue();
@@ -168,17 +223,27 @@ public final class ContenidoService {
         return -1;
     }
 
-    /// Devuelve el tipo de contenido del objeto que posee dicha ID
+    /**
+     * Devuelve el tipo del contenido que tiene ese id general. Lanza DatoInvalidoException si el
+     * id no existe.
+     */
     public TipoContenido getTipo(int idGeneral) throws DatoInvalidoException{
         ContenidoMultimedia contenido = registro.get(idGeneral);
         if (contenido == null) throw new DatoInvalidoException("No existe ningun contenido con ese id. Introduzca el id de contenido.");
         return tipoDe(contenido);
     }
 
+    /**
+     * Devuelve una lista nueva con todos los contenidos. La lista es una copia (agregarle o
+     * quitarle elementos no afecta al registro), pero los contenidos son los mismos objetos.
+     */
     public ArrayList<ContenidoMultimedia> leerTodos() {
         return new ArrayList<>(registro.values());
     }
 
+    /**
+     * Contenidos de todos los tipos según su estado de baja (false = activos).
+     */
     public ArrayList<ContenidoMultimedia> getLista(boolean baja) {
         ArrayList<ContenidoMultimedia> lista = new ArrayList<>();
         for (ContenidoMultimedia contenido : registro.values()) {
@@ -189,6 +254,11 @@ public final class ContenidoService {
         return lista;
     }
 
+    /**
+     * Carga inicial: lee el pivote y, por cada fila, busca el contenido en el service de su tipo
+     * y lo guarda bajo su id general. Si una fila apunta a un contenido que ya no existe, se
+     * ignora.
+     */
     private void cargar() throws SQLException {
         for (RegistroContenido fila : dao.leerTodos()) {
             ContenidoMultimedia contenido = buscarEnService(fila.getTipo(), fila.getIdPropio());
@@ -198,7 +268,10 @@ public final class ContenidoService {
         }
     }
 
-    /// Crea una fila para guardar el contenido
+    /**
+     * Crea la fila del pivote de un contenido ya guardado en su service y lo agrega al registro
+     * con el id general que devuelve la base. Lanza SQLException si no se pudo registrar.
+     */
     private void registrar(TipoContenido tipo, ContenidoMultimedia contenido) throws SQLException {
         int idGeneral = dao.crear(tipo, contenido.getId());
         if (idGeneral <= 0) {
@@ -207,7 +280,10 @@ public final class ContenidoService {
         registro.put(idGeneral, contenido);
     }
 
-    /// Verifica y devuelve el tip de contenido multimedia (Enum)
+    /**
+     * Determina el tipo (enum) de un contenido según su clase, con instanceof. Lanza
+     * DatoInvalidoException si no es película, serie ni videojuego.
+     */
     private TipoContenido tipoDe(ContenidoMultimedia contenido) {
         if (contenido instanceof Pelicula) {
             return TipoContenido.PELICULA;
@@ -223,7 +299,11 @@ public final class ContenidoService {
 
     /* Métodos para gestionar por service */
 
-    /// Agrega el contenido a su correspondiente service.
+    /**
+     * Agrega el contenido en el service de su tipo. Los cinco métodos "...EnService" hacen lo
+     * mismo: según el tipo eligen a qué service delegar (y castean el contenido a su clase
+     * concreta). Así el switch queda en un solo lugar y el resto de la clase no depende del tipo.
+     */
     private boolean agregarEnService(TipoContenido tipo, ContenidoMultimedia contenido) throws SQLException {
         switch (tipo) {
             case PELICULA:
@@ -236,7 +316,9 @@ public final class ContenidoService {
         return false;
     }
 
-    /// Modifica en su correspondiente service.
+    /**
+     * Modifica el contenido en el service de su tipo.
+     */
     private boolean modificarEnService(TipoContenido tipo, ContenidoMultimedia contenido) throws SQLException {
         switch (tipo) {
             case PELICULA:
@@ -249,7 +331,9 @@ public final class ContenidoService {
         return false;
     }
 
-    /// Da de baja en su correspondiente service.
+    /**
+     * Alterna la baja en el service de su tipo.
+     */
     private boolean darDeBajaEnService(TipoContenido tipo, int idPropio) throws SQLException {
         switch (tipo) {
             case PELICULA:
@@ -262,7 +346,9 @@ public final class ContenidoService {
         return false;
     }
 
-    /// Elimina en su correspondiente service.
+    /**
+     * Elimina el contenido en el service de su tipo.
+     */
     private boolean eliminarEnService(TipoContenido tipo, int idPropio) throws SQLException {
         switch (tipo) {
             case PELICULA:
@@ -275,7 +361,9 @@ public final class ContenidoService {
         return false;
     }
 
-    /// Busca por id en su correspondiente service
+    /**
+     * Busca el contenido por id propio en el service de su tipo.
+     */
     private ContenidoMultimedia buscarEnService(TipoContenido tipo, int idPropio) {
         switch (tipo) {
             case PELICULA:
@@ -289,15 +377,25 @@ public final class ContenidoService {
     }
 
     /* Getters de los service */
-    // SOLO USAR PARA LEER DATOS
+
+    /**
+     * Acceso al service de películas, para consultar datos (por ejemplo sus filtros). No usarlo
+     * para agregar, modificar ni dar de baja: eso debe hacerse por esta clase.
+     */
     public PeliculaService getPeliculas() {
         return peliculas;
     }
 
+    /**
+     * Acceso al service de series. Solo para consultar.
+     */
     public SerieService getSeries() {
         return series;
     }
 
+    /**
+     * Acceso al service de videojuegos. Solo para consultar.
+     */
     public VideojuegoService getVideojuegos() {
         return videojuegos;
     }

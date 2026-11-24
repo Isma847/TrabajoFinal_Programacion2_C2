@@ -13,8 +13,24 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 
+/**
+ * DAO de películas: acceso a la tabla {@code peliculas} por JDBC. Implementa BajaLogicaEnDao, así
+ * que además del CRUD básico ofrece baja lógica.
+ *
+ * Todos los DAO siguen el mismo patrón: cada método abre su propia conexión con try-with-
+ * resources (se cierra sola), usa PreparedStatement con parámetros "?" (evita inyección SQL) y no
+ * guarda estado ni colecciones; de eso se ocupa el Service.
+ *
+ * Particularidad: una película puede no tener director. En el modelo eso se representa con
+ * idDirector = 0 y acá se guarda NULL en la base para no violar la clave foránea.
+ */
 public class PeliculaDao implements BajaLogicaEnDao<Pelicula> {
 
+    /**
+     * Inserta la película y devuelve el id que generó la base (también se lo asigna al objeto), o
+     * -1 si no se pudo obtener. El id se pide con LAST_INSERT_ID() sobre la misma conexión, que
+     * es seguro porque ese valor es propio de cada conexión.
+     */
     @Override
     public int crear(Pelicula obj) throws SQLException {
         String query = "Insert into peliculas (nombre, duracionMinutos, clasificacion, baja, genero, id_director, fechaEstreno, descripcion) values (?,?,?,?,?,?,?,?)";
@@ -48,6 +64,10 @@ public class PeliculaDao implements BajaLogicaEnDao<Pelicula> {
         return -1;
     }
 
+    /**
+     * Lee toda la tabla (incluidas las películas dadas de baja) y arma la lista de objetos. El
+     * Service la usa una sola vez, cuando se inicializa.
+     */
     @Override
     public Collection<Pelicula> leerTodos() throws SQLException {
         String query = "Select * from peliculas";
@@ -75,6 +95,10 @@ public class PeliculaDao implements BajaLogicaEnDao<Pelicula> {
         return peliculas;
     }
 
+    /**
+     * Actualiza los datos editables de la película por id. No toca la baja (eso es de
+     * bajaLogica). Devuelve la cantidad de filas afectadas (0 si el id no existe).
+     */
     @Override
     public int actualizar(Pelicula obj) throws SQLException {
         String query = "Update peliculas set nombre = ?, duracionMinutos = ?, clasificacion = ?, genero = ?, id_director = ?, fechaEstreno = ?, descripcion = ? where id_pelicula = ?";
@@ -99,6 +123,10 @@ public class PeliculaDao implements BajaLogicaEnDao<Pelicula> {
         return result;
     }
 
+    /**
+     * Borrado físico, definitivo. La base elimina por cascada su fila del pivote y, a través de
+     * ella, sus reseñas, favoritos e historial.
+     */
     @Override
     public int eliminar(int id) throws SQLException {
         String query = "Delete from peliculas where id_pelicula = ?";
@@ -114,6 +142,10 @@ public class PeliculaDao implements BajaLogicaEnDao<Pelicula> {
         return result;
     }
 
+    /**
+     * Baja lógica: solo cambia la columna baja (true = dada de baja, false = reactivada). La fila
+     * sigue existiendo.
+     */
     public int bajaLogica(int id, boolean baja) throws SQLException {
         String query = "Update peliculas set baja = ? where id_pelicula = ?";
         int result = 0;

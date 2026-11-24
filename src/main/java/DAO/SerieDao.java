@@ -13,8 +13,18 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 
+/**
+ * DAO de series: tabla {@code series}. Funciona igual que PeliculaDao (ver ese DAO para el patrón
+ * general y el manejo del director NULL).
+ *
+ * Lo propio de la serie es que guarda cantidadCapitulos y cantidadTemporadas en lugar de la fecha
+ * de estreno.
+ */
 public class SerieDao implements BajaLogicaEnDao<Serie>{
 
+    /**
+     * Igual que PeliculaDao.crear, pero guardando capítulos y temporadas.
+     */
     @Override
     public int crear(Serie obj) throws SQLException {
         String query = "Insert into series (nombre, duracionMinutos, clasificacion, baja, genero, id_director, cantidadCapitulos, cantidadTemporadas, descripcion) values (?,?,?,?,?,?,?,?,?)";
@@ -49,6 +59,9 @@ public class SerieDao implements BajaLogicaEnDao<Serie>{
         return -1;
     }
 
+    /**
+     * Lee todas las series (incluidas las dadas de baja).
+     */
     @Override
     public Collection<Serie> leerTodos() throws SQLException {
         String query = "Select * from series";
@@ -77,6 +90,9 @@ public class SerieDao implements BajaLogicaEnDao<Serie>{
         return series;
     }
 
+    /**
+     * Actualiza los datos de la serie por id; no modifica la baja.
+     */
     @Override
     public int actualizar(Serie obj) throws SQLException {
         String query = "Update series set nombre = ?, duracionMinutos = ?, clasificacion = ?, genero = ?, id_director = ?, cantidadCapitulos = ?, cantidadTemporadas = ?, descripcion = ? where id_serie = ?";
@@ -102,6 +118,9 @@ public class SerieDao implements BajaLogicaEnDao<Serie>{
         return result;
     }
 
+    /**
+     * Borrado físico; la base borra por cascada su fila del pivote y lo que dependa de ella.
+     */
     @Override
     public int eliminar(int id) throws SQLException {
         String query = "Delete from series where id_serie = ?";
@@ -117,6 +136,9 @@ public class SerieDao implements BajaLogicaEnDao<Serie>{
         return result;
     }
 
+    /**
+     * Cambia solo la columna baja de la serie.
+     */
     public int bajaLogica(int id, boolean baja) throws SQLException {
         String query = "Update series set baja = ? where id_serie = ?";
         int result = 0;

@@ -59,14 +59,14 @@ public class Sistema {
     }
 
     private void iniciarSesion() {
-        System.out.print("Usuario: ");
-        String username = entrada.nextLine();
+        System.out.print("Correo electronico: ");
+        String email = entrada.nextLine();
 
         System.out.print("Contraseña: ");
         String password = entrada.nextLine();
 
         try {
-            gestionCuenta.iniciarSesion(username, password);
+            gestionCuenta.iniciarSesion(email, password);
         } catch (SesionInvalidaException e) {
             System.out.println(e.getMessage());
             return;
