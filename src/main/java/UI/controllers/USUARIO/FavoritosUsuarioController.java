@@ -16,17 +16,16 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Optional;
 
 public class FavoritosUsuarioController extends ControladorBase {
 
@@ -191,5 +190,145 @@ public class FavoritosUsuarioController extends ControladorBase {
         alert.setHeaderText(null);
         alert.setContentText(mensaje);
         alert.showAndWait();
+    }
+
+    @FXML
+    public void agregarFavorito() {
+
+        // Primer diálogo: elegir el tipo de contenido
+        ChoiceDialog<String> dialogTipo = new ChoiceDialog<>(
+                "Películas",
+                "Películas",
+                "Series",
+                "Videojuegos"
+        );
+
+        dialogTipo.setTitle("Agregar favorito");
+        dialogTipo.setHeaderText("Seleccioná el tipo de contenido");
+        dialogTipo.setContentText("Tipo:");
+
+        Optional<String> tipoElegido = dialogTipo.showAndWait();
+
+        if (tipoElegido.isEmpty()) {
+            return;
+        }
+
+        // Segundo diálogo: elegir el contenido
+        switch (tipoElegido.get()) {
+
+            case "Películas":
+                agregarPelicula();
+                break;
+
+            case "Series":
+                agregarSerie();
+                break;
+
+            case "Videojuegos":
+                agregarVideojuego();
+                break;
+        }
+    }
+
+    private void agregarPelicula() {
+
+        ArrayList<Pelicula> peliculas = peliculaService.getLista(false);
+
+        if (peliculas.isEmpty()) {
+            mostrarMensaje("ATENCION","No hay películas disponibles");
+            return;
+        }
+
+        ChoiceDialog<Pelicula> dialog = new ChoiceDialog<>(
+                peliculas.get(0),
+                peliculas
+        );
+
+        dialog.setTitle("Agregar película");
+        dialog.setHeaderText("Seleccioná una película");
+
+        Optional<Pelicula> seleccion = dialog.showAndWait();
+
+        seleccion.ifPresent(pelicula -> guardarFavorito(
+                pelicula.getId(), "PELICULA"
+        ));
+    }
+
+    private void agregarSerie() {
+
+        ArrayList<Serie> series = serieService.getLista(false);
+
+        if (series.isEmpty()) {
+            mostrarMensaje("ATENCION","No hay series disponibles.");
+            return;
+        }
+
+        ChoiceDialog<Serie> dialog = new ChoiceDialog<>(
+                series.get(0),
+                series
+        );
+
+        dialog.setTitle("Agregar serie");
+        dialog.setHeaderText("Seleccioná una serie");
+
+        Optional<Serie> seleccion = dialog.showAndWait();
+
+        seleccion.ifPresent(serie -> guardarFavorito(
+                serie.getId(), "SERIE"
+        ));
+    }
+
+    private void agregarVideojuego() {
+
+        ArrayList<Videojuego> videojuegos = videojuegoService.getLista(false);
+
+        if (videojuegos.isEmpty()) {
+            mostrarMensaje("ATENCION","No hay videojuegos disponibles.");
+            return;
+        }
+
+        ChoiceDialog<Videojuego> dialog = new ChoiceDialog<>(
+                videojuegos.get(0),
+                videojuegos
+        );
+
+        dialog.setTitle("Agregar videojuego");
+        dialog.setHeaderText("Seleccioná un videojuego");
+
+        Optional<Videojuego> seleccion = dialog.showAndWait();
+
+        seleccion.ifPresent(videojuego -> guardarFavorito(
+                videojuego.getId(), "JUEGO"
+        ));
+    }
+
+
+    private void guardarFavorito(int idContenido, String tipo) {
+
+        Cuenta cuenta = gestionCuenta.getUsuarioActual();
+        int idUsuario = cuenta.getId();
+
+        if (favoritoService.contiene(idUsuario, idContenido, tipo)) {
+            mostrarMensaje("ATENCION","Este contenido ya está en tus favoritos.");
+            return;
+        }
+
+        Favorito favorito = new Favorito(
+                0,
+                idUsuario,
+                idContenido,
+                tipo
+        );
+
+        try {
+            if (favoritoService.crear(favorito)) {
+                mostrarMensaje("ATENCION","¡Contenido agregado a favoritos!");
+                cargarFavoritos();
+            } else {
+                mostrarMensaje("ATENCION","No se pudo agregar el favorito.");
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

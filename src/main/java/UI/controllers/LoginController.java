@@ -1,8 +1,9 @@
 package UI.controllers;
 
+import Enumerados.Rol;
 import Excepciones.SesionInvalidaException;
+
 import Modelo.Cuenta;
-import Modelo.Usuario;
 import Service.*;
 import UI.controllers.USUARIO.MenuUsuarioController;
 import javafx.fxml.FXML;
@@ -41,6 +42,8 @@ public class LoginController {
 
     private FavoritoService favoritoService;
 
+    private DirectorService directorService;
+
     public void setPeliculaService(PeliculaService peliculaService) {
         this.peliculaService = peliculaService;
     }
@@ -66,6 +69,10 @@ public class LoginController {
         this.favoritoService = favoritoService;
     }
 
+    public void setDirectorService(DirectorService directorService) {
+        this.directorService = directorService;
+    }
+
     //Metodo que conecta el boton con el controlador
 
     @FXML
@@ -82,9 +89,9 @@ public class LoginController {
             Cuenta cuenta = gestionCuenta.getUsuarioActual();
 
             // Decidimos qué ventana abrir
-            if (cuenta instanceof Usuario && ((Usuario) cuenta).getRol().equals("ADMINISTRADOR") ) {
+            if (gestionCuenta.getUsuarioActual().getRol() == Rol.ADMINISTRADOR) {
                 cargarVentana("/vistas/menu-admin.fxml");
-            } else if (cuenta instanceof Usuario) {
+            } else if (gestionCuenta.getUsuarioActual().getRol()==Rol.USUARIO) {
                 cargarVentana("/vistas/menu-usuario.fxml");
             }
 
@@ -106,7 +113,14 @@ public class LoginController {
 
         if (ruta.equals("/vistas/menu-admin.fxml")) {
             MenuAdminController controller = loader.getController();
+
             controller.setGestionCuenta(gestionCuenta);
+            controller.setPeliculaService(peliculaService);
+            controller.setSerieService(serieService);
+            controller.setVideojuegoService(videojuegoService);
+            controller.setResenaService(resenaService);
+            controller.setFavoritoService(favoritoService);
+            controller.setDirectorService(directorService);
         }
 
         if (ruta.equals("/vistas/menu-usuario.fxml")) {
@@ -128,4 +142,3 @@ public class LoginController {
     }
 
 }
-

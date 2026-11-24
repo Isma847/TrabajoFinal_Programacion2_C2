@@ -65,6 +65,11 @@
                        -fx-font-weight: bold;
                        -fx-background-radius: 8;"/>
 
+        <Button
+                text="Agregar favorito"
+                onAction="#agregarFavorito"
+        />
+
         <Button fx:id="btnVolver"
                 text="Volver al menú"
                 onAction="#volverAlMenu"

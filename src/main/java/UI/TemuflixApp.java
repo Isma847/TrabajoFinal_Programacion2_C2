@@ -17,11 +17,13 @@ public class TemuflixApp extends Application {
     public void start(Stage stage) throws Exception {
 
         UsuarioService usuarios = new UsuarioService();
+
         PeliculaService peliculas = new PeliculaService();
         SerieService serieService=new SerieService();
         VideojuegoService videojuegoService=new VideojuegoService();
         ResenaService resenaService=new ResenaService();
         FavoritoService favoritoService=new FavoritoService(new FavoritoDao());
+        DirectorService directorService=new DirectorService();
 
         GestionCuenta gestionCuenta =
                 new GestionCuenta(usuarios);
@@ -39,6 +41,7 @@ public class TemuflixApp extends Application {
         controller.setVideojuegoService(videojuegoService);
         controller.setResenaService(resenaService);
         controller.setFavoritoService(favoritoService);
+        controller.setDirectorService(directorService);
 
         Scene escena = new Scene(root, 800, 500);
 
