@@ -28,7 +28,7 @@ public class ResenaService {
         if (resena.getIdUsuario() <= 0) {
             throw new DatoInvalidoException("El ID del usuario es obligatorio");
         }
-        validarContenido(resena.getTipo(), resena.getIdContenido());
+        validarContenido(resena.getIdContenido());
 
         int id = dao.crear(resena);
         if (id <= 0) {
@@ -89,11 +89,11 @@ public class ResenaService {
         return resenas;
     }
 
-    public ArrayList<Resena> filtrarPorContenido(String tipo, int idContenido) {
-        validarContenido(tipo, idContenido);
+    public ArrayList<Resena> filtrarPorContenido(int idContenido) {
+        validarContenido(idContenido);
         ArrayList<Resena> resenas = new ArrayList<>();
         for (Resena resena : coleccion.values()) {
-            if (resena.getIdContenido() == idContenido && tipo.equals(resena.getTipo())) {
+            if (resena.getIdContenido() == idContenido) {
                 resenas.add(copiar(resena));
             }
         }
@@ -119,10 +119,7 @@ public class ResenaService {
         }
     }
 
-    private void validarContenido(String tipo, int idContenido) {
-        if (!"PELICULA".equals(tipo) && !"SERIE".equals(tipo) && !"JUEGO".equals(tipo)) {
-            throw new DatoInvalidoException("El tipo de contenido debe ser PELICULA, SERIE o JUEGO");
-        }
+    private void validarContenido(int idContenido) {
         if (idContenido <= 0) {
             throw new DatoInvalidoException("El ID del contenido es obligatorio");
         }
@@ -132,24 +129,11 @@ public class ResenaService {
         Resena copia = new Resena(
                 resena.getIdContenido(),
                 resena.getIdUsuario(),
-                resena.getTipo(),
                 resena.getCalificacion(),
                 resena.getComentario(),
                 resena.getFecha()
         );
         copia.setId(resena.getId());
         return copia;
-    }
-
-    // Llamar despues de eliminar algun contenido multimedia
-    private void eliminarEnCascada(int idContenido, String tipo) throws SQLException {
-        // Tipo tiene que ser 'SERIE', 'JUEGO' o 'PELICULA'
-        for(Resena resena : coleccion.values()) {
-            if (resena.getIdContenido() == idContenido) {
-                if(tipo.equals(resena.getTipo())) {
-                    eliminar(resena.getId());
-                }
-            }
-        }
     }
 }
