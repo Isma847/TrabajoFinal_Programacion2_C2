@@ -1,277 +1,211 @@
-
 package UI.controllers.ADMIN;
 
 import Enumerados.ClasificacionEdad;
 import Enumerados.GeneroVideojuegos;
+import Excepciones.DatoInvalidoException;
+import Modelo.ContenidoMultimedia;
 import Modelo.Videojuego;
-import Service.*;
-
 import UI.controllers.ControladorBase;
-
+import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 
 import java.sql.SQLException;
 
 public class AdministrarVideojuegosController extends ControladorBase {
 
-    private GestionCuenta gestionCuenta;
-    private PeliculaService peliculaService;
-    private SerieService serieService;
-    private VideojuegoService videojuegoService;
-    private ResenaService resenaService;
-    private FavoritoService favoritoService;
-    private DirectorService directorService;
-
     @FXML private Button btnVolver;
-
     @FXML private TableView<Videojuego> tablaVideojuegos;
     @FXML private TableColumn<Videojuego, Integer> colId;
     @FXML private TableColumn<Videojuego, String> colNombre;
+    @FXML private TableColumn<Videojuego, Integer> colDuracion;
     @FXML private TableColumn<Videojuego, String> colGenero;
     @FXML private TableColumn<Videojuego, String> colClasificacion;
-    @FXML private TableColumn<Videojuego, Integer> colDificultad;
-    @FXML private TableColumn<Videojuego, Boolean> colBaja;
-
+    @FXML private TableColumn<Videojuego, String> colBaja;
     @FXML private ComboBox<String> cmbFiltroBaja;
     @FXML private ComboBox<ClasificacionEdad> cmbClasificacion;
     @FXML private ComboBox<GeneroVideojuegos> cmbGenero;
-
     @FXML private TextField txtNombre;
     @FXML private TextField txtDuracion;
-    @FXML private TextField txtDificultad;
     @FXML private TextArea txtDescripcion;
-
-    public void setGestionCuenta(GestionCuenta gestionCuenta) {
-        this.gestionCuenta = gestionCuenta;
-    }
-
-    public void setPeliculaService(PeliculaService peliculaService) {
-        this.peliculaService = peliculaService;
-    }
-
-    public void setSerieService(SerieService serieService) {
-        this.serieService = serieService;
-    }
-
-    public void setVideojuegoService(VideojuegoService videojuegoService) {
-        this.videojuegoService = videojuegoService;
-        filtrarVideojuegos();
-    }
-
-    public void setResenaService(ResenaService resenaService) {
-        this.resenaService = resenaService;
-    }
-
-    public void setFavoritoService(FavoritoService favoritoService) {
-        this.favoritoService = favoritoService;
-    }
-
-    public void setDirectorService(DirectorService directorService) {
-        this.directorService = directorService;
-    }
+    @FXML private TableColumn<Videojuego, Integer> colDificultad;
+    @FXML private TextField txtDificultad;
 
     @FXML
     private void initialize() {
-        cmbClasificacion.getItems().setAll(ClasificacionEdad.values());
-        cmbGenero.getItems().setAll(GeneroVideojuegos.values());
+        colId.setCellValueFactory(datos ->
+                new ReadOnlyObjectWrapper<>(contenidoService.buscarIdContenido(datos.getValue())));
+        colNombre.setCellValueFactory(datos ->
+                new SimpleStringProperty(datos.getValue().getNombre()));
+        colDuracion.setCellValueFactory(datos ->
+                new ReadOnlyObjectWrapper<>(datos.getValue().getDuracionMinutos()));
+        colGenero.setCellValueFactory(datos ->
+                new SimpleStringProperty(String.valueOf(datos.getValue().getGenero())));
+        colClasificacion.setCellValueFactory(datos ->
+                new SimpleStringProperty(String.valueOf(datos.getValue().getClasificacionEdad())));
+        colBaja.setCellValueFactory(datos ->
+                new SimpleStringProperty(datos.getValue().getBaja() ? "De baja" : "Activo"));
+        colDificultad.setCellValueFactory(datos ->
+                new ReadOnlyObjectWrapper<>(datos.getValue().getDificultad()));
 
-        cmbFiltroBaja.getItems().setAll(
-                "Activos",
-                "Dados de baja"
-        );
-        cmbFiltroBaja.setValue("Activos");
+        cmbClasificacion.setItems(FXCollections.observableArrayList(ClasificacionEdad.values()));
+        cmbGenero.setItems(FXCollections.observableArrayList(GeneroVideojuegos.values()));
+        cmbFiltroBaja.setItems(FXCollections.observableArrayList("Todos", "Activos", "De baja"));
+        cmbFiltroBaja.getSelectionModel().selectFirst();
+        cmbFiltroBaja.setOnAction(event -> cargarDatos());
 
-        configurarTabla();
+        tablaVideojuegos.getSelectionModel().selectedItemProperty().addListener(
+                (observable, anterior, actual) -> {
+                    if (actual != null) {
+                        mostrarFormulario(actual);
+                    }
+                });
     }
 
-    private void configurarTabla() {
-        colId.setCellValueFactory(data ->
-                new javafx.beans.property.ReadOnlyObjectWrapper<>(
-                        data.getValue().getId()
-                ));
-
-        colNombre.setCellValueFactory(data ->
-                new javafx.beans.property.SimpleStringProperty(
-                        data.getValue().getNombre()
-                ));
-
-        colGenero.setCellValueFactory(data ->
-                new javafx.beans.property.SimpleStringProperty(
-                        data.getValue().getGenero().toString()
-                ));
-
-        colClasificacion.setCellValueFactory(data ->
-                new javafx.beans.property.SimpleStringProperty(
-                        data.getValue().getClasificacionEdad().toString()
-                ));
-
-        colDificultad.setCellValueFactory(data ->
-                new javafx.beans.property.ReadOnlyObjectWrapper<>(
-                        data.getValue().getDificultad()
-                ));
-
-        colBaja.setCellValueFactory(data ->
-                new javafx.beans.property.ReadOnlyObjectWrapper<>(
-                        data.getValue().getBaja()
-                ));
-    }
-
-    @FXML
-    private void filtrarVideojuegos() {
-        if (videojuegoService == null || cmbFiltroBaja == null) {
+    @Override
+    protected void cargarDatos() {
+        if (!comprobarAdministrador()) {
             return;
         }
 
-        boolean baja = "Dados de baja".equals(cmbFiltroBaja.getValue());
-
-        tablaVideojuegos.getItems().setAll(
-                videojuegoService.getLista(baja)
-        );
+        ObservableList<Videojuego> lista = FXCollections.observableArrayList();
+        for (ContenidoMultimedia contenido : contenidoService.leerTodos()) {
+            if (!(contenido instanceof Videojuego videojuego)) {
+                continue;
+            }
+            if ("Activos".equals(cmbFiltroBaja.getValue()) && contenido.getBaja()) {
+                continue;
+            }
+            if ("De baja".equals(cmbFiltroBaja.getValue()) && !contenido.getBaja()) {
+                continue;
+            }
+            lista.add(videojuego);
+        }
+        tablaVideojuegos.setItems(lista);
+        limpiarFormulario();
     }
 
     @FXML
     private void agregarVideojuego() {
+        if (!comprobarAdministrador()) {
+            return;
+        }
         try {
-            Videojuego videojuego = obtenerDatosFormulario();
-
-            if (videojuegoService.agregar(videojuego)) {
-                mostrarMensaje("Éxito", "Videojuego agregado correctamente.");
-                filtrarVideojuegos();
-                limpiarFormulario();
+            Videojuego contenido = obtenerDatosFormulario(0, false);
+            if (contenidoService.agregar(contenido)) {
+                int idGeneral = contenidoService.buscarIdContenido(contenido);
+                cargarDatos();
+                mostrarMensaje("Videojuegos", "Se agregó el contenido con ID general " + idGeneral + ".");
             } else {
-                mostrarMensaje("Error", "No se pudo agregar el videojuego.");
+                mostrarMensaje("Videojuegos", "No se pudo agregar el contenido.");
             }
-
-        } catch (NumberFormatException e) {
-            mostrarMensaje("Error", "La duración y la dificultad deben ser números enteros.");
-        } catch (Exception e) {
-            mostrarMensaje("Error", e.getMessage());
+        } catch (IllegalArgumentException | DatoInvalidoException e) {
+            mostrarMensaje("Datos inválidos", e.getMessage());
+        } catch (SQLException e) {
+            mostrarMensaje("Error al guardar", e.getMessage());
         }
-    }
-
-    private Videojuego obtenerDatosFormulario() {
-        if (txtNombre.getText().isBlank()
-                || txtDuracion.getText().isBlank()
-                || txtDificultad.getText().isBlank()
-                || txtDescripcion.getText().isBlank()
-                || cmbClasificacion.getValue() == null
-                || cmbGenero.getValue() == null) {
-
-            throw new IllegalArgumentException(
-                    "Completá todos los campos."
-            );
-        }
-
-        int duracion = Integer.parseInt(txtDuracion.getText());
-        int dificultad = Integer.parseInt(txtDificultad.getText());
-
-        if (duracion <= 0) {
-            throw new IllegalArgumentException(
-                    "La duración debe ser mayor a cero."
-            );
-        }
-
-        if (dificultad <= 0) {
-            throw new IllegalArgumentException(
-                    "La dificultad debe ser mayor a cero."
-            );
-        }
-
-        return new Videojuego(
-                false,
-                cmbClasificacion.getValue(),
-                duracion,
-                txtNombre.getText().trim(),
-                0,
-                dificultad,
-                cmbGenero.getValue(),
-                txtDescripcion.getText().trim()
-        );
     }
 
     @FXML
     private void modificarVideojuego() {
-        Videojuego seleccionada = tablaVideojuegos.getSelectionModel()
-                .getSelectedItem();
-
-        if (seleccionada == null) {
-            mostrarMensaje("Atención", "Seleccioná un videojuego.");
+        if (!comprobarAdministrador()) {
             return;
         }
-
         try {
-            Videojuego modificado = obtenerDatosFormulario();
-
-            modificado.setId(seleccionada.getId());
-            modificado.setBaja(seleccionada.getBaja());
-
-            if (videojuegoService.modificar(modificado)) {
-                mostrarMensaje("Éxito", "Videojuego modificado correctamente.");
-                filtrarVideojuegos();
-                limpiarFormulario();
+            Videojuego seleccionada = pedirSeleccion();
+            Videojuego modificada = obtenerDatosFormulario(
+                    seleccionada.getId(), seleccionada.getBaja());
+            if (contenidoService.modificar(modificada)) {
+                cargarDatos();
+                mostrarMensaje("Videojuegos", "Se guardaron los cambios.");
             } else {
-                mostrarMensaje("Error", "No se pudo modificar el videojuego.");
+                mostrarMensaje("Videojuegos", "No se pudieron guardar los cambios.");
             }
-
-        } catch (NumberFormatException e) {
-            mostrarMensaje("Error", "La duración y la dificultad deben ser números enteros.");
-        } catch (Exception e) {
-            mostrarMensaje("Error", e.getMessage());
+        } catch (IllegalArgumentException | DatoInvalidoException e) {
+            mostrarMensaje("Datos inválidos", e.getMessage());
+        } catch (SQLException e) {
+            mostrarMensaje("Error al guardar", e.getMessage());
         }
     }
 
     @FXML
     private void cambiarEstadoVideojuego() {
-        Videojuego seleccionada = tablaVideojuegos.getSelectionModel()
-                .getSelectedItem();
-
-        if (seleccionada == null) {
-            mostrarMensaje("Atención", "Seleccioná un videojuego.");
+        if (!comprobarAdministrador()) {
             return;
         }
-
         try {
-            if (videojuegoService.darDeBaja(seleccionada.getId())) {
-                mostrarMensaje("Éxito", "Estado del videojuego actualizado.");
-                filtrarVideojuegos();
+            Videojuego seleccionada = pedirSeleccion();
+            boolean estabaDeBaja = seleccionada.getBaja();
+            if (contenidoService.darDeBaja(seleccionada)) {
+                cargarDatos();
+                mostrarMensaje("Videojuegos",
+                        estabaDeBaja ? "Contenido reactivado." : "Contenido dado de baja.");
             } else {
-                mostrarMensaje("Error", "No se pudo cambiar el estado.");
+                mostrarMensaje("Videojuegos", "No se pudo cambiar el estado.");
             }
-
+        } catch (IllegalArgumentException | DatoInvalidoException e) {
+            mostrarMensaje("Datos inválidos", e.getMessage());
         } catch (SQLException e) {
-            mostrarMensaje("Error", e.getMessage());
+            mostrarMensaje("Error al guardar", e.getMessage());
+        }
+    }
+
+    private Videojuego pedirSeleccion() {
+        Videojuego seleccionada = tablaVideojuegos.getSelectionModel().getSelectedItem();
+        if (seleccionada == null) {
+            throw new DatoInvalidoException("Seleccioná un videojuego de la tabla.");
+        }
+        return seleccionada;
+    }
+
+    private Videojuego obtenerDatosFormulario(int id, boolean baja) {
+        String nombre = leerTextoObligatorio(txtNombre, "Nombre", 100);
+        int duracion = leerEnteroPositivo(txtDuracion, "Duración en minutos");
+        if (cmbClasificacion.getValue() == null || cmbGenero.getValue() == null) {
+            throw new DatoInvalidoException("Seleccioná una clasificación y un género.");
+        }
+        int dificultad = leerEnteroPositivo(txtDificultad, "Dificultad");
+        String descripcion = leerDescripcion(txtDescripcion);
+        return new Videojuego(baja, cmbClasificacion.getValue(), duracion, nombre,
+                id, dificultad, cmbGenero.getValue(), descripcion);
+    }
+
+    private void mostrarFormulario(Videojuego contenido) {
+        txtNombre.setText(contenido.getNombre());
+        txtDuracion.setText(String.valueOf(contenido.getDuracionMinutos()));
+        cmbClasificacion.setValue(contenido.getClasificacionEdad());
+        cmbGenero.setValue(contenido.getGenero());
+        txtDescripcion.setText(contenido.getDescripcion() == null ? "" : contenido.getDescripcion());
+        txtDificultad.setText(String.valueOf(contenido.getDificultad()));
+    }
+
+    @FXML
+    private void nuevoVideojuego() {
+        if (comprobarAdministrador()) {
+            limpiarFormulario();
         }
     }
 
     private void limpiarFormulario() {
+        tablaVideojuegos.getSelectionModel().clearSelection();
         txtNombre.clear();
         txtDuracion.clear();
-        txtDificultad.clear();
         txtDescripcion.clear();
-        cmbClasificacion.setValue(null);
-        cmbGenero.setValue(null);
-    }
-
-    private void mostrarMensaje(String titulo, String mensaje) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(titulo);
-        alert.setHeaderText(null);
-        alert.setContentText(mensaje);
-        alert.showAndWait();
+        cmbClasificacion.getSelectionModel().clearSelection();
+        cmbGenero.getSelectionModel().clearSelection();
+        txtDificultad.clear();
     }
 
     @FXML
     private void volver() {
-        volverAlMenuAdministrador(
-                btnVolver,
-                gestionCuenta,
-                peliculaService,
-                serieService,
-                videojuegoService,
-                resenaService,
-                favoritoService,
-                directorService
-        );
+        cambiarVista(btnVolver, "/vistas/gestion-admin.fxml", "Gestión administrativa");
     }
 }

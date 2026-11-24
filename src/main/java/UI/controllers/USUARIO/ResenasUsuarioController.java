@@ -1,264 +1,299 @@
 package UI.controllers.USUARIO;
 
+import Enumerados.TipoContenido;
+import Excepciones.DatoInvalidoException;
 import Modelo.ContenidoMultimedia;
 import Modelo.Resena;
-import Service.*;
+import Modelo.Usuario;
 import UI.controllers.ControladorBase;
-
+import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.util.StringConverter;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.util.List;
+import java.util.ArrayList;
+import java.util.Comparator;
 
 public class ResenasUsuarioController extends ControladorBase {
 
-    private ResenaService resenaService;
-    private PeliculaService peliculaService;
-    private SerieService serieService;
-    private VideojuegoService videojuegoService;
-    private FavoritoService favoritoService;
-    private GestionCuenta gestionCuenta;
-
-
-    @FXML
-    private ComboBox<String> comboTipo;
-
-    @FXML
-    private ComboBox<ContenidoMultimedia> comboContenido;
+    @FXML private ComboBox<TipoContenido> comboTipo;
+    @FXML private ComboBox<ContenidoMultimedia> comboContenido;
+    @FXML private TableView<Resena> tablaResenas;
+    @FXML private TableColumn<Resena, Integer> colAutor;
+    @FXML private TableColumn<Resena, Integer> colCalificacion;
+    @FXML private TableColumn<Resena, String> colComentario;
+    @FXML private TableColumn<Resena, String> colFecha;
+    @FXML private TextField txtCalificacion;
+    @FXML private TextArea txtComentario;
+    @FXML private Button btnModificar;
+    @FXML private Label lblResumen;
 
     @FXML
-    private TableView<Resena> tablaResenas;
+    private void initialize() {
+        comboTipo.setItems(FXCollections.observableArrayList(TipoContenido.values()));
+        comboTipo.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(TipoContenido tipo) {
+                if (tipo == null) return "";
+                return switch (tipo) {
+                    case PELICULA -> "Películas";
+                    case SERIE -> "Series";
+                    case JUEGO -> "Videojuegos";
+                };
+            }
 
-    @FXML
-    private TableColumn<Resena, Integer> colCalificacion;
+            @Override
+            public TipoContenido fromString(String texto) {
+                return null;
+            }
+        });
+        comboContenido.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(ContenidoMultimedia contenido) {
+                return contenido == null ? ""
+                        : contenido.getNombre() + " · ID "
+                                + contenidoService.buscarIdContenido(contenido);
+            }
 
-    @FXML
-    private TableColumn<Resena, String> colComentario;
+            @Override
+            public ContenidoMultimedia fromString(String texto) {
+                return null;
+            }
+        });
 
-    @FXML
-    private TableColumn<Resena, String> colFecha;
-
-    @FXML
-    private TextField txtCalificacion;
-
-    @FXML
-    private TextArea txtComentario;
-
-    public void setResenaService(ResenaService resenaService) {
-        this.resenaService = resenaService;
-        configurarColumnas();
-    }
-
-    public void setPeliculaService(PeliculaService peliculaService) {
-        this.peliculaService = peliculaService;
-    }
-
-    public void setSerieService(SerieService serieService) {
-        this.serieService = serieService;
-    }
-
-    public void setVideojuegoService(VideojuegoService videojuegoService) {
-        this.videojuegoService = videojuegoService;
-    }
-
-    public void setFavoritoService(FavoritoService favoritoService) {
-        this.favoritoService = favoritoService;
-    }
-
-    public void setGestionCuenta(GestionCuenta gestionCuenta) {
-        this.gestionCuenta = gestionCuenta;
-    }
-
-    @FXML
-    public void initialize() {
-        comboTipo.setItems(FXCollections.observableArrayList(
-                "PELICULA", "SERIE", "JUEGO"
-        ));
-
-        comboTipo.setOnAction(event -> cargarContenidos());
-
-        comboContenido.setOnAction(event -> cargarResenas());
-    }
-
-    private void configurarColumnas() {
+        colAutor.setCellValueFactory(datos ->
+                new ReadOnlyObjectWrapper<>(datos.getValue().getIdUsuario()));
         colCalificacion.setCellValueFactory(datos ->
-                new javafx.beans.property.ReadOnlyObjectWrapper<>(
-                        datos.getValue().getCalificacion()
-                ));
-
+                new ReadOnlyObjectWrapper<>(datos.getValue().getCalificacion()));
         colComentario.setCellValueFactory(datos ->
-                new javafx.beans.property.SimpleStringProperty(
-                        datos.getValue().getComentario()
-                ));
-
+                new SimpleStringProperty(datos.getValue().getComentario() == null
+                        || datos.getValue().getComentario().isBlank()
+                        ? "Sin comentario" : datos.getValue().getComentario()));
+        colComentario.setCellFactory(columna -> new TableCell<>() {
+            @Override
+            protected void updateItem(String comentario, boolean vacia) {
+                super.updateItem(comentario, vacia);
+                setText(vacia ? null : comentario);
+                setWrapText(true);
+            }
+        });
         colFecha.setCellValueFactory(datos ->
-                new javafx.beans.property.SimpleStringProperty(
-                        datos.getValue().getFecha()
-                ));
+                new SimpleStringProperty(datos.getValue().getFecha()));
+        tablaResenas.setPlaceholder(new Label(
+                "Elegí un contenido para consultar sus reseñas."));
+
+        comboTipo.setOnAction(evento -> cargarContenidos());
+        comboContenido.setOnAction(evento -> cargarResenas());
+        tablaResenas.getSelectionModel().selectedItemProperty()
+                .addListener((observable, anterior, seleccionada) ->
+                        seleccionarResena(seleccionada));
+        btnModificar.setDisable(true);
+    }
+
+    @Override
+    protected void cargarDatos() {
+        try {
+            usuarioActual();
+            if (comboTipo.getValue() == null) {
+                comboTipo.getSelectionModel().selectFirst();
+            } else {
+                cargarContenidos();
+            }
+        } catch (DatoInvalidoException e) {
+            mostrarMensaje("Atención", e.getMessage());
+        }
     }
 
     private void cargarContenidos() {
+        comboContenido.getSelectionModel().clearSelection();
         comboContenido.getItems().clear();
         tablaResenas.getItems().clear();
+        limpiarCampos();
+        lblResumen.setText("Seleccioná un contenido.");
 
-        String tipo = comboTipo.getValue();
+        if (comboTipo.getValue() == null) return;
 
-        if (tipo == null) {
-            return;
-        }
+        try {
+            usuarioActual();
+            ArrayList<ContenidoMultimedia> disponibles =
+                    contenidoService.filtrarPorTipo(comboTipo.getValue(), false);
+            disponibles.sort(Comparator.comparing(
+                    ContenidoMultimedia::getNombre, String.CASE_INSENSITIVE_ORDER));
+            comboContenido.setItems(FXCollections.observableArrayList(disponibles));
 
-        List<? extends ContenidoMultimedia> contenidos;
-
-        switch (tipo) {
-            case "PELICULA" -> contenidos = peliculaService.getLista(false);
-            case "SERIE" -> contenidos = serieService.getLista(false);
-            case "JUEGO" -> contenidos = videojuegoService.getLista(false);
-            default -> {
-                return;
+            if (disponibles.isEmpty()) {
+                lblResumen.setText("No hay contenidos disponibles de este tipo.");
             }
+        } catch (DatoInvalidoException e) {
+            mostrarMensaje("Atención", e.getMessage());
         }
-
-        comboContenido.setItems(
-                FXCollections.observableArrayList(contenidos)
-        );
     }
 
     private void cargarResenas() {
-        ContenidoMultimedia contenido = comboContenido.getValue();
+        tablaResenas.getItems().clear();
+        limpiarCampos();
 
-        if (contenido == null) {
+        if (comboContenido.getValue() == null) {
+            lblResumen.setText("Seleccioná un contenido.");
             return;
         }
 
-        tablaResenas.setItems(
-                FXCollections.observableArrayList(
-                        resenaService.filtrarPorContenido(contenido.getId())
-                )
-        );
+        try {
+            usuarioActual();
+            int idGeneral = idContenidoSeleccionado();
+            ArrayList<Resena> resenas = resenaService.filtrarPorContenido(idGeneral);
+            resenas.sort(Comparator.comparing(Resena::getFecha).reversed()
+                    .thenComparingInt(Resena::getIdUsuario));
+            tablaResenas.setItems(FXCollections.observableArrayList(resenas));
+            lblResumen.setText("Reseñas de la comunidad: " + resenas.size());
+        } catch (DatoInvalidoException e) {
+            lblResumen.setText("El contenido no está disponible.");
+            mostrarMensaje("Atención", e.getMessage());
+        }
+    }
+
+    private int idContenidoSeleccionado() {
+        ContenidoMultimedia seleccionado = comboContenido.getValue();
+        if (seleccionado == null) {
+            throw new DatoInvalidoException("Seleccioná un contenido.");
+        }
+
+        int idGeneral = contenidoService.buscarIdContenido(seleccionado);
+        ContenidoMultimedia actual = contenidoService.buscarPorId(idGeneral);
+        if (idGeneral <= 0 || actual == null || actual.getBaja()) {
+            throw new DatoInvalidoException(
+                    "El contenido seleccionado no está disponible.");
+        }
+        return idGeneral;
+    }
+
+    private int leerCalificacion() {
+        int calificacion = leerEnteroPositivo(txtCalificacion, "La calificación");
+        if (calificacion > 10) {
+            throw new DatoInvalidoException(
+                    "La calificación debe estar entre 1 y 10.");
+        }
+        return calificacion;
+    }
+
+    private String comentarioIngresado() {
+        String comentario = txtComentario.getText();
+        return comentario == null || comentario.isBlank() ? null : comentario.trim();
     }
 
     @FXML
     private void publicarResena() {
         try {
-            ContenidoMultimedia contenido = comboContenido.getValue();
+            Usuario usuario = usuarioActual();
+            int idGeneral = idContenidoSeleccionado();
 
-            if (contenido == null) {
-                mostrarMensaje("Seleccioná un contenido.");
+            if (resenaService.buscarPorContenidoYUsuario(
+                    idGeneral, usuario.getId()) != null) {
+                mostrarMensaje("Reseñas",
+                        "Ya publicaste una reseña sobre este contenido. "
+                                + "Seleccioná la tuya en la tabla para modificarla.");
                 return;
             }
 
-            int calificacion = Integer.parseInt(txtCalificacion.getText());
-
-            if (calificacion < 1 || calificacion > 10) {
-                mostrarMensaje("La calificación debe estar entre 1 y 10.");
-                return;
-            }
-
-            String comentario = txtComentario.getText();
-
-            Resena resena = new Resena(
-                    contenido.getId(),
-                    gestionCuenta.getUsuarioActual().getId(),
-                    calificacion,
-                    comentario == null || comentario.isBlank()
-                            ? null : comentario.trim(),
+            Resena nueva = new Resena(
+                    idGeneral,
+                    usuario.getId(),
+                    leerCalificacion(),
+                    comentarioIngresado(),
                     LocalDate.now().toString()
             );
 
-            if (resenaService.agregar(resena)) {
-                mostrarMensaje("Reseña publicada correctamente.");
-                limpiarCampos();
+            if (resenaService.agregar(nueva)) {
                 cargarResenas();
+                mostrarMensaje("Reseñas", "La reseña se publicó correctamente.");
+            } else {
+                mostrarMensaje("Reseñas", "No se pudo publicar la reseña.");
             }
-
         } catch (NumberFormatException e) {
-            mostrarMensaje("Ingresá una calificación válida.");
+            mostrarMensaje("Atención", "Ingresá una calificación entera entre 1 y 10.");
+        } catch (DatoInvalidoException e) {
+            mostrarMensaje("Atención", e.getMessage());
         } catch (SQLException e) {
-            mostrarMensaje("Error al guardar la reseña: " + e.getMessage());
+            mostrarMensaje("Error", "No se pudo guardar la reseña: " + e.getMessage());
         }
     }
 
     @FXML
     private void modificarResena() {
-        Resena seleccionada = tablaResenas.getSelectionModel().getSelectedItem();
-
-        if (seleccionada == null) {
-            mostrarMensaje("Seleccioná una reseña de la tabla.");
-            return;
-        }
-
-        if (seleccionada.getIdUsuario()
-                != gestionCuenta.getUsuarioActual().getId()) {
-            mostrarMensaje("Solo podés modificar tus propias reseñas.");
-            return;
-        }
-
         try {
-            int calificacion = Integer.parseInt(txtCalificacion.getText());
+            Usuario usuario = usuarioActual();
+            int idGeneral = idContenidoSeleccionado();
+            Resena seleccionada = tablaResenas.getSelectionModel().getSelectedItem();
 
-            if (calificacion < 1 || calificacion > 10) {
-                mostrarMensaje("La calificación debe estar entre 1 y 10.");
-                return;
+            if (seleccionada == null) {
+                throw new DatoInvalidoException("Seleccioná tu reseña en la tabla.");
             }
 
-            seleccionada.setCalificacion(calificacion);
+            Resena cambios = resenaService.buscarPorContenidoYUsuario(
+                    idGeneral, usuario.getId());
+            if (seleccionada.getIdUsuario() != usuario.getId()
+                    || seleccionada.getIdContenido() != idGeneral
+                    || cambios == null
+                    || cambios.getId() != seleccionada.getId()) {
+                throw new DatoInvalidoException(
+                        "Solo podés modificar tu propia reseña del contenido seleccionado.");
+            }
 
-            String comentario = txtComentario.getText();
-            seleccionada.setComentario(
-                    comentario == null || comentario.isBlank()
-                            ? null : comentario.trim()
-            );
+            // El servicio devuelve una copia: la tabla conserva sus datos hasta guardar.
+            cambios.setCalificacion(leerCalificacion());
+            cambios.setComentario(comentarioIngresado());
 
-            if (resenaService.modificar(seleccionada)) {
-                mostrarMensaje("Reseña modificada correctamente.");
-                limpiarCampos();
+            if (resenaService.modificar(cambios)) {
                 cargarResenas();
+                mostrarMensaje("Reseñas", "La reseña se modificó correctamente.");
+            } else {
+                mostrarMensaje("Reseñas", "No se pudo modificar la reseña.");
             }
-
         } catch (NumberFormatException e) {
-            mostrarMensaje("Ingresá una calificación válida.");
+            mostrarMensaje("Atención", "Ingresá una calificación entera entre 1 y 10.");
+        } catch (DatoInvalidoException e) {
+            mostrarMensaje("Atención", e.getMessage());
         } catch (SQLException e) {
-            mostrarMensaje("Error al modificar la reseña: " + e.getMessage());
+            mostrarMensaje("Error", "No se pudo modificar la reseña: " + e.getMessage());
         }
     }
 
-    @FXML
-    private void seleccionarResena() {
-        Resena seleccionada = tablaResenas.getSelectionModel().getSelectedItem();
+    private void seleccionarResena(Resena seleccionada) {
+        limpiarCampos();
+        if (seleccionada == null) return;
 
-        if (seleccionada != null) {
-            txtCalificacion.setText(
-                    String.valueOf(seleccionada.getCalificacion())
-            );
-            txtComentario.setText(seleccionada.getComentario());
+        try {
+            if (seleccionada.getIdUsuario() == usuarioActual().getId()) {
+                txtCalificacion.setText(String.valueOf(seleccionada.getCalificacion()));
+                txtComentario.setText(seleccionada.getComentario() == null
+                        ? "" : seleccionada.getComentario());
+                btnModificar.setDisable(false);
+            }
+        } catch (DatoInvalidoException e) {
+            mostrarMensaje("Atención", e.getMessage());
         }
     }
 
     private void limpiarCampos() {
         txtCalificacion.clear();
         txtComentario.clear();
-    }
-
-    private void mostrarMensaje(String mensaje) {
-        Alert alerta = new Alert(Alert.AlertType.INFORMATION);
-        alerta.setHeaderText(null);
-        alerta.setContentText(mensaje);
-        alerta.showAndWait();
+        btnModificar.setDisable(true);
     }
 
     @FXML
     private void volverMenu() {
-        volverAlMenuUsuario(
-                tablaResenas,
-                gestionCuenta,
-                peliculaService,
-                serieService,
-                videojuegoService,
-                resenaService,
-                favoritoService
-        );
+        cambiarVista(tablaResenas, "/vistas/menu-usuario.fxml", "Temuflix");
     }
 }
+

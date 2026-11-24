@@ -1,144 +1,48 @@
 package UI.controllers;
 
 import Enumerados.Rol;
+import Excepciones.DatoInvalidoException;
 import Excepciones.SesionInvalidaException;
-
-import Modelo.Cuenta;
-import Service.*;
-import UI.controllers.USUARIO.MenuUsuarioController;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.stage.Stage;
-import UI.controllers.ADMIN.MenuAdminController;
 
-import java.io.IOException;
+public class LoginController extends ControladorBase {
 
-public class LoginController {
-
-    @FXML
-    private TextField txtUsuario;
+    @FXML private TextField txtUsuario;
+    @FXML private PasswordField txtContrasena;
+    @FXML private Button btnIniciarSesion;
 
     @FXML
-    private PasswordField txtContrasena;
-
-    @FXML
-    private Button btnIniciarSesion;
-
-
-    private GestionCuenta gestionCuenta;
-
-    private PeliculaService peliculaService;
-
-    private SerieService serieService;
-
-    private VideojuegoService videojuegoService;
-
-    private ResenaService resenaService;
-
-    private FavoritoService favoritoService;
-
-    private DirectorService directorService;
-
-    public void setPeliculaService(PeliculaService peliculaService) {
-        this.peliculaService = peliculaService;
+    private void initialize() {
+        txtContrasena.setOnAction(evento -> iniciarSesion());
     }
-
-
-    public void setGestionCuenta(GestionCuenta gestionCuenta) {
-        this.gestionCuenta = gestionCuenta;
-    }
-
-    public void setSerieService(SerieService serieService) {
-        this.serieService = serieService;
-    }
-
-    public void setVideojuegoService(VideojuegoService videojuegoService) {
-        this.videojuegoService = videojuegoService;
-    }
-
-    public void setResenaService(ResenaService resenaService) {
-        this.resenaService = resenaService;
-    }
-
-    public void setFavoritoService(FavoritoService favoritoService) {
-        this.favoritoService = favoritoService;
-    }
-
-    public void setDirectorService(DirectorService directorService) {
-        this.directorService = directorService;
-    }
-
-    //Metodo que conecta el boton con el controlador
 
     @FXML
     private void iniciarSesion() {
-
-        String usuario = txtUsuario.getText();
+        String nombreUsuario = txtUsuario.getText();
         String contrasena = txtContrasena.getText();
 
+        if (nombreUsuario.isBlank() || contrasena.isBlank()) {
+            mostrarMensaje("Iniciar sesion", "Completa el usuario y la contrasena.");
+            return;
+        }
+
         try {
-            // Validamos las credenciales
-            gestionCuenta.iniciarSesion(usuario, contrasena);
+            gestionCuenta.iniciarSesion(nombreUsuario, contrasena);
 
-            // Obtenemos la cuenta que inició sesión
-            Cuenta cuenta = gestionCuenta.getUsuarioActual();
-
-            // Decidimos qué ventana abrir
-            if (gestionCuenta.getUsuarioActual().getRol() == Rol.ADMINISTRADOR) {
-                cargarVentana("/vistas/menu-admin.fxml");
-            } else if (gestionCuenta.getUsuarioActual().getRol()==Rol.USUARIO) {
-                cargarVentana("/vistas/menu-usuario.fxml");
+            if (usuarioActual().getRol() == Rol.ADMINISTRADOR) {
+                cambiarVista(btnIniciarSesion, "/vistas/menu-admin.fxml",
+                        "Temuflix - Administracion");
+            } else {
+                cambiarVista(btnIniciarSesion, "/vistas/menu-usuario.fxml",
+                        "Temuflix - Catalogo");
             }
 
-        } catch (SesionInvalidaException e) {
-            System.out.println(e.getMessage());
-
-        } catch (IOException e) {
-            System.out.println("Error al cargar la ventana: " + e.getMessage());
+        } catch (SesionInvalidaException | DatoInvalidoException e) {
+            mostrarMensaje("Iniciar sesion", e.getMessage());
         }
     }
-
-    //este metodo cargar ventana se va a encargar de reemplazar la pantalla del
-    //login por la proxima
-
-    private void cargarVentana(String ruta) throws IOException {
-
-        FXMLLoader loader = new FXMLLoader(getClass().getResource(ruta));
-        Parent root = loader.load();
-
-        if (ruta.equals("/vistas/menu-admin.fxml")) {
-            MenuAdminController controller = loader.getController();
-
-            controller.setGestionCuenta(gestionCuenta);
-            controller.setPeliculaService(peliculaService);
-            controller.setSerieService(serieService);
-            controller.setVideojuegoService(videojuegoService);
-            controller.setResenaService(resenaService);
-            controller.setFavoritoService(favoritoService);
-            controller.setDirectorService(directorService);
-        }
-
-        if (ruta.equals("/vistas/menu-usuario.fxml")) {
-            MenuUsuarioController controller = loader.getController();
-
-            controller.setGestionCuenta(gestionCuenta);
-            controller.setPeliculaService(peliculaService);
-            controller.setSerieService(serieService);
-            controller.setVideojuegoService(videojuegoService);
-            controller.setResenaService(resenaService);
-            controller.setFavoritoService(favoritoService);
-        }
-
-        Stage stage = (Stage) btnIniciarSesion.getScene().getWindow();
-
-        Scene escena = new Scene(root);
-        stage.setScene(escena);
-        stage.show();
-    }
-
 }
+

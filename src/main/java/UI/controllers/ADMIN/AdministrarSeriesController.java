@@ -1,318 +1,251 @@
-
 package UI.controllers.ADMIN;
 
 import Enumerados.ClasificacionEdad;
 import Enumerados.GeneroAudiovisual;
+import Excepciones.DatoInvalidoException;
+import Modelo.ContenidoMultimedia;
 import Modelo.Director;
 import Modelo.Serie;
-import Service.*;
-
 import UI.controllers.ControladorBase;
-
+import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.util.StringConverter;
 
 import java.sql.SQLException;
 
 public class AdministrarSeriesController extends ControladorBase {
 
-    private GestionCuenta gestionCuenta;
-    private PeliculaService peliculaService;
-    private SerieService serieService;
-    private VideojuegoService videojuegoService;
-    private ResenaService resenaService;
-    private FavoritoService favoritoService;
-    private DirectorService directorService;
-
     @FXML private Button btnVolver;
-
     @FXML private TableView<Serie> tablaSeries;
     @FXML private TableColumn<Serie, Integer> colId;
     @FXML private TableColumn<Serie, String> colNombre;
+    @FXML private TableColumn<Serie, Integer> colDuracion;
     @FXML private TableColumn<Serie, String> colGenero;
     @FXML private TableColumn<Serie, String> colClasificacion;
-    @FXML private TableColumn<Serie, Integer> colCapitulos;
-    @FXML private TableColumn<Serie, Integer> colTemporadas;
-    @FXML private TableColumn<Serie, Boolean> colBaja;
-
+    @FXML private TableColumn<Serie, String> colBaja;
     @FXML private ComboBox<String> cmbFiltroBaja;
     @FXML private ComboBox<ClasificacionEdad> cmbClasificacion;
     @FXML private ComboBox<GeneroAudiovisual> cmbGenero;
     @FXML private ComboBox<Director> cmbDirector;
-
     @FXML private TextField txtNombre;
     @FXML private TextField txtDuracion;
+    @FXML private TextArea txtDescripcion;
+    @FXML private TableColumn<Serie, Integer> colCapitulos;
+    @FXML private TableColumn<Serie, Integer> colTemporadas;
     @FXML private TextField txtCapitulos;
     @FXML private TextField txtTemporadas;
-    @FXML private TextArea txtDescripcion;
-
-    public void setGestionCuenta(GestionCuenta gestionCuenta) {
-        this.gestionCuenta = gestionCuenta;
-    }
-
-    public void setPeliculaService(PeliculaService peliculaService) {
-        this.peliculaService = peliculaService;
-    }
-
-    public void setSerieService(SerieService serieService) {
-        this.serieService = serieService;
-    }
-
-    public void setVideojuegoService(VideojuegoService videojuegoService) {
-        this.videojuegoService = videojuegoService;
-    }
-
-    public void setResenaService(ResenaService resenaService) {
-        this.resenaService = resenaService;
-    }
-
-    public void setFavoritoService(FavoritoService favoritoService) {
-        this.favoritoService = favoritoService;
-    }
-
-    public void setDirectorService(DirectorService directorService) {
-        this.directorService = directorService;
-        cargarDirectores();
-    }
 
     @FXML
     private void initialize() {
-        cmbClasificacion.getItems().setAll(ClasificacionEdad.values());
-        cmbGenero.getItems().setAll(GeneroAudiovisual.values());
+        colId.setCellValueFactory(datos ->
+                new ReadOnlyObjectWrapper<>(contenidoService.buscarIdContenido(datos.getValue())));
+        colNombre.setCellValueFactory(datos ->
+                new SimpleStringProperty(datos.getValue().getNombre()));
+        colDuracion.setCellValueFactory(datos ->
+                new ReadOnlyObjectWrapper<>(datos.getValue().getDuracionMinutos()));
+        colGenero.setCellValueFactory(datos ->
+                new SimpleStringProperty(String.valueOf(datos.getValue().getGenero())));
+        colClasificacion.setCellValueFactory(datos ->
+                new SimpleStringProperty(String.valueOf(datos.getValue().getClasificacionEdad())));
+        colBaja.setCellValueFactory(datos ->
+                new SimpleStringProperty(datos.getValue().getBaja() ? "De baja" : "Activo"));
+        colCapitulos.setCellValueFactory(datos ->
+                new ReadOnlyObjectWrapper<>(datos.getValue().getCantidadCapitulos()));
+        colTemporadas.setCellValueFactory(datos ->
+                new ReadOnlyObjectWrapper<>(datos.getValue().getCantidadTemporadas()));
 
-        cmbFiltroBaja.getItems().setAll(
-                "Activas",
-                "Dadas de baja"
-        );
+        cmbClasificacion.setItems(FXCollections.observableArrayList(ClasificacionEdad.values()));
+        cmbGenero.setItems(FXCollections.observableArrayList(GeneroAudiovisual.values()));
+        cmbFiltroBaja.setItems(FXCollections.observableArrayList("Todos", "Activos", "De baja"));
+        cmbFiltroBaja.getSelectionModel().selectFirst();
+        cmbFiltroBaja.setOnAction(event -> cargarDatos());
 
-        cmbFiltroBaja.setValue("Activas");
-
-        configurarTabla();
-    }
-
-    private void configurarTabla() {
-        colId.setCellValueFactory(data ->
-                new javafx.beans.property.ReadOnlyObjectWrapper<>(
-                        data.getValue().getId()
-                ));
-
-        colNombre.setCellValueFactory(data ->
-                new javafx.beans.property.SimpleStringProperty(
-                        data.getValue().getNombre()
-                ));
-
-        colGenero.setCellValueFactory(data ->
-                new javafx.beans.property.SimpleStringProperty(
-                        data.getValue().getGenero().toString()
-                ));
-
-        colClasificacion.setCellValueFactory(data ->
-                new javafx.beans.property.SimpleStringProperty(
-                        data.getValue().getClasificacionEdad().toString()
-                ));
-
-        colCapitulos.setCellValueFactory(data ->
-                new javafx.beans.property.ReadOnlyObjectWrapper<>(
-                        data.getValue().getCantidadCapitulos()
-                ));
-
-        colTemporadas.setCellValueFactory(data ->
-                new javafx.beans.property.ReadOnlyObjectWrapper<>(
-                        data.getValue().getCantidadTemporadas()
-                ));
-
-        colBaja.setCellValueFactory(data ->
-                new javafx.beans.property.ReadOnlyObjectWrapper<>(
-                        data.getValue().getBaja()
-                ));
-    }
-
-    private void cargarDirectores() {
-        cmbDirector.getItems().setAll(directorService.leerTodos());
-
-        cmbDirector.setCellFactory(lista -> new ListCell<>() {
+        cmbDirector.setConverter(new StringConverter<>() {
             @Override
-            protected void updateItem(Director director, boolean empty) {
-                super.updateItem(director, empty);
-
-                if (empty || director == null) {
-                    setText(null);
-                } else {
-                    setText(director.getNombre() + " " + director.getApellido());
+            public String toString(Director director) {
+                if (director == null) {
+                    return "Sin director";
                 }
+                return director.getNombre() + " " + director.getApellido()
+                        + " (ID " + director.getId() + ")";
+            }
+
+            @Override
+            public Director fromString(String texto) {
+                return null;
             }
         });
+        cmbDirector.setPromptText("Sin director");
 
-        cmbDirector.setButtonCell(new ListCell<>() {
-            @Override
-            protected void updateItem(Director director, boolean empty) {
-                super.updateItem(director, empty);
-
-                if (empty || director == null) {
-                    setText(null);
-                } else {
-                    setText(director.getNombre() + " " + director.getApellido());
-                }
-            }
-        });
+        tablaSeries.getSelectionModel().selectedItemProperty().addListener(
+                (observable, anterior, actual) -> {
+                    if (actual != null) {
+                        mostrarFormulario(actual);
+                    }
+                });
     }
 
-    @FXML
-    private void filtrarSeries() {
-        if (serieService == null || cmbFiltroBaja == null) return;
+    @Override
+    protected void cargarDatos() {
+        if (!comprobarAdministrador()) {
+            return;
+        }
 
-        boolean baja = "Dadas de baja".equals(cmbFiltroBaja.getValue());
-
-        tablaSeries.getItems().setAll(
-                serieService.getLista(baja)
-        );
+        cmbDirector.getItems().clear();
+        cmbDirector.getItems().add(null);
+        cmbDirector.getItems().addAll(directorService.leerTodos());
+        ObservableList<Serie> lista = FXCollections.observableArrayList();
+        for (ContenidoMultimedia contenido : contenidoService.leerTodos()) {
+            if (!(contenido instanceof Serie serie)) {
+                continue;
+            }
+            if ("Activos".equals(cmbFiltroBaja.getValue()) && contenido.getBaja()) {
+                continue;
+            }
+            if ("De baja".equals(cmbFiltroBaja.getValue()) && !contenido.getBaja()) {
+                continue;
+            }
+            lista.add(serie);
+        }
+        tablaSeries.setItems(lista);
+        limpiarFormulario();
     }
 
     @FXML
     private void agregarSerie() {
+        if (!comprobarAdministrador()) {
+            return;
+        }
         try {
-            Serie serie = obtenerDatosFormulario();
-
-            if (serieService.agregar(serie)) {
-                mostrarMensaje("Éxito", "Serie agregada correctamente.");
-                filtrarSeries();
-                limpiarFormulario();
+            Serie contenido = obtenerDatosFormulario(0, false);
+            if (contenidoService.agregar(contenido)) {
+                int idGeneral = contenidoService.buscarIdContenido(contenido);
+                cargarDatos();
+                mostrarMensaje("Series", "Se agregó el contenido con ID general " + idGeneral + ".");
             } else {
-                mostrarMensaje("Error", "No se pudo agregar la serie.");
+                mostrarMensaje("Series", "No se pudo agregar el contenido.");
             }
-
-        } catch (NumberFormatException e) {
-            mostrarMensaje("Error", "La duración, los capítulos y las temporadas deben ser números enteros.");
-        } catch (Exception e) {
-            mostrarMensaje("Error", e.getMessage());
+        } catch (IllegalArgumentException | DatoInvalidoException e) {
+            mostrarMensaje("Datos inválidos", e.getMessage());
+        } catch (SQLException e) {
+            mostrarMensaje("Error al guardar", e.getMessage());
         }
-    }
-
-    private Serie obtenerDatosFormulario() {
-        if (txtNombre.getText().isBlank()
-                || txtDuracion.getText().isBlank()
-                || txtCapitulos.getText().isBlank()
-                || txtTemporadas.getText().isBlank()
-                || txtDescripcion.getText().isBlank()
-                || cmbClasificacion.getValue() == null
-                || cmbGenero.getValue() == null
-                || cmbDirector.getValue() == null) {
-
-            throw new IllegalArgumentException(
-                    "Completá todos los campos."
-            );
-        }
-
-        int duracion = Integer.parseInt(txtDuracion.getText());
-        int capitulos = Integer.parseInt(txtCapitulos.getText());
-        int temporadas = Integer.parseInt(txtTemporadas.getText());
-
-        if (duracion <= 0 || capitulos <= 0 || temporadas <= 0) {
-            throw new IllegalArgumentException(
-                    "La duración, los capítulos y las temporadas deben ser mayores a cero."
-            );
-        }
-
-        Director director = cmbDirector.getValue();
-
-        return new Serie(
-                false,
-                cmbClasificacion.getValue(),
-                duracion,
-                txtNombre.getText().trim(),
-                cmbGenero.getValue(),
-                director.getId(),
-                0,
-                capitulos,
-                temporadas,
-                txtDescripcion.getText().trim()
-        );
     }
 
     @FXML
     private void modificarSerie() {
-        Serie seleccionada = tablaSeries.getSelectionModel()
-                .getSelectedItem();
-
-        if (seleccionada == null) {
-            mostrarMensaje("Atención", "Seleccioná una serie.");
+        if (!comprobarAdministrador()) {
             return;
         }
-
         try {
-            Serie modificada = obtenerDatosFormulario();
-
-            modificada.setId(seleccionada.getId());
-            modificada.setBaja(seleccionada.getBaja());
-
-            if (serieService.modificar(modificada)) {
-                mostrarMensaje("Éxito", "Serie modificada correctamente.");
-                filtrarSeries();
-                limpiarFormulario();
+            Serie seleccionada = pedirSeleccion();
+            Serie modificada = obtenerDatosFormulario(
+                    seleccionada.getId(), seleccionada.getBaja());
+            if (contenidoService.modificar(modificada)) {
+                cargarDatos();
+                mostrarMensaje("Series", "Se guardaron los cambios.");
             } else {
-                mostrarMensaje("Error", "No se pudo modificar la serie.");
+                mostrarMensaje("Series", "No se pudieron guardar los cambios.");
             }
-
-        } catch (NumberFormatException e) {
-            mostrarMensaje("Error", "La duración, los capítulos y las temporadas deben ser números enteros.");
-        } catch (Exception e) {
-            mostrarMensaje("Error", e.getMessage());
+        } catch (IllegalArgumentException | DatoInvalidoException e) {
+            mostrarMensaje("Datos inválidos", e.getMessage());
+        } catch (SQLException e) {
+            mostrarMensaje("Error al guardar", e.getMessage());
         }
     }
 
     @FXML
     private void cambiarEstadoSerie() {
-        Serie seleccionada = tablaSeries.getSelectionModel().getSelectedItem();
-
-        if (seleccionada == null) {
-            mostrarMensaje("Atención", "Seleccioná una serie.");
+        if (!comprobarAdministrador()) {
             return;
         }
-
         try {
-            if (serieService.darDeBaja(seleccionada.getId())) {
-                mostrarMensaje("Éxito", "Estado de la serie actualizado.");
-                filtrarSeries();
+            Serie seleccionada = pedirSeleccion();
+            boolean estabaDeBaja = seleccionada.getBaja();
+            if (contenidoService.darDeBaja(seleccionada)) {
+                cargarDatos();
+                mostrarMensaje("Series",
+                        estabaDeBaja ? "Contenido reactivado." : "Contenido dado de baja.");
             } else {
-                mostrarMensaje("Error", "No se pudo cambiar el estado.");
+                mostrarMensaje("Series", "No se pudo cambiar el estado.");
             }
-
+        } catch (IllegalArgumentException | DatoInvalidoException e) {
+            mostrarMensaje("Datos inválidos", e.getMessage());
         } catch (SQLException e) {
-            mostrarMensaje("Error", e.getMessage());
+            mostrarMensaje("Error al guardar", e.getMessage());
+        }
+    }
+
+    private Serie pedirSeleccion() {
+        Serie seleccionada = tablaSeries.getSelectionModel().getSelectedItem();
+        if (seleccionada == null) {
+            throw new DatoInvalidoException("Seleccioná una serie de la tabla.");
+        }
+        return seleccionada;
+    }
+
+    private Serie obtenerDatosFormulario(int id, boolean baja) {
+        String nombre = leerTextoObligatorio(txtNombre, "Nombre", 100);
+        int duracion = leerEnteroPositivo(txtDuracion, "Duración en minutos");
+        if (cmbClasificacion.getValue() == null || cmbGenero.getValue() == null) {
+            throw new DatoInvalidoException("Seleccioná una clasificación y un género.");
+        }
+        Director director = cmbDirector.getValue();
+        int idDirector = director == null ? 0 : director.getId();
+        int capitulos = leerEnteroPositivo(txtCapitulos, "Cantidad de capítulos");
+        int temporadas = leerEnteroPositivo(txtTemporadas, "Cantidad de temporadas");
+        String descripcion = leerDescripcion(txtDescripcion);
+        return new Serie(baja, cmbClasificacion.getValue(), duracion, nombre,
+                cmbGenero.getValue(), idDirector, id, capitulos, temporadas, descripcion);
+    }
+
+    private void mostrarFormulario(Serie contenido) {
+        txtNombre.setText(contenido.getNombre());
+        txtDuracion.setText(String.valueOf(contenido.getDuracionMinutos()));
+        cmbClasificacion.setValue(contenido.getClasificacionEdad());
+        cmbGenero.setValue(contenido.getGenero());
+        txtDescripcion.setText(contenido.getDescripcion() == null ? "" : contenido.getDescripcion());
+        txtCapitulos.setText(String.valueOf(contenido.getCantidadCapitulos()));
+        txtTemporadas.setText(String.valueOf(contenido.getCantidadTemporadas()));
+        cmbDirector.getSelectionModel().clearSelection();
+        for (Director director : cmbDirector.getItems()) {
+            if (director != null && director.getId() == contenido.getIdDirector()) {
+                cmbDirector.getSelectionModel().select(director);
+                break;
+            }
+        }
+    }
+
+    @FXML
+    private void nuevaSerie() {
+        if (comprobarAdministrador()) {
+            limpiarFormulario();
         }
     }
 
     private void limpiarFormulario() {
+        tablaSeries.getSelectionModel().clearSelection();
         txtNombre.clear();
         txtDuracion.clear();
+        txtDescripcion.clear();
+        cmbClasificacion.getSelectionModel().clearSelection();
+        cmbGenero.getSelectionModel().clearSelection();
+        cmbDirector.getSelectionModel().clearSelection();
         txtCapitulos.clear();
         txtTemporadas.clear();
-        txtDescripcion.clear();
-
-        cmbClasificacion.setValue(null);
-        cmbGenero.setValue(null);
-        cmbDirector.setValue(null);
-    }
-
-    private void mostrarMensaje(String titulo, String mensaje) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(titulo);
-        alert.setHeaderText(null);
-        alert.setContentText(mensaje);
-        alert.showAndWait();
     }
 
     @FXML
     private void volver() {
-        volverAlMenuAdministrador(
-                btnVolver,
-                gestionCuenta,
-                peliculaService,
-                serieService,
-                videojuegoService,
-                resenaService,
-                favoritoService,
-                directorService
-        );
+        cambiarVista(btnVolver, "/vistas/gestion-admin.fxml", "Gestión administrativa");
     }
 }
