@@ -94,6 +94,8 @@ public class MenuSeries {
                     serie.getId(), serie.getNombre(), serie.getCantidadTemporadas(),
                     serie.getCantidadCapitulos(), estado(serie), descripcionVisible(serie.getDescripcion()));
         }
+        System.out.println("presione enter para continuar...");
+        entrada.nextLine();
     }
 
     private void mostrarSerie(Serie serie) {
@@ -107,6 +109,8 @@ public class MenuSeries {
         System.out.println("Temporadas: " + serie.getCantidadTemporadas());
         System.out.println("Descripción: " + descripcionVisible(serie.getDescripcion()));
         System.out.println("Estado: " + estado(serie));
+        System.out.println("presione enter para continuar...");
+        entrada.nextLine();
     }
 
     private String descripcionVisible(String descripcion) {

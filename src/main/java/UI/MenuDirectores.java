@@ -83,6 +83,8 @@ public class MenuDirectores {
             System.out.printf("%d | %s | %s%n",
                     director.getId(), director.getNombre(), director.getApellido());
         }
+        System.out.println("presione enter para continuar...");
+        entrada.nextLine();
     }
 
     private void mostrarDirector(Director director) {
@@ -95,6 +97,8 @@ public class MenuDirectores {
         System.out.println("Nombre: " + director.getNombre());
         System.out.println("Apellido: " + director.getApellido());
         System.out.println("Descripción: " + descripcion);
+        System.out.println("presione enter para continuar...");
+        entrada.nextLine();
     }
 
     private Director pedirDirector() {
