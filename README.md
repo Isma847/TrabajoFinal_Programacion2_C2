@@ -56,3 +56,6 @@ planteadas para el administrador.</p>
     <li><b>EMAIL: </b> usuario@mail.com</li>
     <li><b>CONTRASEÑA: </b> clave1234</li>
 </ul>
+
+<h1>Diseño del programa (UML)</h1>
+<img src="UML.png" alt="UML">
