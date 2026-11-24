@@ -1,34 +1,33 @@
 package UI;
 
 import Enumerados.Rol;
+import Enumerados.TipoContenido;
 import Excepciones.DatoInvalidoException;
 import Modelo.ContenidoMultimedia;
 import Modelo.Resena;
 import Modelo.Usuario;
-import Service.PeliculaService;
+import Service.ContenidoService;
 import Service.ResenaService;
-import Service.SerieService;
-import Service.VideojuegoService;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
 
 public class MenuResenas {
 
+    /// Un contenido con su id general (el que guardan las reseñas).
+    private record Item(int idGeneral, ContenidoMultimedia contenido) {}
+
     private final ResenaService resenas;
-    private final PeliculaService peliculas;
-    private final SerieService series;
-    private final VideojuegoService videojuegos;
+    private final ContenidoService contenidos;
     private final Scanner entrada;
 
-    public MenuResenas(ResenaService resenas, PeliculaService peliculas,
-                       SerieService series, VideojuegoService videojuegos, Scanner entrada) {
+    public MenuResenas(ResenaService resenas, ContenidoService contenidos, Scanner entrada) {
         this.resenas = resenas;
-        this.peliculas = peliculas;
-        this.series = series;
-        this.videojuegos = videojuegos;
+        this.contenidos = contenidos;
         this.entrada = entrada;
     }
 
@@ -79,9 +78,9 @@ public class MenuResenas {
 
             try {
                 switch (entrada.nextLine().trim()) {
-                    case "1" -> elegirContenido(usuario, "PELICULA", peliculas.getLista(false));
-                    case "2" -> elegirContenido(usuario, "SERIE", series.getLista(false));
-                    case "3" -> elegirContenido(usuario, "JUEGO", videojuegos.getLista(false));
+                    case "1" -> elegirContenido(usuario, TipoContenido.PELICULA);
+                    case "2" -> elegirContenido(usuario, TipoContenido.SERIE);
+                    case "3" -> elegirContenido(usuario, TipoContenido.JUEGO);
                     case "0" -> {
                         return;
                     }
@@ -93,16 +92,16 @@ public class MenuResenas {
         }
     }
 
-    private void elegirContenido(Usuario usuario, String tipo,
-                                 List<? extends ContenidoMultimedia> contenidos) {
-        if (contenidos.isEmpty()) {
+    private void elegirContenido(Usuario usuario, TipoContenido tipo) {
+        ArrayList<Item> items = activosDeTipo(tipo);
+        if (items.isEmpty()) {
             System.out.println("No hay títulos activos de este tipo.");
             return;
         }
 
         System.out.println("\nID | Nombre");
-        for (ContenidoMultimedia contenido : contenidos) {
-            System.out.printf("%d | %s%n", contenido.getId(), contenido.getNombre());
+        for (Item item : items) {
+            System.out.printf("%d | %s%n", item.idGeneral(), item.contenido().getNombre());
         }
 
         int id = leerEntero("ID del contenido (0 para volver)");
@@ -110,17 +109,32 @@ public class MenuResenas {
             return;
         }
 
-        for (ContenidoMultimedia contenido : contenidos) {
-            if (contenido.getId() == id) {
-                mostrarPorContenido(usuario, tipo, contenido);
+        for (Item item : items) {
+            if (item.idGeneral() == id) {
+                mostrarPorContenido(usuario, item);
                 return;
             }
         }
 
-        System.out.println("No hay un título activo con ese ID.");
+        System.out.println("No hay un título activo de ese tipo con ese ID.");
     }
 
-    private void mostrarPorContenido(Usuario usuario, String tipo, ContenidoMultimedia contenido) {
+    /// Contenidos activos de un tipo, con su id general.
+    private ArrayList<Item> activosDeTipo(TipoContenido tipo) {
+        ArrayList<Item> items = new ArrayList<>();
+        for (ContenidoMultimedia contenido : contenidos.leerTodos()) {
+            int idGeneral = contenidos.buscarIdContenido(contenido);
+            if (idGeneral != -1 && !contenido.getBaja() && contenidos.getTipo(idGeneral) == tipo) {
+                items.add(new Item(idGeneral, contenido));
+            }
+        }
+        items.sort(Comparator.comparingInt(Item::idGeneral));
+        return items;
+    }
+
+    private void mostrarPorContenido(Usuario usuario, Item item) {
+        ContenidoMultimedia contenido = item.contenido();
+        int idContenido = item.idGeneral();
         while (true) {
             System.out.println("\n--- Reseñas de " + contenido.getNombre() + " ---");
             System.out.println("1. Ver reseñas");
@@ -131,9 +145,9 @@ public class MenuResenas {
 
             try {
                 switch (entrada.nextLine().trim()) {
-                    case "1" -> listar(resenas.filtrarPorContenido(tipo, contenido.getId()));
-                    case "2" -> agregar(usuario.getId(), tipo, contenido.getId());
-                    case "3" -> modificar(usuario.getId(), tipo, contenido.getId());
+                    case "1" -> listar(resenas.filtrarPorContenido(idContenido));
+                    case "2" -> agregar(usuario.getId(), idContenido);
+                    case "3" -> modificar(usuario.getId(), idContenido);
                     case "0" -> {
                         return;
                     }
@@ -164,8 +178,15 @@ public class MenuResenas {
             comentario = "Sin comentario";
         }
 
-        System.out.printf("%nReseña %d | %s %d | Usuario %d%n",
-                resena.getId(), resena.getTipo(), resena.getIdContenido(), resena.getIdUsuario());
+        // El tipo no se guarda en la reseña: se obtiene del contenido.
+        int idContenido = resena.getIdContenido();
+        ContenidoMultimedia contenido = contenidos.buscarPorId(idContenido);
+        String titulo = contenido == null
+                ? "Contenido " + idContenido
+                : contenidos.getTipo(idContenido) + " " + idContenido + " (" + contenido.getNombre() + ")";
+
+        System.out.printf("%nReseña %d | %s | Usuario %d%n",
+                resena.getId(), titulo, resena.getIdUsuario());
         System.out.println("Calificación: " + resena.getCalificacion());
         System.out.println("Comentario: " + comentario);
         System.out.println("Fecha: " + resena.getFecha());
@@ -180,12 +201,12 @@ public class MenuResenas {
         return resena;
     }
 
-    private void agregar(int idUsuario, String tipo, int idContenido) throws SQLException {
+    private void agregar(int idUsuario, int idContenido) throws SQLException {
         int calificacion = leerEntero("Calificación");
         String comentario = leerComentario();
         String fecha = LocalDate.now().toString();
 
-        Resena resena = new Resena(idContenido, idUsuario, tipo, calificacion, comentario, fecha);
+        Resena resena = new Resena(idContenido, idUsuario, calificacion, comentario, fecha);
         if (resenas.agregar(resena)) {
             System.out.println("Reseña publicada con ID " + resena.getId() + ".");
         } else {
@@ -193,10 +214,9 @@ public class MenuResenas {
         }
     }
 
-    private void modificar(int idUsuario, String tipo, int idContenido) throws SQLException {
+    private void modificar(int idUsuario, int idContenido) throws SQLException {
         Resena resena = pedirResena();
-        if (resena.getIdUsuario() != idUsuario
-                || resena.getIdContenido() != idContenido || !tipo.equals(resena.getTipo())) {
+        if (resena.getIdUsuario() != idUsuario || resena.getIdContenido() != idContenido) {
             throw new DatoInvalidoException("Elegí una reseña tuya de este título.");
         }
 
