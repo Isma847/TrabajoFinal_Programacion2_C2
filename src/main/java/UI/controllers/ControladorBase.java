@@ -1,6 +1,7 @@
 package UI.controllers;
 
 import Service.*;
+import UI.controllers.ADMIN.MenuAdminController;
 import UI.controllers.USUARIO.MenuUsuarioController;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleStringProperty;
@@ -66,5 +67,44 @@ public class ControladorBase {
             System.out.println("Error al volver al menú: " + e.getMessage());
         }
     }
+
+    protected void volverAlMenuAdministrador(
+            Node componente,
+            GestionCuenta gestionCuenta,
+            PeliculaService peliculaService,
+            SerieService serieService,
+            VideojuegoService videojuegoService,
+            ResenaService resenaService,
+            FavoritoService favoritoService,
+            DirectorService directorService
+            ) {
+
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/vistas/menu-admin.fxml")
+            );
+
+            Parent root = loader.load();
+
+            MenuAdminController controller = loader.getController();
+
+            controller.setGestionCuenta(gestionCuenta);
+            controller.setPeliculaService(peliculaService);
+            controller.setSerieService(serieService);
+            controller.setVideojuegoService(videojuegoService);
+            controller.setResenaService(resenaService);
+            controller.setFavoritoService(favoritoService);
+            controller.setDirectorService(directorService);
+
+
+            Stage stage = (Stage) componente.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.show();
+
+        } catch (IOException e) {
+            System.out.println("Error al volver al menú administrador: " + e.getMessage());
+        }
+    }
+
 
 }

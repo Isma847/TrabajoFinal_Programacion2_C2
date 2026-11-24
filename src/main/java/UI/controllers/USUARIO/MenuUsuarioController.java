@@ -1,6 +1,7 @@
 package UI.controllers.USUARIO;
 
 import Service.*;
+import UI.controllers.ControladorBase;
 import UI.controllers.LoginController;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -11,7 +12,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-public class MenuUsuarioController {
+public class MenuUsuarioController extends ControladorBase {
 
     private GestionCuenta gestionCuenta;
 
