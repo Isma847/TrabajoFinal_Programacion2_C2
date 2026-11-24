@@ -26,6 +26,7 @@ public class AdministrarSeriesController extends ControladorBase {
 
     @FXML private Button btnVolver;
     @FXML private TableView<Serie> tablaSeries;
+    @FXML private TextField txtBuscarId;
     @FXML private TableColumn<Serie, Integer> colId;
     @FXML private TableColumn<Serie, String> colNombre;
     @FXML private TableColumn<Serie, Integer> colDuracion;
@@ -242,6 +243,49 @@ public class AdministrarSeriesController extends ControladorBase {
         cmbDirector.getSelectionModel().clearSelection();
         txtCapitulos.clear();
         txtTemporadas.clear();
+    }
+
+    @FXML
+    private void buscarSerie() {
+        if (!comprobarAdministrador()) {
+            return;
+        }
+
+        try {
+            int id = Integer.parseInt(txtBuscarId.getText());
+
+            ContenidoMultimedia contenido = contenidoService.buscarPorId(id);
+
+            if (contenido == null) {
+                mostrarMensaje("Búsqueda", "No se encontró ningún contenido con ese ID.");
+                return;
+            }
+
+            if (!(contenido instanceof Serie)) {
+                mostrarMensaje("Búsqueda", "El ID corresponde a otro tipo de contenido.");
+                return;
+            }
+
+            Serie serie = (Serie) contenido;
+
+            String filtro = cmbFiltroBaja.getValue();
+
+            if (("Activos".equals(filtro) && serie.getBaja())
+                    || ("De baja".equals(filtro) && !serie.getBaja())) {
+                mostrarMensaje("Búsqueda", "La serie no coincide con el filtro seleccionado.");
+                return;
+            }
+
+            tablaSeries.getItems().setAll(serie);
+
+        } catch (NumberFormatException e) {
+            mostrarMensaje("Búsqueda", "Ingresá un ID numérico válido.");
+        }
+    }
+
+    @FXML
+    private void mostrarTodasLasSeries() {
+        cargarDatos();
     }
 
     @FXML
