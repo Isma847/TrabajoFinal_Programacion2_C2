@@ -5,6 +5,7 @@ import Enumerados.GeneroAudiovisual;
 import Excepciones.DatoInvalidoException;
 import Modelo.Director;
 import Modelo.Serie;
+import Service.ContenidoService;
 import Service.DirectorService;
 import Service.SerieService;
 
@@ -18,9 +19,12 @@ public class MenuSeries {
     private final SerieService series;
     private final DirectorService directores;
     private final Scanner entrada;
+    private final ContenidoService contenidos;
 
-    public MenuSeries(SerieService series, DirectorService directores, Scanner entrada) {
-        this.series = series;
+    public MenuSeries(ContenidoService contenidos,
+                      DirectorService directores, Scanner entrada) {
+        this.contenidos = contenidos;
+        this.series = contenidos.getSeries();
         this.directores = directores;
         this.entrada = entrada;
     }
@@ -146,7 +150,7 @@ public class MenuSeries {
 
         Serie serie = new Serie(false, clasificacion, duracion, nombre, genero,
                 idDirector, 0, capitulos, temporadas, descripcion);
-        if (series.agregar(serie)) {
+        if (contenidos.agregar(serie)) {
             System.out.println("Serie agregada con ID " + serie.getId() + ".");
         } else {
             System.out.println("No se pudo agregar la serie.");
@@ -188,7 +192,7 @@ public class MenuSeries {
             }
         }
 
-        if (series.modificar(modificada)) {
+        if (contenidos.modificar(modificada)) {
             System.out.println("Serie modificada.");
         } else {
             System.out.println("No se pudo modificar la serie.");
@@ -214,7 +218,7 @@ public class MenuSeries {
         Serie serie = pedirSerie(false);
         boolean estabaDeBaja = serie.getBaja();
 
-        if (series.darDeBaja(serie.getId())) {
+        if (contenidos.darDeBaja(serie)) {
             System.out.println(estabaDeBaja ? "Serie reactivada." : "Serie dada de baja.");
         } else {
             System.out.println("No se pudo cambiar el estado de la serie.");

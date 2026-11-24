@@ -12,15 +12,19 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import Service.ContenidoService;
 
 public class MenuPeliculas {
 
     private final PeliculaService peliculas;
     private final DirectorService directores;
     private final Scanner entrada;
+    private final ContenidoService contenidos;
 
-    public MenuPeliculas(PeliculaService peliculas, DirectorService directores, Scanner entrada) {
-        this.peliculas = peliculas;
+    public MenuPeliculas(ContenidoService contenidos,
+                         DirectorService directores, Scanner entrada) {
+        this.contenidos = contenidos;
+        this.peliculas = contenidos.getPeliculas();
         this.directores = directores;
         this.entrada = entrada;
     }
@@ -143,7 +147,7 @@ public class MenuPeliculas {
 
         Pelicula pelicula = new Pelicula(false, clasificacion, duracion, nombre, genero,
                 idDirector, fechaEstreno, 0, descripcion);
-        if (peliculas.agregar(pelicula)) {
+        if (contenidos.agregar(pelicula)) {
             System.out.println("Película agregada con ID " + pelicula.getId() + ".");
         } else {
             System.out.println("No se pudo agregar la película.");
@@ -183,7 +187,7 @@ public class MenuPeliculas {
             }
         }
 
-        if (peliculas.modificar(modificada)) {
+        if (contenidos.modificar(modificada)) {
             System.out.println("Película modificada.");
         } else {
             System.out.println("No se pudo modificar la película.");
@@ -208,7 +212,7 @@ public class MenuPeliculas {
         Pelicula pelicula = pedirPelicula(false);
         boolean estabaDeBaja = pelicula.getBaja();
 
-        if (peliculas.darDeBaja(pelicula.getId())) {
+        if (contenidos.darDeBaja(pelicula)) {
             System.out.println(estabaDeBaja ? "Película reactivada." : "Película dada de baja.");
         } else {
             System.out.println("No se pudo cambiar el estado de la película.");

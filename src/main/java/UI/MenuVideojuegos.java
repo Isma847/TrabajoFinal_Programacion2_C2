@@ -4,6 +4,7 @@ import Enumerados.ClasificacionEdad;
 import Enumerados.GeneroVideojuegos;
 import Excepciones.DatoInvalidoException;
 import Modelo.Videojuego;
+import Service.ContenidoService;
 import Service.VideojuegoService;
 
 import java.sql.SQLException;
@@ -14,9 +15,11 @@ public class MenuVideojuegos {
 
     private final VideojuegoService videojuegos;
     private final Scanner entrada;
+    private final ContenidoService contenidos;
 
-    public MenuVideojuegos(VideojuegoService videojuegos, Scanner entrada) {
-        this.videojuegos = videojuegos;
+    public MenuVideojuegos(ContenidoService contenidos, Scanner entrada) {
+        this.contenidos = contenidos;
+        this.videojuegos = contenidos.getVideojuegos();
         this.entrada = entrada;
     }
 
@@ -127,7 +130,7 @@ public class MenuVideojuegos {
 
         Videojuego videojuego = new Videojuego(false, clasificacion, duracion, nombre,
                 0, dificultad, genero, descripcion);
-        if (videojuegos.agregar(videojuego)) {
+        if (contenidos.agregar(videojuego)) {
             System.out.println("Videojuego agregado con ID " + videojuego.getId() + ".");
         } else {
             System.out.println("No se pudo agregar el videojuego.");
@@ -165,7 +168,7 @@ public class MenuVideojuegos {
             }
         }
 
-        if (videojuegos.modificar(modificado)) {
+        if (contenidos.modificar(modificado)) {
             System.out.println("Videojuego modificado.");
         } else {
             System.out.println("No se pudo modificar el videojuego.");
@@ -189,7 +192,7 @@ public class MenuVideojuegos {
         Videojuego videojuego = pedirVideojuego(false);
         boolean estabaDeBaja = videojuego.getBaja();
 
-        if (videojuegos.darDeBaja(videojuego.getId())) {
+        if (contenidos.darDeBaja(videojuego)) {
             System.out.println(estabaDeBaja ? "Videojuego reactivado." : "Videojuego dado de baja.");
         } else {
             System.out.println("No se pudo cambiar el estado del videojuego.");

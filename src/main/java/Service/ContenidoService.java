@@ -42,35 +42,91 @@ public final class ContenidoService {
 
     public boolean agregar(ContenidoMultimedia contenido) throws SQLException {
         TipoContenido tipo = tipoDe(contenido);
-        if (!agregarEnService(tipo, contenido)) return false;
+
+        if (contenido.getId() != 0) {
+            throw new DatoInvalidoException(
+                    "Un contenido nuevo debe tener ID propio igual a cero."
+            );
+        }
+
+        if (!agregarEnService(tipo, contenido)) {
+            return false;
+        }
 
         try {
             registrar(tipo, contenido);
-        } catch (SQLException e) {
+        } catch (SQLException error) {
             try {
-                eliminarEnService(tipo, contenido.getId());
-            } catch (SQLException deshacer) {
-                e.addSuppressed(deshacer);
+                if (eliminarEnService(tipo, contenido.getId())) {
+                    contenido.setId(0);
+                } else {
+                    error.addSuppressed(new SQLException(
+                            "No se pudo deshacer el alta del contenido."
+                    ));
+                }
+            } catch (SQLException errorDeshacer) {
+                error.addSuppressed(errorDeshacer);
             }
-            throw e;
+
+            throw error;
         }
+
         return true;
     }
 
     public boolean modificar(ContenidoMultimedia contenido) throws SQLException {
         TipoContenido tipo = tipoDe(contenido);
-        int idGeneral = buscarIdContenido(contenido);
+        int idGeneral = buscarIdContenido(tipo, contenido.getId());
 
-        if(!modificarEnService(tipo, contenido)) return false;
-        if (idGeneral != -1) registro.put(idGeneral, contenido);
+        if (idGeneral == -1) {
+            throw new DatoInvalidoException(
+                    "El contenido no tiene un registro general."
+            );
+        }
 
+        if (!modificarEnService(tipo, contenido)) {
+            return false;
+        }
+
+        registro.put(idGeneral, buscarEnService(tipo, contenido.getId()));
         return true;
     }
 
-    /// Alternar la baja
-    public boolean darDeBaja(TipoContenido tipo, int idPropio) throws SQLException {
-        return darDeBajaEnService(tipo, idPropio);
+    public boolean darDeBaja(TipoContenido tipo, int idPropio)
+            throws SQLException {
+        int idGeneral = buscarIdContenido(tipo, idPropio);
+
+        if (idGeneral == -1) {
+            throw new DatoInvalidoException(
+                    "El contenido no tiene un registro general."
+            );
+        }
+
+        if (!darDeBajaEnService(tipo, idPropio)) {
+            return false;
+        }
+
+        registro.put(idGeneral, buscarEnService(tipo, idPropio));
+        return true;
     }
+
+    public boolean darDeBaja(ContenidoMultimedia contenido) throws SQLException {
+        return darDeBaja(tipoDe(contenido), contenido.getId());
+    }
+
+    public ArrayList<ContenidoMultimedia> filtrarPorTipo(
+            TipoContenido tipo, boolean baja) {
+        ArrayList<ContenidoMultimedia> resultado = new ArrayList<>();
+
+        for (ContenidoMultimedia contenido : registro.values()) {
+            if (contenido.getBaja() == baja && tipoDe(contenido) == tipo) {
+                resultado.add(contenido);
+            }
+        }
+
+        return resultado;
+    }
+
 
     public boolean eliminar(TipoContenido tipo, int idPropio) throws SQLException {
         int idGeneral = buscarIdContenido(tipo, idPropio);
