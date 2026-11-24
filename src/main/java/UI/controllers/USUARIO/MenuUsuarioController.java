@@ -12,6 +12,7 @@ public class MenuUsuarioController extends ControladorBase {
     @FXML private Label lblCuenta;
     @FXML private Button btnPeliculas;
     @FXML private Button btnAdministracion;
+    @FXML private Button btnMiCuenta;
     @FXML private Button btnCerrarSesion;
 
     @Override
@@ -55,6 +56,12 @@ public class MenuUsuarioController extends ControladorBase {
     }
 
     @FXML
+    private void abrirMiCuenta() {
+        cambiarVista(btnMiCuenta, "/vistas/gestion-mi-cuenta.fxml",
+                "Temuflix - Mi cuenta");
+    }
+
+    @FXML
     private void volverAdministracion() {
         if (comprobarAdministrador()) {
             cambiarVista(btnAdministracion, "/vistas/menu-admin.fxml",
@@ -69,4 +76,3 @@ public class MenuUsuarioController extends ControladorBase {
                 "Temuflix - Iniciar sesion");
     }
 }
-
