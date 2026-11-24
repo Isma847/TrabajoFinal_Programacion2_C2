@@ -93,6 +93,8 @@ public class MenuPeliculas {
             System.out.printf("%d | %s | %d min | %s | %s%n",
                     pelicula.getId(), pelicula.getNombre(), pelicula.getDuracionMinutos(), estado(pelicula), descripcionVisible(pelicula.getDescripcion()));
         }
+        System.out.println("presione enter para continuar...");
+        entrada.nextLine();
     }
 
     private void mostrarPelicula(Pelicula pelicula) {
@@ -105,6 +107,8 @@ public class MenuPeliculas {
         System.out.println("Fecha de estreno: " + pelicula.getFechaEstreno());
         System.out.println("Descripción: " + descripcionVisible(pelicula.getDescripcion()));
         System.out.println("Estado: " + estado(pelicula));
+        System.out.println("presione enter para continuar...");
+        entrada.nextLine();
     }
 
     private String descripcionVisible(String descripcion) {

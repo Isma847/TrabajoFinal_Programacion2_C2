@@ -233,7 +233,6 @@ public class Sistema {
                 System.out.println("1. reintentar");
                 System.out.println("2. volver al menu inicial");
                 int opcionDatoinvalido = leerEntero();
-                entrada.nextLine();
                 if (opcionDatoinvalido == 1) {
                     reintentar = true;
                 } else if (opcionDatoinvalido == 2) {

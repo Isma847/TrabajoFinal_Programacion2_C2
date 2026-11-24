@@ -98,6 +98,8 @@ public class MenuFavoritos {
             }
             System.out.println(tipo + " | " + total);
         }
+        System.out.println("presione enter para continuar...");
+        entrada.nextLine();
     }
 
     private void mostrarPopularidad(boolean soloActivos, boolean topCinco) {
@@ -133,6 +135,8 @@ public class MenuFavoritos {
                     item.contenido().getNombre(), cantidades.get(orden.get(i)),
                     item.contenido().getBaja() ? "De baja" : "Activo");
         }
+        System.out.println("presione enter para continuar...");
+        entrada.nextLine();
     }
 
     private void mostrarCuentas() {
@@ -176,6 +180,8 @@ public class MenuFavoritos {
             System.out.printf("%d | %s | %d | %s | %s%n", i + 1, tipo,
                     favorito.getId_contenido(), nombre, estado);
         }
+        System.out.println("presione enter para continuar...");
+        entrada.nextLine();
         return lista;
     }
 

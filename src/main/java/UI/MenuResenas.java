@@ -172,6 +172,8 @@ public class MenuResenas {
         for (Resena resena : lista) {
             mostrarResena(resena);
         }
+        System.out.println("presione enter para continuar...");
+        entrada.nextLine();
     }
 
     private void mostrarResena(Resena resena) {
@@ -192,6 +194,8 @@ public class MenuResenas {
         System.out.println("Calificación: " + resena.getCalificacion());
         System.out.println("Comentario: " + comentario);
         System.out.println("Fecha: " + resena.getFecha());
+        System.out.println("presione enter para continuar...");
+        entrada.nextLine();
     }
 
     private Resena pedirResena() {

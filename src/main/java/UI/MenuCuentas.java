@@ -96,6 +96,8 @@ public class MenuCuentas {
                     usuario.getRol(),
                     usuario.getBaja() ? "De baja" : "Activa");
         }
+        System.out.println("presione enter para continuar...");
+        entrada.nextLine();
     }
 
     private void mostrarCuenta(Usuario usuario) {
@@ -111,6 +113,8 @@ public class MenuCuentas {
                 + (usuario.isPuedeEliminar() ? "Sí" : "No"));
         System.out.println("Estado: "
                 + (usuario.getBaja() ? "De baja" : "Activa"));
+        System.out.println("presione enter para continuar...");
+        entrada.nextLine();
     }
 
     private Usuario pedirCuenta() {

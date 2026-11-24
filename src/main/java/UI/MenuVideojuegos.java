@@ -89,6 +89,8 @@ public class MenuVideojuegos {
                     videojuego.getNombre(), videojuego.getGenero(), videojuego.getDificultad(),
                     estado(videojuego));
         }
+        System.out.println("presione enter para continuar...");
+        entrada.nextLine();
     }
 
     private void mostrarVideojuego(Videojuego videojuego) {
@@ -105,6 +107,8 @@ public class MenuVideojuegos {
         System.out.println("Dificultad: " + videojuego.getDificultad());
         System.out.println("Descripción: " + descripcion);
         System.out.println("Estado: " + estado(videojuego));
+        System.out.println("presione enter para continuar...");
+        entrada.nextLine();
     }
 
     private String estado(Videojuego videojuego) {

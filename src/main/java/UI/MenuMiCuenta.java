@@ -79,6 +79,8 @@ public class MenuMiCuenta {
         System.out.println("Edad: "
                 + (usuario.getEdad() == null ? "Sin informar" : usuario.getEdad()));
         System.out.println("Rol: " + usuario.getRol());
+        System.out.println("presione enter para continuar...");
+        entrada.nextLine();
     }
 
     private void mostrarEstadisticas() {
@@ -143,6 +145,8 @@ public class MenuMiCuenta {
                     "Promedio de tus calificaciones: %.2f%n", promedio
             );
         }
+        System.out.println("presione enter para continuar...");
+        entrada.nextLine();
     }
 
     private void modificar() throws SQLException {
