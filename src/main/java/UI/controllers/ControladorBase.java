@@ -2,6 +2,7 @@ package UI.controllers;
 
 import Enumerados.Rol;
 import Excepciones.DatoInvalidoException;
+import Modelo.ContenidoMultimedia;
 import Modelo.Director;
 import Modelo.Usuario;
 import Service.ContenidoService;
@@ -156,6 +157,20 @@ public class ControladorBase {
         Director director = directorService.buscarPorId(idDirector);
         return director == null ? "Sin director"
                 : director.getNombre() + " " + director.getApellido();
+    }
+
+    protected boolean coincideConFiltro(ContenidoMultimedia contenido,
+                                        String filtro) {
+
+        if ("Activos".equals(filtro) && contenido.getBaja()) {
+            return false;
+        }
+
+        if ("De baja".equals(filtro) && !contenido.getBaja()) {
+            return false;
+        }
+
+        return true;
     }
 }
 

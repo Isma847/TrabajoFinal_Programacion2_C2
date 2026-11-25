@@ -256,7 +256,7 @@ public class MenuResenas {
 
     private void eliminar() throws SQLException {
         Resena resena = pedirResena();
-        if (resenas.eliminar(resena.getId())) {
+        if (resenas.eliminar(resena.getId(),resena.getIdUsuario())) {
             System.out.println("Reseña eliminada.");
         } else {
             System.out.println("No se pudo eliminar la reseña.");

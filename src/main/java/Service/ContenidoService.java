@@ -376,6 +376,26 @@ public final class ContenidoService {
         return null;
     }
 
+    ///Busca por el nombre de la pelicula
+    public ArrayList<ContenidoMultimedia> buscarPorNombre(String nombre) {
+        ArrayList<ContenidoMultimedia> resultado = new ArrayList<>();
+
+        if (nombre == null || nombre.trim().isEmpty()) {
+            return resultado;
+        }
+
+        String nombreBuscado = nombre.trim().toLowerCase();
+
+        for (ContenidoMultimedia contenido : registro.values()) {
+            if (contenido.getNombre() != null &&
+                    contenido.getNombre().toLowerCase().contains(nombreBuscado)) {
+                resultado.add(contenido);
+            }
+        }
+
+        return resultado;
+    }
+
     /* Getters de los service */
 
     /**

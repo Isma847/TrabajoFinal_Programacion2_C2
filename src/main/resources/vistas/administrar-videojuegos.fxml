@@ -36,8 +36,8 @@
                           maxWidth="Infinity"/>
 
                 <HBox spacing="8">
-                    <TextField fx:id="txtBuscarId"
-                               promptText="Ingresar ID general"
+                    <TextField fx:id="txtBuscarNombre"
+                               promptText="Ingresar nombre de película"
                                HBox.hgrow="ALWAYS"/>
 
                     <Button text="BUSCAR"

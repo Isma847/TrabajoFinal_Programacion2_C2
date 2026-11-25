@@ -4,6 +4,8 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
 
 <VBox alignment="CENTER" prefHeight="600.0" prefWidth="900.0" spacing="10.0"
       xmlns="http://javafx.com/javafx/26"
@@ -21,6 +23,17 @@
     </Label>
 
     <Label fx:id="lblCantidad" text="Disponibles: 0" />
+
+    <HBox spacing="10" alignment="CENTER">
+        <TextField fx:id="txtBuscarNombre"
+                   promptText="Buscar director por nombre"
+                   prefWidth="300"/>
+
+        <Button onAction="#buscarDirector" text="BUSCAR"/>
+
+        <Button onAction="#mostrarTodosLosDirectores"
+                text="MOSTRAR TODOS"/>
+    </HBox>
 
     <TableView fx:id="tablaPeliculas" prefHeight="300.0" VBox.vgrow="ALWAYS">
         <columns>

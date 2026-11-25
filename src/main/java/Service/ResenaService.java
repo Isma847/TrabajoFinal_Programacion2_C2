@@ -225,10 +225,14 @@ public class ResenaService {
     /**
      * Elimina la reseña por su id, primero en la base y luego en la colección.
      */
-    public boolean eliminar(int idResena) throws SQLException {
+    public boolean eliminar(int idResena, int idUsuario) throws SQLException {
         Resena resena = buscarPorId(idResena);
 
         if (resena == null) {
+            return false;
+        }
+
+        if (resena.getIdUsuario() != idUsuario) {
             return false;
         }
 

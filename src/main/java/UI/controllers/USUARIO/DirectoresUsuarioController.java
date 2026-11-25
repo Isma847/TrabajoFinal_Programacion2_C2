@@ -9,10 +9,7 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,6 +22,7 @@ public class DirectoresUsuarioController extends ControladorBase {
     @FXML private TableColumn<Director, String> colApellido;
     @FXML private TableColumn<Director, String> colProducciones;
     @FXML private TextArea txtDescripcion;
+    @FXML private TextField txtBuscarNombre;
     @FXML private Label lblCantidad;
 
     @FXML
@@ -87,6 +85,41 @@ public class DirectoresUsuarioController extends ControladorBase {
             lblCantidad.setText("Disponibles: 0");
             mostrarMensaje("Atención", e.getMessage());
         }
+    }
+
+    @FXML
+    private void buscarDirector() {
+        String nombre = txtBuscarNombre.getText().trim();
+
+        if (nombre.isEmpty()) {
+            mostrarMensaje("Búsqueda", "Ingresá el nombre de un director.");
+            return;
+        }
+
+        ArrayList<Director> resultado = new ArrayList<>();
+
+        for (Director director : directorService.leerTodos()) {
+            if (director.getNombre() != null &&
+                    director.getNombre().toLowerCase().contains(nombre.toLowerCase())) {
+                resultado.add(director);
+            }
+        }
+
+        tablaPeliculas.setItems(FXCollections.observableArrayList(resultado));
+
+        tablaPeliculas.getSelectionModel().clearSelection();
+        txtDescripcion.clear();
+
+        lblCantidad.setText("Resultados: " + resultado.size());
+
+        if (resultado.isEmpty()) {
+            mostrarMensaje("Búsqueda", "No se encontraron directores con ese nombre.");
+        }
+    }
+
+    @FXML
+    private void mostrarTodosLosDirectores() {
+        cargarDatos();
     }
 
     @FXML

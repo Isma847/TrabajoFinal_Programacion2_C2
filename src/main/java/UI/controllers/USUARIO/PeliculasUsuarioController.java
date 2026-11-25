@@ -9,10 +9,7 @@ import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.*;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -29,6 +26,7 @@ public class PeliculasUsuarioController extends ControladorBase {
     @FXML private TableColumn<Pelicula, String> colFecha;
     @FXML private TableColumn<Pelicula, String> colDirector;
     @FXML private TextArea txtDescripcion;
+    @FXML private TextField txtBuscarNombre;
     @FXML private Label lblCantidad;
 
     @FXML
@@ -83,6 +81,43 @@ public class PeliculasUsuarioController extends ControladorBase {
             lblCantidad.setText("Disponibles: 0");
             mostrarMensaje("Atención", e.getMessage());
         }
+    }
+
+    @FXML
+    private void buscarPelicula() {
+        String nombre = txtBuscarNombre.getText().trim();
+
+        if (nombre.isEmpty()) {
+            mostrarMensaje("Búsqueda", "Ingresá el nombre de una película.");
+            return;
+        }
+
+        ArrayList<Pelicula> resultado = new ArrayList<>();
+
+        for (ContenidoMultimedia contenido : contenidoService.buscarPorNombre(nombre)) {
+            if (contenido instanceof Pelicula pelicula && !pelicula.getBaja()) {
+                resultado.add(pelicula);
+            }
+        }
+
+        resultado.sort(Comparator.comparing(
+                Pelicula::getNombre, String.CASE_INSENSITIVE_ORDER));
+
+        tablaPeliculas.setItems(FXCollections.observableArrayList(resultado));
+
+        tablaPeliculas.getSelectionModel().clearSelection();
+        txtDescripcion.clear();
+
+        lblCantidad.setText("Resultados: " + resultado.size());
+
+        if (resultado.isEmpty()) {
+            mostrarMensaje("Búsqueda", "No se encontraron películas con ese nombre.");
+        }
+    }
+
+    @FXML
+    private void mostrarTodasLasPeliculas() {
+        cargarDatos();
     }
 
     @FXML

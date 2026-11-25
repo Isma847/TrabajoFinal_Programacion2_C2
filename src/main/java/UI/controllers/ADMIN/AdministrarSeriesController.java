@@ -5,6 +5,7 @@ import Enumerados.GeneroAudiovisual;
 import Excepciones.DatoInvalidoException;
 import Modelo.ContenidoMultimedia;
 import Modelo.Director;
+import Modelo.Pelicula;
 import Modelo.Serie;
 import UI.controllers.ControladorBase;
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -21,12 +22,13 @@ import javafx.scene.control.TextField;
 import javafx.util.StringConverter;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class AdministrarSeriesController extends ControladorBase {
 
     @FXML private Button btnVolver;
     @FXML private TableView<Serie> tablaSeries;
-    @FXML private TextField txtBuscarId;
+    @FXML private TextField txtBuscarNombre;
     @FXML private TableColumn<Serie, Integer> colId;
     @FXML private TableColumn<Serie, String> colNombre;
     @FXML private TableColumn<Serie, Integer> colDuracion;
@@ -247,40 +249,19 @@ public class AdministrarSeriesController extends ControladorBase {
 
     @FXML
     private void buscarSerie() {
-        if (!comprobarAdministrador()) {
-            return;
+        String nombre = txtBuscarNombre.getText().trim();
+
+        ArrayList<Serie> resultado = new ArrayList<>();
+
+        for (ContenidoMultimedia contenido : contenidoService.buscarPorNombre(nombre)) {
+            if (contenido instanceof Serie serie) {
+                if (coincideConFiltro(serie, cmbFiltroBaja.getValue())) {
+                    resultado.add(serie);
+                }
+            }
         }
 
-        try {
-            int id = Integer.parseInt(txtBuscarId.getText());
-
-            ContenidoMultimedia contenido = contenidoService.buscarPorId(id);
-
-            if (contenido == null) {
-                mostrarMensaje("Búsqueda", "No se encontró ningún contenido con ese ID.");
-                return;
-            }
-
-            if (!(contenido instanceof Serie)) {
-                mostrarMensaje("Búsqueda", "El ID corresponde a otro tipo de contenido.");
-                return;
-            }
-
-            Serie serie = (Serie) contenido;
-
-            String filtro = cmbFiltroBaja.getValue();
-
-            if (("Activos".equals(filtro) && serie.getBaja())
-                    || ("De baja".equals(filtro) && !serie.getBaja())) {
-                mostrarMensaje("Búsqueda", "La serie no coincide con el filtro seleccionado.");
-                return;
-            }
-
-            tablaSeries.getItems().setAll(serie);
-
-        } catch (NumberFormatException e) {
-            mostrarMensaje("Búsqueda", "Ingresá un ID numérico válido.");
-        }
+        tablaSeries.setItems(FXCollections.observableArrayList(resultado));
     }
 
     @FXML

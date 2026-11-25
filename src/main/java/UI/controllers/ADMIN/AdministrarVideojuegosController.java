@@ -4,6 +4,7 @@ import Enumerados.ClasificacionEdad;
 import Enumerados.GeneroVideojuegos;
 import Excepciones.DatoInvalidoException;
 import Modelo.ContenidoMultimedia;
+import Modelo.Serie;
 import Modelo.Videojuego;
 import UI.controllers.ControladorBase;
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -19,12 +20,13 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class AdministrarVideojuegosController extends ControladorBase {
 
     @FXML private Button btnVolver;
     @FXML private TableView<Videojuego> tablaVideojuegos;
-    @FXML private TextField txtBuscarId;
+    @FXML private TextField txtBuscarNombre;
     @FXML private TableColumn<Videojuego, Integer> colId;
     @FXML private TableColumn<Videojuego, String> colNombre;
     @FXML private TableColumn<Videojuego, Integer> colDuracion;
@@ -207,40 +209,19 @@ public class AdministrarVideojuegosController extends ControladorBase {
 
     @FXML
     private void buscarVideojuego() {
-        if (!comprobarAdministrador()) {
-            return;
+        String nombre = txtBuscarNombre.getText().trim();
+
+        ArrayList<Videojuego> resultado = new ArrayList<>();
+
+        for (ContenidoMultimedia contenido : contenidoService.buscarPorNombre(nombre)) {
+            if (contenido instanceof Videojuego videojuego) {
+                if (coincideConFiltro(videojuego, cmbFiltroBaja.getValue())) {
+                    resultado.add(videojuego);
+                }
+            }
         }
 
-        try {
-            int id = Integer.parseInt(txtBuscarId.getText());
-
-            ContenidoMultimedia contenido = contenidoService.buscarPorId(id);
-
-            if (contenido == null) {
-                mostrarMensaje("Búsqueda", "No se encontró ningún contenido con ese ID.");
-                return;
-            }
-
-            if (!(contenido instanceof Videojuego)) {
-                mostrarMensaje("Búsqueda", "El ID corresponde a otro tipo de contenido.");
-                return;
-            }
-
-            Videojuego videojuego = (Videojuego) contenido;
-
-            String filtro = cmbFiltroBaja.getValue();
-
-            if (("Activos".equals(filtro) && videojuego.getBaja())
-                    || ("De baja".equals(filtro) && !videojuego.getBaja())) {
-                mostrarMensaje("Búsqueda", "El videojuego no coincide con el filtro seleccionado.");
-                return;
-            }
-
-            tablaVideojuegos.getItems().setAll(videojuego);
-
-        } catch (NumberFormatException e) {
-            mostrarMensaje("Búsqueda", "Ingresá un ID numérico válido.");
-        }
+        tablaVideojuegos.setItems(FXCollections.observableArrayList(resultado));
     }
 
     @FXML

@@ -9,10 +9,7 @@ import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.*;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -30,6 +27,7 @@ public class SeriesUsuarioController extends ControladorBase {
     @FXML private TableColumn<Serie, Integer> colTemporadas;
     @FXML private TableColumn<Serie, String> colDirector;
     @FXML private TextArea txtDescripcion;
+    @FXML private TextField txtBuscarNombre;
     @FXML private Label lblCantidad;
 
     @FXML
@@ -86,6 +84,43 @@ public class SeriesUsuarioController extends ControladorBase {
             lblCantidad.setText("Disponibles: 0");
             mostrarMensaje("Atención", e.getMessage());
         }
+    }
+
+    @FXML
+    private void buscarSerie() {
+        String nombre = txtBuscarNombre.getText().trim();
+
+        if (nombre.isEmpty()) {
+            mostrarMensaje("Búsqueda", "Ingresá el nombre de una serie.");
+            return;
+        }
+
+        ArrayList<Serie> resultado = new ArrayList<>();
+
+        for (ContenidoMultimedia contenido : contenidoService.buscarPorNombre(nombre)) {
+            if (contenido instanceof Serie serie && !serie.getBaja()) {
+                resultado.add(serie);
+            }
+        }
+
+        resultado.sort(Comparator.comparing(
+                Serie::getNombre, String.CASE_INSENSITIVE_ORDER));
+
+        tablaSeries.setItems(FXCollections.observableArrayList(resultado));
+
+        tablaSeries.getSelectionModel().clearSelection();
+        txtDescripcion.clear();
+
+        lblCantidad.setText("Resultados: " + resultado.size());
+
+        if (resultado.isEmpty()) {
+            mostrarMensaje("Búsqueda", "No se encontraron series con ese nombre.");
+        }
+    }
+
+    @FXML
+    private void mostrarTodasLasSeries() {
+        cargarDatos();
     }
 
     @FXML

@@ -37,6 +37,7 @@ public class ResenasUsuarioController extends ControladorBase {
     @FXML private TextField txtCalificacion;
     @FXML private TextArea txtComentario;
     @FXML private Button btnModificar;
+    @FXML private Button btnEliminar;
     @FXML private Label lblResumen;
 
     @FXML
@@ -99,6 +100,7 @@ public class ResenasUsuarioController extends ControladorBase {
                 .addListener((observable, anterior, seleccionada) ->
                         seleccionarResena(seleccionada));
         btnModificar.setDisable(true);
+        btnEliminar.setDisable(true);
     }
 
     @Override
@@ -279,9 +281,40 @@ public class ResenasUsuarioController extends ControladorBase {
                 txtComentario.setText(seleccionada.getComentario() == null
                         ? "" : seleccionada.getComentario());
                 btnModificar.setDisable(false);
+                btnEliminar.setDisable(false);
             }
         } catch (DatoInvalidoException e) {
             mostrarMensaje("Atención", e.getMessage());
+        }
+    }
+
+    @FXML
+    private void eliminarResena() {
+        try {
+            Usuario usuario = usuarioActual();
+
+            Resena seleccionada = tablaResenas.getSelectionModel().getSelectedItem();
+
+            if (seleccionada == null) {
+                throw new DatoInvalidoException("Seleccioná tu reseña para eliminarla.");
+            }
+
+            if (seleccionada.getIdUsuario() != usuario.getId()) {
+                throw new DatoInvalidoException(
+                        "Solamente podés eliminar tus propias reseñas.");
+            }
+
+            if (resenaService.eliminar(seleccionada.getId(), usuario.getId())) {
+                cargarResenas();
+                mostrarMensaje("Reseñas", "Tu reseña se eliminó correctamente.");
+            } else {
+                mostrarMensaje("Reseñas", "No se pudo eliminar la reseña.");
+            }
+
+        } catch (DatoInvalidoException e) {
+            mostrarMensaje("Atención", e.getMessage());
+        } catch (SQLException e) {
+            mostrarMensaje("Error", "No se pudo eliminar la reseña: " + e.getMessage());
         }
     }
 
@@ -289,6 +322,7 @@ public class ResenasUsuarioController extends ControladorBase {
         txtCalificacion.clear();
         txtComentario.clear();
         btnModificar.setDisable(true);
+        btnEliminar.setDisable(true);
     }
 
     @FXML
