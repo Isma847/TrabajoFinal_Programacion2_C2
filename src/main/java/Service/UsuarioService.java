@@ -165,9 +165,11 @@ public class UsuarioService {
 
         if (usuario.getEmail().length() < 8
                 || !usuario.getEmail().contains("@")
-                || !usuario.getEmail().contains(".")) {
+                || !usuario.getEmail().contains(".")
+                || usuario.getEmail().contains(" ")) {
             throw new DatoInvalidoException(
-                    "El email debe contener un arroba, un punto y al menos 8 caracteres"
+                    "El email debe contener un arroba, un punto, "
+                            + "al menos 8 caracteres y no puede contener espacios"
             );
         }
     }

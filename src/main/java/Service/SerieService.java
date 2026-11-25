@@ -21,8 +21,20 @@ public class SerieService extends Service<Serie> {
     /// Solo exige que la serie tenga género; lanza DatoInvalidoException si falta.
     @Override
     protected void validar(Serie s) {
-        if(s.getGenero() == null) {
+        if (s.getGenero() == null) {
             throw new DatoInvalidoException("El género es obligatorio");
+        }
+
+        if (s.getCantidadCapitulos() <= 0) {
+            throw new DatoInvalidoException(
+                    "La cantidad de capítulos debe ser mayor a 0"
+            );
+        }
+
+        if (s.getCantidadTemporadas() <= 0) {
+            throw new DatoInvalidoException(
+                    "La cantidad de temporadas debe ser mayor a 0"
+            );
         }
     }
 
