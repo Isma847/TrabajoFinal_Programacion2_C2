@@ -125,7 +125,7 @@ public class PeliculaDao implements BajaLogicaEnDao<Pelicula> {
 
     /**
      * Borrado físico, definitivo. La base elimina por cascada su fila del pivote y, a través de
-     * ella, sus reseñas, favoritos e historial.
+     * ella, sus reseñas y favoritos.
      */
     @Override
     public int eliminar(int id) throws SQLException {

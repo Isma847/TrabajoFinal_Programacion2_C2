@@ -107,10 +107,7 @@ public class VideojuegoDao implements BajaLogicaEnDao<Videojuego> {
         return result;
     }
 
-    /**
-     * Borrado físico; la base borra por cascada su fila del pivote, lo que dependa de ella y sus
-     * progresos.
-     */
+    ///Borrado físico; la base borra por cascada su fila del pivote, lo que dependa de ella.
     @Override
     public int eliminar(int id) throws SQLException {
         String query = "Delete from videojuegos where id_videojuego = ?";

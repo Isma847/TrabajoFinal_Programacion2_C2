@@ -11,13 +11,35 @@ import Service.UsuarioService;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.Collections;
 import java.util.Scanner;
 
 public class MenuFavoritos {
 
     /// Un contenido con su id general y su tipo, que ya no se guarda en el favorito.
-    private record Item(int idGeneral, TipoContenido tipo, ContenidoMultimedia contenido) {}
+    private static class Item {
+        private final int idGeneral;
+        private final TipoContenido tipo;
+        private final ContenidoMultimedia contenido;
+
+        Item(int idGeneral, TipoContenido tipo, ContenidoMultimedia contenido) {
+            this.idGeneral = idGeneral;
+            this.tipo = tipo;
+            this.contenido = contenido;
+        }
+
+        int idGeneral() {
+            return idGeneral;
+        }
+
+        TipoContenido tipo() {
+            return tipo;
+        }
+
+        ContenidoMultimedia contenido() {
+            return contenido;
+        }
+    }
 
     private final FavoritoService favoritos;
     private final ContenidoService contenidos;
@@ -123,9 +145,17 @@ public class MenuFavoritos {
         for (int i = 0; i < lista.size(); i++) {
             orden.add(i);
         }
-        orden.sort(Comparator.<Integer>comparingInt(cantidades::get).reversed()
-                .thenComparing(i -> lista.get(i).tipo())
-                .thenComparingInt(i -> lista.get(i).idGeneral()));
+        // Orden por cantidad de favoritos, de mayor a menor (inserción estable: ante un empate
+        // se mantiene el orden del catálogo, que es por id general).
+        for (int i = 1; i < orden.size(); i++) {
+            int actual = orden.get(i);
+            int j = i - 1;
+            while (j >= 0 && cantidades.get(orden.get(j)) < cantidades.get(actual)) {
+                orden.set(j + 1, orden.get(j));
+                j--;
+            }
+            orden.set(j + 1, actual);
+        }
 
         int limite = topCinco ? Math.min(5, orden.size()) : orden.size();
         System.out.println("\nTipo | ID | Nombre | Favoritos | Estado");
@@ -141,14 +171,19 @@ public class MenuFavoritos {
 
     private void mostrarCuentas() {
         java.util.Map<Integer, Integer> cantidades = favoritos.contarPorUsuario();
-        int maximo = cantidades.values().stream().mapToInt(Integer::intValue).max().orElse(0);
+        int maximo = 0;
+        for (int cantidad : cantidades.values()) {
+            if (cantidad > maximo) {
+                maximo = cantidad;
+            }
+        }
         if (maximo == 0) {
             System.out.println("Todavía no hay cuentas con favoritos.");
             return;
         }
 
         ArrayList<Integer> ids = new ArrayList<>(cantidades.keySet());
-        ids.sort(Integer::compareTo);
+        Collections.sort(ids);
         System.out.println("\nCuentas con más favoritos");
         for (int id : ids) {
             if (cantidades.get(id) == maximo) {
@@ -161,9 +196,8 @@ public class MenuFavoritos {
 
     private ArrayList<Favorito> listarPropios(int idUsuario) {
         ArrayList<Favorito> lista = new ArrayList<>(favoritos.leerPorUsuario(idUsuario));
-        // El tipo se deriva del contenido: se ordena por tipo y luego por id general.
-        lista.sort(Comparator.<Favorito, Integer>comparing(f -> tipoOrden(f.getId_contenido()))
-                .thenComparingInt(Favorito::getId_contenido));
+        // El tipo se deriva del contenido; los favoritos se listan por id general.
+        ordenarPorContenido(lista);
 
         if (lista.isEmpty()) {
             System.out.println("Todavía no tenés favoritos.");
@@ -204,7 +238,12 @@ public class MenuFavoritos {
             return;
         }
         // El service de favoritos no conoce los contenidos: la existencia se valida acá.
-        boolean enLista = items.stream().anyMatch(item -> item.idGeneral() == id);
+        boolean enLista = false;
+        for (Item item : items) {
+            if (item.idGeneral() == id) {
+                enLista = true;
+            }
+        }
         if (!enLista) {
             throw new IllegalArgumentException("No existe un contenido activo de ese tipo con ese ID.");
         }
@@ -252,13 +291,21 @@ public class MenuFavoritos {
                 items.add(new Item(idGeneral, tipoContenido, contenido));
             }
         }
-        items.sort(Comparator.comparingInt(Item::idGeneral));
+        // leerTodos() ya devuelve los contenidos ordenados por id general.
         return items;
     }
 
-    private int tipoOrden(int idGeneral) {
-        return contenidos.buscarPorId(idGeneral) == null
-                ? Integer.MAX_VALUE : contenidos.getTipo(idGeneral).ordinal();
+    /// Ordena los favoritos de menor a mayor id de contenido (inserción).
+    private void ordenarPorContenido(ArrayList<Favorito> lista) {
+        for (int i = 1; i < lista.size(); i++) {
+            Favorito actual = lista.get(i);
+            int j = i - 1;
+            while (j >= 0 && lista.get(j).getId_contenido() > actual.getId_contenido()) {
+                lista.set(j + 1, lista.get(j));
+                j--;
+            }
+            lista.set(j + 1, actual);
+        }
     }
 
     /// Devuelve null cuando se eligen todos los tipos.

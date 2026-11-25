@@ -125,7 +125,12 @@ public class FavoritoService {
      */
     public void eliminarPorUsuario(int idUsuario) throws SQLException {
         dao.eliminarPorUsuario(idUsuario);
-        coleccion.removeIf(favorito -> favorito.getId_usaurio() == idUsuario);
+        Iterator<Favorito> it = coleccion.iterator();
+        while (it.hasNext()) {
+            if (it.next().getId_usaurio() == idUsuario) {
+                it.remove();
+            }
+        }
     }
 
     /**
@@ -135,8 +140,13 @@ public class FavoritoService {
     public int quitarDeUsuario(int idUsuario, int idContenido) throws SQLException {
         validarReferencia(idUsuario, idContenido);
         int eliminados = dao.quitarDeUsuario(idUsuario, idContenido);
-        coleccion.removeIf(favorito -> favorito.getId_usaurio() == idUsuario
-                && favorito.getId_contenido() == idContenido);
+        Iterator<Favorito> it = coleccion.iterator();
+        while (it.hasNext()) {
+            Favorito favorito = it.next();
+            if (favorito.getId_usaurio() == idUsuario && favorito.getId_contenido() == idContenido) {
+                it.remove();
+            }
+        }
         return eliminados;
     }
 
@@ -155,12 +165,17 @@ public class FavoritoService {
 
     /**
      * Cuenta los favoritos de cada usuario. Se devuelve un Map porque cada usuario (clave) lleva
-     * su propio contador (valor); merge suma 1 cada vez que aparece el mismo usuario.
+     * su propio contador (valor); cada vez que aparece el mismo usuario se le suma 1.
      */
     public Map<Integer, Integer> contarPorUsuario() {
         Map<Integer, Integer> cantidades = new LinkedHashMap<>();
         for (Favorito favorito : coleccion) {
-            cantidades.merge(favorito.getId_usaurio(), 1, Integer::sum);
+            Integer actual = cantidades.get(favorito.getId_usaurio());
+            if (actual == null) {
+                cantidades.put(favorito.getId_usaurio(), 1);
+            } else {
+                cantidades.put(favorito.getId_usaurio(), actual + 1);
+            }
         }
         return cantidades;
     }

@@ -12,14 +12,29 @@ import Service.ResenaService;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
 
 public class MenuResenas {
 
     /// Un contenido con su id general (el que guardan las reseñas).
-    private record Item(int idGeneral, ContenidoMultimedia contenido) {}
+    private static class Item {
+        private final int idGeneral;
+        private final ContenidoMultimedia contenido;
+
+        Item(int idGeneral, ContenidoMultimedia contenido) {
+            this.idGeneral = idGeneral;
+            this.contenido = contenido;
+        }
+
+        int idGeneral() {
+            return idGeneral;
+        }
+
+        ContenidoMultimedia contenido() {
+            return contenido;
+        }
+    }
 
     private final ResenaService resenas;
     private final ContenidoService contenidos;
@@ -130,7 +145,7 @@ public class MenuResenas {
                 items.add(new Item(idGeneral, contenido));
             }
         }
-        items.sort(Comparator.comparingInt(Item::idGeneral));
+        // leerTodos() ya devuelve los contenidos ordenados por id general.
         return items;
     }
 
