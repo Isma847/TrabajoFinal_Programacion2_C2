@@ -152,6 +152,7 @@ public class UsuarioService {
             throw new DatoInvalidoException("La edad es obligatoria para el rol USUARIO");
         }
 
+
         if (edad != null && (edad < 1 || edad > 120)) {
             throw new DatoInvalidoException("La edad debe estar entre 1 y 120");
         }
@@ -159,6 +160,14 @@ public class UsuarioService {
         if (usuario.getRol() == Rol.USUARIO && usuario.isPuedeEliminar()) {
             throw new DatoInvalidoException(
                     "El permiso de eliminación corresponde al rol ADMINISTRADOR"
+            );
+        }
+
+        if (usuario.getEmail().length() < 8
+                || !usuario.getEmail().contains("@")
+                || !usuario.getEmail().contains(".")) {
+            throw new DatoInvalidoException(
+                    "El email debe contener un arroba, un punto y al menos 8 caracteres"
             );
         }
     }
