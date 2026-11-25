@@ -167,7 +167,7 @@ public final class ContenidoService {
 
     /**
      * Borrado definitivo de un contenido, por tipo e id propio. Se elimina en el service del tipo
-     * y la base borra por cascada su fila del pivote y sus reseñas, favoritos e historial; acá se
+     * y la base borra por cascada su fila del pivote y sus reseñas y favoritos; acá se
      * quita la entrada del registro. Las colecciones en memoria de reseñas y favoritos no se
      * enteran: quien llame a este método debe limpiarlas. Es una acción excepcional, lo habitual
      * es la baja lógica.
