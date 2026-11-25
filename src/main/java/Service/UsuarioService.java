@@ -163,13 +163,20 @@ public class UsuarioService {
             );
         }
 
-        if (usuario.getEmail().length() < 8
-                || !usuario.getEmail().contains("@")
-                || !usuario.getEmail().contains(".")
-                || usuario.getEmail().contains(" ")) {
+        String email = usuario.getEmail();
+
+        int arroba = email.indexOf("@");
+        int punto = email.lastIndexOf(".");
+
+        if (email.length() < 8
+                || arroba <= 0
+                || arroba != email.lastIndexOf("@")
+                || punto <= arroba + 1
+                || punto == email.length() - 1
+                || email.contains(" ")) {
+
             throw new DatoInvalidoException(
-                    "El email debe contener un arroba, un punto, "
-                            + "al menos 8 caracteres y no puede contener espacios"
+                    "El formato del email es inválido, debe tener al menos 8 carácteres, un ' @ ' y un ' . '"
             );
         }
     }

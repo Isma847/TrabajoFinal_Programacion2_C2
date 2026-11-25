@@ -22,8 +22,18 @@ public class VideojuegoService extends Service<Videojuego> {
     /// Solo exige que el videojuego tenga género; lanza DatoInvalidoException si falta.
     @Override
     protected void validar(Videojuego v) {
-        if(v.getGenero() == null) {
-            throw new DatoInvalidoException("El genero es obligatorio");
+        if (v.getGenero() == null) {
+            throw new DatoInvalidoException("El género es obligatorio");
+        }
+
+        if (v.getClasificacionEdad() == null) {
+            throw new DatoInvalidoException("La clasificación es obligatoria");
+        }
+
+        if (v.getDificultad() <= 0) {
+            throw new DatoInvalidoException(
+                    "La dificultad debe ser mayor a 0"
+            );
         }
     }
 
